@@ -62,8 +62,7 @@ impl Iterator for Program {
     ///
     /// @alias self.next_instruction()
     fn next(&mut self) -> Option<Self::Item> {
-        let opcode = *self.read_immediate();
-        self.program_counter += 1;
+        let opcode = *self.next_byte();
 
         if opcode == Instruction::PREFIX_INDICATION_BYTE {
             self.prefixed = true;
