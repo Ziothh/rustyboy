@@ -20,7 +20,13 @@ impl Program {
         }
     }
 
+    /// Returns the Program Counter (PC)
+    pub fn pc(&self) -> u16 {
+        self.program_counter
+    }
+
     #[inline]
+    /// Wether the next opcode byte is prefixed
     pub fn is_prefixed(&self) -> bool {
         self.prefixed
     }

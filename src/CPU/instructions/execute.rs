@@ -8,7 +8,8 @@ use super::decode::*;
 
 
 impl CPU {
-    pub fn execute(&mut self, instruction: Instruction) -> u16 {
+    /// Executes a single instruction
+    pub fn execute(&mut self, instruction: Instruction) {
         match instruction {
             // Instruction::LD(load_type) => match load_type {
             //     LoadType::Byte(target, source) => {
@@ -103,6 +104,6 @@ impl CPU {
         };
 
         // TODO: return correct PC
-        return self.program_counter;
+        // return self.program_counter;
     }
 }
