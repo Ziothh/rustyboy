@@ -1,13 +1,23 @@
 use std::ops::Index;
 
-use super::registers::Registers;
+use crate::{
+    program::Program,
+    CPU::memory::{Reg16, Reg8, Registers},
+};
 
 pub enum Instruction {
     ADD(ArithmeticTarget),
     INC(IncDecTarget),
     /// Jump
     JP(JumpTest),
+    /// Load values from memory
     LD(LoadType),
+
+    // [Function calls]
+    /// Call a function
+    CALL(JumpTest),
+    /// Return from current function
+    RET(JumpTest),
     // [Register data instructions]
     // TODO
 
@@ -44,19 +54,49 @@ pub enum Instruction {
 impl Instruction {
     pub const PREFIX_INDICATION_BYTE: u8 = 0xCB;
 
-    pub fn try_from_byte(byte: u8, prefixed: bool) -> Result<Self, String> {
-        if prefixed {
-            Self::try_from_byte_prefixed(byte)
+    pub fn try_from_opcode(byte: u8, program: &mut Program) -> Result<Self, String> {
+        if program.is_prefixed() {
+            Self::try_from_opcode_prefixed(byte, program)
         } else {
-            Self::try_from_byte_default(byte)
+            Self::try_from_opcode_default(byte, program)
         }
     }
 
     /// Non-prefixed instructions
-    pub fn try_from_byte_default(byte: u8) -> Result<Self, String> {
+    pub fn try_from_opcode_default(byte: u8, program: &mut Program) -> Result<Self, String> {
         match byte {
-            0x02 => Ok(Instruction::INC(IncDecTarget::BC)),
-            0x13 => Ok(Instruction::INC(IncDecTarget::DE)),
+            // [8-bit load instructions]
+            0x41 => Ok(Instruction::LD(
+                LoadType::Register { destination: program.next_byte().try_into()?, source: program.next_byte().try_into()?, }
+            )),
+            0x06 => Ok(Instruction::LD(
+                LoadType::Immediate { destination: program.next_byte().try_into()? }
+            )),
+            0x46 => Ok(Instruction::LD(
+                LoadType::FromIndirect { destination: program.next_byte().try_into()?, source: Reg16::HL }
+            )),
+            0x70 => Ok(Instruction::LD(
+                LoadType::ToIndirect { source: program.next_byte().try_into()?, destination: Reg16::HL }
+            )),
+            0x36 => Ok(Instruction::LD(
+                LoadType::ImmediateToIndirect
+            )),
+            0x0A => Ok(Instruction::LD(
+                LoadType::FromIndirect { destination: Reg8::A, source: Reg16::BC }
+            )),
+            0x1A => Ok(Instruction::LD(
+                LoadType::FromIndirect { destination: Reg8::A, source: Reg16::DE }
+            )),
+            0x02 => Ok(Instruction::LD(
+                LoadType::ToIndirect { source: Reg8::A, destination: Reg16::BC }
+            )),
+            0x12 => Ok(Instruction::LD(
+                LoadType::ToIndirect { source: Reg8::A, destination: Reg16::DE }
+            )),
+            0xFA => Ok(Instruction::LD(
+                LoadType::FromIndirect { destination: Reg8::A, source:  }
+            )),
+
 
             // Errors
             Self::PREFIX_INDICATION_BYTE => Err(format!("Instruction prefix indication byte 0x{byte:X} was passed instead of a valid instruction byte")),
@@ -65,7 +105,7 @@ impl Instruction {
     }
 
     /// Prefixed instructions
-    pub fn try_from_byte_prefixed(byte: u8) -> Result<Self, String> {
+    pub fn try_from_opcode_prefixed(byte: u8, program: &mut Program) -> Result<Self, String> {
         match byte {
             // Errors
             Self::PREFIX_INDICATION_BYTE => Err(format!("Instruction prefix indication byte 0xCB{byte:X} was passed instead of a valid prefixed instruction byte")),
@@ -74,28 +114,92 @@ impl Instruction {
     }
 }
 
-#[rustfmt::skip]
-pub enum LoadByteTarget {
-    A, B, C, D, E, H, L, HLI
-}
-
-#[rustfmt::skip]
-pub enum LoadByteSource {
-    A, B, C, D, E, H, L, 
-    /// Direct 8bit value
-    D8, 
-    /// Indicates that we use the HL virtual u16 as a load address
-    HLI
-}
+// #[rustfmt::skip]
+// pub enum LoadByteTarget {
+//     A, B, C, D, E, H, L, HLI
+// }
+//
+// #[rustfmt::skip]
+// pub enum LoadByteSource {
+//     A, B, C, D, E, H, L,
+//     /// Direct 8bit value
+//     D8,
+//     /// Indicates that we use the HL virtual u16 as a load address
+//     HLI
+// }
 pub enum LoadType {
-    Byte(LoadByteTarget, LoadByteSource),
-    
+    /// Load the bytes from the `source` register into the `destination` register.
+    ///
+    /// # Pseudo code
+    /// ```ignore
+    /// // example: LD B, C
+    /// B = C
+    /// ```
+    Register {
+        /// The first byte after the opcode
+        destination: Reg8,
+        /// The second byte after the opcode
+        source: Reg8,
+    },
+
+    /// Load the bytes from the immidiate memory address at the `program_counter` into the `destination` register.
+    ///
+    /// # Pseudo code
+    /// ```ignore
+    /// // example: LD B, n
+    /// B = read(PC++)
+    /// ```
+    Immediate { destination: Reg8 },
+
+    /// Load the bytes from the memory address pointed to by the `HL` combined register into the `destination` register.
+    ///
+    /// # Pseudo code
+    /// ```ignore
+    /// // example: LD B, (HL)
+    /// B = read(HL)
+    /// ```
+    FromIndirect {
+        /// The register receiving the value.
+        ///
+        /// Read from memory
+        destination: Reg8,
+        /// The combined register containing a pointer to the memory addres.
+        ///
+        /// Implicit, based on opcode
+        source: Reg16,
+    },
+
+    /// Load to the 8-bit register, data from the absolute address specified by the 16-bit register.
+    ///
+    /// # Pseudo code
+    /// ```ignore
+    /// // example: LD (HL), B
+    /// write(HL, B)
+    /// ```
+    ToIndirect {
+        /// The register containing the value.
+        ///
+        /// Read from memory
+        source: Reg8,
+        /// The combined register containing a pointer to the memory addres.
+        ///
+        /// Implicit, based on opcode
+        destination: Reg16,
+    },
+
+    /// Load the bytes from `destination` register into the memory address pointed to by the `HL` register.
+    ///
+    /// # Pseudo code
+    /// ```ignore
+    /// n = read(PC++)
+    /// write(HL, n)
+    /// ```
+    ImmediateToIndirect,
     // Word: just like the Byte type except with 16-bit values
     // AFromIndirect: load the A register with the contents from a value from a memory location whose address is stored in some location
     // IndirectFromA: load a memory location whose address is stored in some location with the contents of the A register
     // AFromByteAddress: Just like AFromIndirect except the memory address is some address in the very last byte of memory.
     // ByteAddressFromA: Just like IndirectFromA except the memory address is some address in the very last byte of memory.
-
 }
 pub enum IncDecTarget {
     // TODO: add other targets

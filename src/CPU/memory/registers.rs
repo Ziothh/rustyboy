@@ -69,6 +69,7 @@ impl Registers {
 }
 
 #[derive(Clone, Copy, Debug)]
+#[repr(u8)]
 /// Enum of the 8 bit register names on the CPU
 pub enum Reg8 {
     A,
@@ -78,6 +79,30 @@ pub enum Reg8 {
     E,
     H,
     L,
+}
+
+impl TryFrom<u8> for Reg8 {
+    type Error = String;
+
+    fn try_from(byte: u8) -> Result<Self, Self::Error> {
+        match byte {
+            0x00 => Ok(Reg8::A),
+            0x01 => Ok(Reg8::B),
+            0x02 => Ok(Reg8::C),
+            0x03 => Ok(Reg8::D),
+            0x04 => Ok(Reg8::E),
+            0x05 => Ok(Reg8::H),
+            0x06 => Ok(Reg8::L),
+            _ => Err(format!("Byte {byte:X} is not a valid register identifier")),
+        }
+    }
+}
+impl TryFrom<&u8> for Reg8 {
+    type Error = String;
+
+    fn try_from(byte: &u8) -> Result<Self, Self::Error> {
+        Self::try_from(*byte)
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -139,7 +164,9 @@ impl From<&FlagsRegister> for u8 {
 }
 
 impl From<&u8> for FlagsRegister {
-    fn from(byte: &u8) -> Self { Self::from(*byte) }
+    fn from(byte: &u8) -> Self {
+        Self::from(*byte)
+    }
 }
 impl From<u8> for FlagsRegister {
     fn from(byte: u8) -> Self {
