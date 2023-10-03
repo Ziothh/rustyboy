@@ -7,22 +7,21 @@ use crate::{
 };
 
 pub enum Instruction {
-    ADD(ArithmeticTarget),
-    INC(IncDecTarget),
-    /// Jump
-    JP(JumpTest),
     /// Load values from memory
     LD(LoadType),
     /// Load halfword
     LDH(LoadHalfwordType),
 
     // [Function calls]
-    /// Call a function
-    CALL(JumpTest),
-    /// Return from current function
-    RET(JumpTest),
-    // [Register data instructions]
-    // TODO
+    // Call a function
+    // CALL(JumpTest),
+    // Return from current function
+    // RET(JumpTest),
+    // [idk]
+    // ADD(ArithmeticTarget),
+    // INC(IncDecTarget),
+    // /// Jump
+    // JP(JumpTest),
 
     // ADDHL (add to HL) - just like ADD except that the target is added to the HL register
     // ADC (add with carry) - just like ADD except that the value of the carry flag is also added to the number
@@ -115,9 +114,31 @@ impl Instruction {
             )),
             // LDH A, (C): Load accumulator (indirect 0xFF00+C)
             0xF2 => Ok(Instruction::LDH(
-                    LoadHalfwordType::FromIndirect { source: Reg8::A, destination: Reg8::C }
-
+                LoadHalfwordType::FromIndirect { source: Reg8::C }
             )),
+            // LDH (C), A: Load from accumulator (indirect 0xFF00+C)
+            0xE2 => Ok(Instruction::LDH(
+                LoadHalfwordType::ToIndirect { destination: Reg8::C }
+            )),
+            // LDH A, (n): Load accumulator (direct 0xFF00+n)
+            0xF0 => Ok(Instruction::LDH(
+                LoadHalfwordType::FromDirect { source: *program.next_byte() }
+            )),
+            // LDH (n), A: Load from accumulator (direct 0xFF00+n)
+            0xE0 => Ok(Instruction::LDH(
+                LoadHalfwordType::ToDirect { destination: *program.next_byte() }
+            )),
+            // LD A, (HL-): Load accumulator (indirect HL, decrement)
+            0x3A => Ok(Instruction::LD(LoadType::DecFromIndirect)),
+            // LD (HL-), A: Load from accumulator (indirect HL, decrement)
+            0x32 => Ok(Instruction::LD(LoadType::DecToIndirect)),
+            // LD A, (HL+): Load accumulator (indirect HL, increment)
+            0x2A => Ok(Instruction::LD(LoadType::IncFromIndirect)),
+            // LD (HL+), A: Load from accumulator (indirect HL, increment)
+            0x22 => Ok(Instruction::LD(LoadType::IncToIndirect)),
+
+            // [16-bit load instructions]
+            
 
 
             // Errors
@@ -225,85 +246,159 @@ pub enum LoadType {
         source: Reg8,
     },
 
-
-    // Word: just like the Byte type except with 16-bit values
-    // AFromIndirect: load the A register with the contents from a value from a memory location whose address is stored in some location
-    // IndirectFromA: load a memory location whose address is stored in some location with the contents of the A register
-    // AFromByteAddress: Just like AFromIndirect except the memory address is some address in the very last byte of memory.
-    // ByteAddressFromA: Just like IndirectFromA except the memory address is some address in the very last byte of memory.
-}
-
-pub enum LoadHalfwordType {
-    /// Load to the 8-bit `source` register, data from the address specified by the 8-bit `destination` register. The full 16-bit absolute
-    /// address is obtained by setting the most significant byte to 0xFF and the least significant byte to the value of `destination`,
-    /// so the possible range is `0xFF00..=0xFFFF`.
+    /// Load to the 8-bit `A` register, data from the absolute address specified by the 16-bit register `HL`. 
+    /// The value of `HL` is decremented after the memory read.
     ///
     /// # Pseudo code
     /// ```ignore
+    /// A = read(HL--)
+    /// ```
+    DecFromIndirect,
+    /// Load to the absolute address specified by the 16-bit register `HL`, data from the 8-bit `A` register. 
+    /// The value of HL is decremented after the memory write.
+    ///
+    /// # Pseudo code
+    /// ```ignore
+    /// write(HL--, A)
+    /// ```
+    DecToIndirect,
+
+    /// Load to the 8-bit `A` register, data from the absolute address specified by the 16-bit register `HL`. 
+    /// The value of `HL` is incremented after the memory read.
+    ///
+    /// # Pseudo code
+    /// ```ignore
+    /// A = read(HL++)
+    /// ```
+    IncFromIndirect,
+    /// Load to the absolute address specified by the 16-bit register `HL`, data from the 8-bit `A` register. 
+    /// The value of `HL` is incremented after the memory write.
+    ///
+    /// # Pseudo code
+    /// ```ignore
+    /// write(HL++, A)
+    /// ```
+    IncToIndirect,
+}
+
+pub enum LoadHalfwordType {
+    /// Load to the 8-bit `A` register, data from the address specified by the 8-bit `source` register. 
+    /// The full 16-bit absolute address is obtained by setting the most significant `byte` to 0xFF 
+    /// and the least significant byte to the value of `source`, so the possible range is `0xFF00..=0xFFFF`.
+    ///
+    /// # Pseudo code
+    /// ```ignore
+    /// // Example
+    ///
     /// A = read(unsigned_16(lsb=C, msb=0xFF))
     /// ```
     FromIndirect {
         /// The register containing the lsb of the memory address
         source: Reg8,
-        /// The register the data gets loaded into
+    },
+
+    /// Load to the address specified by the 8-bit `destination` register, data from the 8-bit `A` register. 
+    /// The full 16-bit absolute address is obtained by setting the most significant byte to `0xFF` 
+    /// and the least significant byte to the value of `destination`, so the possible range is `0xFF00..=0xFFFF`.
+    ///
+    /// # Pseudo code
+    /// ```ignore
+    /// // Example
+    ///
+    /// write(unsigned_16(lsb=C, msb=0xFF), A)
+    /// ```
+    ToIndirect {
+        /// The register containing the lsb of the memory address
         destination: Reg8,
-    }
+    },
+
+    /// Load to the 8-bit `A` register, data from the address specified by the 8-bit immediate data `source`. 
+    /// The full 16-bit absolute address is obtained by setting the most significant byte to `0xFF` and the least significant byte 
+    /// to the value of `source`, so the possible range is `0xFF00..=0xFFFF`.
+    ///
+    /// # Pseudo code
+    /// ```ignore
+    /// // Example
+    ///
+    /// n = read(PC++)
+    /// A = read(unsigned_16(lsb=n, msb=0xFF))
+    /// ```
+    FromDirect {
+        /// The lsb of the memory address of the value
+        source: u8,
+    },
+
+    /// Load to the address specified by the 8-bit immediate data `destination`, data from the 8-bit `A` register. 
+    /// The full 16-bit absolute address is obtained by setting the most significant byte to `0xFF` 
+    /// and the least significant byte to the value of `A`, so the possible range is `0xFF00-0xFFFF`.
+    ///
+    /// # Pseudo code
+    /// ```ignore
+    /// // Example
+    ///
+    /// n = read(PC++)
+    /// write(unsigned_16(lsb=n, msb=0xFF), A)
+    /// ```
+    ToDirect {
+        /// The lsb of the memory address containnig the value
+        destination: u8,
+    },
 }
 
 
 
 
-
-pub enum IncDecTarget {
-    // TODO: add other targets
-    BC,
-    DE,
-}
-
-pub enum ArithmeticTarget {
-    A,
-    B,
-    C,
-    D,
-    E,
-    H,
-    L,
-}
-
-impl ArithmeticTarget {
-    pub fn to_register(&self, registers: &Registers) -> u8 {
-        match *self {
-            Self::A => registers.a,
-            Self::B => registers.b,
-            Self::C => registers.c,
-            Self::D => registers.d,
-            Self::E => registers.e,
-            Self::H => registers.h,
-            Self::L => registers.l,
-        }
-    }
-}
-
-impl Index<ArithmeticTarget> for Registers {
-    type Output = u8;
-
-    fn index(&self, index: ArithmeticTarget) -> &Self::Output {
-        match index {
-            ArithmeticTarget::A => &self.a,
-            ArithmeticTarget::B => &self.b,
-            ArithmeticTarget::C => &self.c,
-            ArithmeticTarget::D => &self.d,
-            ArithmeticTarget::E => &self.e,
-            ArithmeticTarget::H => &self.h,
-            ArithmeticTarget::L => &self.l,
-        }
-    }
-}
-
-pub enum JumpTest {
-    NotZero,
-    Zero,
-    NotCarry,
-    Carry,
-    Always,
-}
+//
+// pub enum IncDecTarget {
+//     // TODO: add other targets
+//     BC,
+//     DE,
+// }
+//
+// pub enum ArithmeticTarget {
+//     A,
+//     B,
+//     C,
+//     D,
+//     E,
+//     H,
+//     L,
+// }
+//
+// impl ArithmeticTarget {
+//     pub fn to_register(&self, registers: &Registers) -> u8 {
+//         match *self {
+//             Self::A => registers.a,
+//             Self::B => registers.b,
+//             Self::C => registers.c,
+//             Self::D => registers.d,
+//             Self::E => registers.e,
+//             Self::H => registers.h,
+//             Self::L => registers.l,
+//         }
+//     }
+// }
+//
+// impl Index<ArithmeticTarget> for Registers {
+//     type Output = u8;
+//
+//     fn index(&self, index: ArithmeticTarget) -> &Self::Output {
+//         match index {
+//             ArithmeticTarget::A => &self.a,
+//             ArithmeticTarget::B => &self.b,
+//             ArithmeticTarget::C => &self.c,
+//             ArithmeticTarget::D => &self.d,
+//             ArithmeticTarget::E => &self.e,
+//             ArithmeticTarget::H => &self.h,
+//             ArithmeticTarget::L => &self.l,
+//         }
+//     }
+// }
+//
+// pub enum JumpTest {
+//     NotZero,
+//     Zero,
+//     NotCarry,
+//     Carry,
+//     Always,
+// }
