@@ -1,5 +1,5 @@
-use self::{instructions::Instruction, registers::Registers};
-use super::memory::MemoryBus;
+use self::{instructions::Instruction, registers::Registers, stack::Stack};
+use crate::hardware::memory::MemoryBus;
 
 mod instructions;
 mod execute;
@@ -9,7 +9,7 @@ mod stack;
 pub struct CPU {
     registers: Registers,
     program_counter: u16,
-    stack: 
+    stack: Stack,
     /// Memory bus
     bus: MemoryBus,
 }
