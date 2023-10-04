@@ -2,7 +2,7 @@ use crate::{hardware::memory::MemoryBus, CPU::Instruction};
 
 /// An iterator that iterates over all of the program bytes and parses them into `Instruction`s
 pub struct Program {
-    /// The Program Counter (PC) or index into the program bytes
+    /// The Program Counter (PC) is the index into the program bytes
     program_counter: u16,
     /// The memory bus of the Game Boy
     // TODO: Check if this can't be a read-only reference into the ROM part of the memory bus

@@ -138,6 +138,7 @@ impl Instruction {
             0x22 => Ok(Instruction::LD(LoadType::IncToIndirect)),
 
             // [16-bit load instructions]
+            0x01 => Ok(Instruction::LD(LoadType::DirectToReg16)),
             
 
 
@@ -279,6 +280,15 @@ pub enum LoadType {
     /// write(HL++, A)
     /// ```
     IncToIndirect,
+
+    /// Load to the 16-bit register `Reg16`, the immediate 16-bit data nn.
+    ///
+    /// # Pseudo code
+    /// ```ignore
+    /// nn = unsigned_16(lsb=read(PC++), msb=read(PC++))
+    /// BC = nn
+    /// ```
+    DirectToReg16,
 }
 
 pub enum LoadHalfwordType {
