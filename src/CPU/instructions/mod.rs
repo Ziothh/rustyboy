@@ -1,14 +1,27 @@
 mod decode;
-pub use decode::Instruction;
 
 mod execute;
 
 
 pub enum Instruction {
+    /// Adds to the 8-bit A register, the carry flag and the 8-bit register r, and stores the result back into the A register.
+    /// 
+    /// # Example
+    /// ```ignore
+    /// # example: ADC B
+    /// if opcode == 0x88:
+    ///   result, carry_per_bit = A + flags.C + B
+    ///   A = result
+    ///   flags.Z = 1 if result == 0 else 0
+    ///   flags.N = 0
+    ///   flags.H = 1 if carry_per_bit[3] else 0
+    ///   flags.C = 1 if carry_per_bit[7] else 0
+    /// ```
+    ADC(),
     /// Load values from memory
-    LD(LoadType),
+    // LD(LoadType),
     /// Load halfword
-    LDH(LoadHalfwordType),
+    // LDH(LoadHalfwordType),
 
     // [Function calls]
     // Call a function
