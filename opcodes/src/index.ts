@@ -38,7 +38,7 @@ const parseOpcode = (
 
   return [
     ...comments.map(x => x.split("\n").map(y => `// ${y}`)).flat(),
-    `${opcode} => Instruction::${data.mnemonic},\n`,
+    `${opcode} => Ok(Instruction::${data.mnemonic}),\n`,
   ];
 }
 

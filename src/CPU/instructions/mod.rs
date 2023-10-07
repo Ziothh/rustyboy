@@ -1,14 +1,17 @@
+use super::memory::{Reg8, Reg16};
+
 mod decode;
 
 mod execute;
 
 
 pub enum Instruction {
-    /// Adds to the 8-bit A register, the carry flag and the 8-bit register r, and stores the result back into the A register.
+    /// Adds to the 8-bit `A` register, the carry flag and a value (based on ArithmeticTarget), 
+    /// and stores the result back into the `A` register.
     /// 
     /// # Example
     /// ```ignore
-    /// # example: ADC B
+    /// // Example: ADC B
     /// if opcode == 0x88:
     ///   result, carry_per_bit = A + flags.C + B
     ///   A = result
@@ -17,10 +20,26 @@ pub enum Instruction {
     ///   flags.H = 1 if carry_per_bit[3] else 0
     ///   flags.C = 1 if carry_per_bit[7] else 0
     /// ```
-    ADC(),
-    /// Load values from memory
+    ADC(ArithmeticTarget),
+    /// Adds to the 8-bit `A` register, a value (based on ArithmeticTarget), 
+    /// and stores the result back into the `A` register.
+    ///
+    /// # Example
+    /// ```ignore
+    /// // Example: ADD (HL)
+    /// if opcode == 0x86:
+    ///   data = read(HL)
+    ///   result, carry_per_bit = A + data
+    ///   A = result
+    ///   flags.Z = 1 if result == 0 else 0
+    ///   flags.N = 0
+    ///   flags.H = 1 if carry_per_bit[3] else 0
+    ///   flags.C = 1 if carry_per_bit[7] else 0
+    /// ```
+    ADD(ArithmeticTarget),
+    // /// Load values from memory
     // LD(LoadType),
-    /// Load halfword
+    // /// Load halfword
     // LDH(LoadHalfwordType),
 
     // [Function calls]
@@ -62,4 +81,19 @@ pub enum Instruction {
     // SRA (shift right arithmetic) - arithmetic shift a specific register right by 1
     // SLA (shift left arithmetic) - arithmetic shift a specific register left by 1
     // SWAP (swap nibbles) - switch upper and lower nibble of a specific register
+}
+
+pub enum ArithmeticTarget {
+    /// Add to the `A` register the data is inside of a 8-bit register
+    Reg8(Reg8),
+    /// Add to the combined `HL` register the data is inside of a combined 16-bit register
+    Reg16(Reg16),
+    /// The HL register contains the memory address of the 8-bit value
+    Indirect,
+    /// The value is equal to `mem[PC++]`
+    Immediate { value: u8 },
+    /// The stack pointer is incremented by a signed 8-bit value at `mem[PC++]`
+    SignedU8ToSP { value: i8 },
+    /// Add to the combined 16-bit `HL` register the data is inside of the Stack Pointer
+    StackPointer,
 }

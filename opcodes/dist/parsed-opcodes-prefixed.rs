@@ -20,7 +20,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x40 => Instruction::BIT,
+            0x40 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -39,7 +39,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x41 => Instruction::BIT,
+            0x41 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -58,7 +58,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x42 => Instruction::BIT,
+            0x42 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -77,7 +77,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x43 => Instruction::BIT,
+            0x43 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -96,7 +96,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x44 => Instruction::BIT,
+            0x44 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -115,7 +115,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x45 => Instruction::BIT,
+            0x45 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes 
             // Operands: [
@@ -134,7 +134,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x46 => Instruction::BIT,
+            0x46 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -153,7 +153,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x47 => Instruction::BIT,
+            0x47 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -172,7 +172,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x48 => Instruction::BIT,
+            0x48 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -191,7 +191,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x49 => Instruction::BIT,
+            0x49 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -210,7 +210,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x4A => Instruction::BIT,
+            0x4A => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -229,7 +229,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x4B => Instruction::BIT,
+            0x4B => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -248,7 +248,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x4C => Instruction::BIT,
+            0x4C => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -267,7 +267,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x4D => Instruction::BIT,
+            0x4D => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes 
             // Operands: [
@@ -286,7 +286,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x4E => Instruction::BIT,
+            0x4E => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -305,7 +305,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x4F => Instruction::BIT,
+            0x4F => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -324,7 +324,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x50 => Instruction::BIT,
+            0x50 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -343,7 +343,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x51 => Instruction::BIT,
+            0x51 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -362,7 +362,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x52 => Instruction::BIT,
+            0x52 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -381,7 +381,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x53 => Instruction::BIT,
+            0x53 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -400,7 +400,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x54 => Instruction::BIT,
+            0x54 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -419,7 +419,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x55 => Instruction::BIT,
+            0x55 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes 
             // Operands: [
@@ -438,7 +438,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x56 => Instruction::BIT,
+            0x56 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -457,7 +457,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x57 => Instruction::BIT,
+            0x57 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -476,7 +476,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x58 => Instruction::BIT,
+            0x58 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -495,7 +495,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x59 => Instruction::BIT,
+            0x59 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -514,7 +514,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x5A => Instruction::BIT,
+            0x5A => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -533,7 +533,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x5B => Instruction::BIT,
+            0x5B => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -552,7 +552,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x5C => Instruction::BIT,
+            0x5C => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -571,7 +571,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x5D => Instruction::BIT,
+            0x5D => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes 
             // Operands: [
@@ -590,7 +590,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x5E => Instruction::BIT,
+            0x5E => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -609,7 +609,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x5F => Instruction::BIT,
+            0x5F => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -628,7 +628,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x60 => Instruction::BIT,
+            0x60 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -647,7 +647,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x61 => Instruction::BIT,
+            0x61 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -666,7 +666,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x62 => Instruction::BIT,
+            0x62 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -685,7 +685,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x63 => Instruction::BIT,
+            0x63 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -704,7 +704,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x64 => Instruction::BIT,
+            0x64 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -723,7 +723,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x65 => Instruction::BIT,
+            0x65 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes 
             // Operands: [
@@ -742,7 +742,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x66 => Instruction::BIT,
+            0x66 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -761,7 +761,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x67 => Instruction::BIT,
+            0x67 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -780,7 +780,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x68 => Instruction::BIT,
+            0x68 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -799,7 +799,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x69 => Instruction::BIT,
+            0x69 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -818,7 +818,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x6A => Instruction::BIT,
+            0x6A => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -837,7 +837,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x6B => Instruction::BIT,
+            0x6B => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -856,7 +856,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x6C => Instruction::BIT,
+            0x6C => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -875,7 +875,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x6D => Instruction::BIT,
+            0x6D => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes 
             // Operands: [
@@ -894,7 +894,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x6E => Instruction::BIT,
+            0x6E => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -913,7 +913,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x6F => Instruction::BIT,
+            0x6F => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -932,7 +932,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x70 => Instruction::BIT,
+            0x70 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -951,7 +951,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x71 => Instruction::BIT,
+            0x71 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -970,7 +970,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x72 => Instruction::BIT,
+            0x72 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -989,7 +989,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x73 => Instruction::BIT,
+            0x73 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -1008,7 +1008,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x74 => Instruction::BIT,
+            0x74 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -1027,7 +1027,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x75 => Instruction::BIT,
+            0x75 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes 
             // Operands: [
@@ -1046,7 +1046,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x76 => Instruction::BIT,
+            0x76 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -1065,7 +1065,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x77 => Instruction::BIT,
+            0x77 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -1084,7 +1084,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x78 => Instruction::BIT,
+            0x78 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -1103,7 +1103,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x79 => Instruction::BIT,
+            0x79 => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -1122,7 +1122,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x7A => Instruction::BIT,
+            0x7A => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -1141,7 +1141,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x7B => Instruction::BIT,
+            0x7B => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -1160,7 +1160,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x7C => Instruction::BIT,
+            0x7C => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -1179,7 +1179,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x7D => Instruction::BIT,
+            0x7D => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes 
             // Operands: [
@@ -1198,7 +1198,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x7E => Instruction::BIT,
+            0x7E => Ok(Instruction::BIT),
 
             // Instruction: BIT 2 bytes (immediate)
             // Operands: [
@@ -1217,7 +1217,7 @@ impl Instruction {
             //   "H": "1",
             //   "C": "-"
             // }
-            0x7F => Instruction::BIT,
+            0x7F => Ok(Instruction::BIT),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1236,7 +1236,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x80 => Instruction::RES,
+            0x80 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1255,7 +1255,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x81 => Instruction::RES,
+            0x81 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1274,7 +1274,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x82 => Instruction::RES,
+            0x82 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1293,7 +1293,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x83 => Instruction::RES,
+            0x83 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1312,7 +1312,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x84 => Instruction::RES,
+            0x84 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1331,7 +1331,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x85 => Instruction::RES,
+            0x85 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes 
             // Operands: [
@@ -1350,7 +1350,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x86 => Instruction::RES,
+            0x86 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1369,7 +1369,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x87 => Instruction::RES,
+            0x87 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1388,7 +1388,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x88 => Instruction::RES,
+            0x88 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1407,7 +1407,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x89 => Instruction::RES,
+            0x89 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1426,7 +1426,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x8A => Instruction::RES,
+            0x8A => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1445,7 +1445,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x8B => Instruction::RES,
+            0x8B => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1464,7 +1464,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x8C => Instruction::RES,
+            0x8C => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1483,7 +1483,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x8D => Instruction::RES,
+            0x8D => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes 
             // Operands: [
@@ -1502,7 +1502,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x8E => Instruction::RES,
+            0x8E => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1521,7 +1521,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x8F => Instruction::RES,
+            0x8F => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1540,7 +1540,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x90 => Instruction::RES,
+            0x90 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1559,7 +1559,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x91 => Instruction::RES,
+            0x91 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1578,7 +1578,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x92 => Instruction::RES,
+            0x92 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1597,7 +1597,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x93 => Instruction::RES,
+            0x93 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1616,7 +1616,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x94 => Instruction::RES,
+            0x94 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1635,7 +1635,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x95 => Instruction::RES,
+            0x95 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes 
             // Operands: [
@@ -1654,7 +1654,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x96 => Instruction::RES,
+            0x96 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1673,7 +1673,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x97 => Instruction::RES,
+            0x97 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1692,7 +1692,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x98 => Instruction::RES,
+            0x98 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1711,7 +1711,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x99 => Instruction::RES,
+            0x99 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1730,7 +1730,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x9A => Instruction::RES,
+            0x9A => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1749,7 +1749,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x9B => Instruction::RES,
+            0x9B => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1768,7 +1768,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x9C => Instruction::RES,
+            0x9C => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1787,7 +1787,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x9D => Instruction::RES,
+            0x9D => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes 
             // Operands: [
@@ -1806,7 +1806,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x9E => Instruction::RES,
+            0x9E => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1825,7 +1825,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0x9F => Instruction::RES,
+            0x9F => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1844,7 +1844,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xA0 => Instruction::RES,
+            0xA0 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1863,7 +1863,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xA1 => Instruction::RES,
+            0xA1 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1882,7 +1882,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xA2 => Instruction::RES,
+            0xA2 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1901,7 +1901,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xA3 => Instruction::RES,
+            0xA3 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1920,7 +1920,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xA4 => Instruction::RES,
+            0xA4 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1939,7 +1939,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xA5 => Instruction::RES,
+            0xA5 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes 
             // Operands: [
@@ -1958,7 +1958,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xA6 => Instruction::RES,
+            0xA6 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1977,7 +1977,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xA7 => Instruction::RES,
+            0xA7 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -1996,7 +1996,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xA8 => Instruction::RES,
+            0xA8 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2015,7 +2015,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xA9 => Instruction::RES,
+            0xA9 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2034,7 +2034,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xAA => Instruction::RES,
+            0xAA => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2053,7 +2053,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xAB => Instruction::RES,
+            0xAB => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2072,7 +2072,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xAC => Instruction::RES,
+            0xAC => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2091,7 +2091,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xAD => Instruction::RES,
+            0xAD => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes 
             // Operands: [
@@ -2110,7 +2110,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xAE => Instruction::RES,
+            0xAE => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2129,7 +2129,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xAF => Instruction::RES,
+            0xAF => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2148,7 +2148,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xB0 => Instruction::RES,
+            0xB0 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2167,7 +2167,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xB1 => Instruction::RES,
+            0xB1 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2186,7 +2186,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xB2 => Instruction::RES,
+            0xB2 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2205,7 +2205,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xB3 => Instruction::RES,
+            0xB3 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2224,7 +2224,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xB4 => Instruction::RES,
+            0xB4 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2243,7 +2243,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xB5 => Instruction::RES,
+            0xB5 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes 
             // Operands: [
@@ -2262,7 +2262,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xB6 => Instruction::RES,
+            0xB6 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2281,7 +2281,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xB7 => Instruction::RES,
+            0xB7 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2300,7 +2300,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xB8 => Instruction::RES,
+            0xB8 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2319,7 +2319,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xB9 => Instruction::RES,
+            0xB9 => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2338,7 +2338,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xBA => Instruction::RES,
+            0xBA => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2357,7 +2357,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xBB => Instruction::RES,
+            0xBB => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2376,7 +2376,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xBC => Instruction::RES,
+            0xBC => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2395,7 +2395,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xBD => Instruction::RES,
+            0xBD => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes 
             // Operands: [
@@ -2414,7 +2414,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xBE => Instruction::RES,
+            0xBE => Ok(Instruction::RES),
 
             // Instruction: RES 2 bytes (immediate)
             // Operands: [
@@ -2433,7 +2433,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xBF => Instruction::RES,
+            0xBF => Ok(Instruction::RES),
 
             // Instruction: RL 2 bytes (immediate)
             // Operands: [
@@ -2448,7 +2448,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x10 => Instruction::RL,
+            0x10 => Ok(Instruction::RL),
 
             // Instruction: RL 2 bytes (immediate)
             // Operands: [
@@ -2463,7 +2463,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x11 => Instruction::RL,
+            0x11 => Ok(Instruction::RL),
 
             // Instruction: RL 2 bytes (immediate)
             // Operands: [
@@ -2478,7 +2478,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x12 => Instruction::RL,
+            0x12 => Ok(Instruction::RL),
 
             // Instruction: RL 2 bytes (immediate)
             // Operands: [
@@ -2493,7 +2493,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x13 => Instruction::RL,
+            0x13 => Ok(Instruction::RL),
 
             // Instruction: RL 2 bytes (immediate)
             // Operands: [
@@ -2508,7 +2508,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x14 => Instruction::RL,
+            0x14 => Ok(Instruction::RL),
 
             // Instruction: RL 2 bytes (immediate)
             // Operands: [
@@ -2523,7 +2523,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x15 => Instruction::RL,
+            0x15 => Ok(Instruction::RL),
 
             // Instruction: RL 2 bytes 
             // Operands: [
@@ -2538,7 +2538,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x16 => Instruction::RL,
+            0x16 => Ok(Instruction::RL),
 
             // Instruction: RL 2 bytes (immediate)
             // Operands: [
@@ -2553,7 +2553,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x17 => Instruction::RL,
+            0x17 => Ok(Instruction::RL),
 
             // Instruction: RLC 2 bytes (immediate)
             // Operands: [
@@ -2568,7 +2568,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x00 => Instruction::RLC,
+            0x00 => Ok(Instruction::RLC),
 
             // Instruction: RLC 2 bytes (immediate)
             // Operands: [
@@ -2583,7 +2583,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x01 => Instruction::RLC,
+            0x01 => Ok(Instruction::RLC),
 
             // Instruction: RLC 2 bytes (immediate)
             // Operands: [
@@ -2598,7 +2598,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x02 => Instruction::RLC,
+            0x02 => Ok(Instruction::RLC),
 
             // Instruction: RLC 2 bytes (immediate)
             // Operands: [
@@ -2613,7 +2613,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x03 => Instruction::RLC,
+            0x03 => Ok(Instruction::RLC),
 
             // Instruction: RLC 2 bytes (immediate)
             // Operands: [
@@ -2628,7 +2628,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x04 => Instruction::RLC,
+            0x04 => Ok(Instruction::RLC),
 
             // Instruction: RLC 2 bytes (immediate)
             // Operands: [
@@ -2643,7 +2643,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x05 => Instruction::RLC,
+            0x05 => Ok(Instruction::RLC),
 
             // Instruction: RLC 2 bytes 
             // Operands: [
@@ -2658,7 +2658,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x06 => Instruction::RLC,
+            0x06 => Ok(Instruction::RLC),
 
             // Instruction: RLC 2 bytes (immediate)
             // Operands: [
@@ -2673,7 +2673,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x07 => Instruction::RLC,
+            0x07 => Ok(Instruction::RLC),
 
             // Instruction: RR 2 bytes (immediate)
             // Operands: [
@@ -2688,7 +2688,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x18 => Instruction::RR,
+            0x18 => Ok(Instruction::RR),
 
             // Instruction: RR 2 bytes (immediate)
             // Operands: [
@@ -2703,7 +2703,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x19 => Instruction::RR,
+            0x19 => Ok(Instruction::RR),
 
             // Instruction: RR 2 bytes (immediate)
             // Operands: [
@@ -2718,7 +2718,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x1A => Instruction::RR,
+            0x1A => Ok(Instruction::RR),
 
             // Instruction: RR 2 bytes (immediate)
             // Operands: [
@@ -2733,7 +2733,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x1B => Instruction::RR,
+            0x1B => Ok(Instruction::RR),
 
             // Instruction: RR 2 bytes (immediate)
             // Operands: [
@@ -2748,7 +2748,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x1C => Instruction::RR,
+            0x1C => Ok(Instruction::RR),
 
             // Instruction: RR 2 bytes (immediate)
             // Operands: [
@@ -2763,7 +2763,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x1D => Instruction::RR,
+            0x1D => Ok(Instruction::RR),
 
             // Instruction: RR 2 bytes 
             // Operands: [
@@ -2778,7 +2778,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x1E => Instruction::RR,
+            0x1E => Ok(Instruction::RR),
 
             // Instruction: RR 2 bytes (immediate)
             // Operands: [
@@ -2793,7 +2793,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x1F => Instruction::RR,
+            0x1F => Ok(Instruction::RR),
 
             // Instruction: RRC 2 bytes (immediate)
             // Operands: [
@@ -2808,7 +2808,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x08 => Instruction::RRC,
+            0x08 => Ok(Instruction::RRC),
 
             // Instruction: RRC 2 bytes (immediate)
             // Operands: [
@@ -2823,7 +2823,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x09 => Instruction::RRC,
+            0x09 => Ok(Instruction::RRC),
 
             // Instruction: RRC 2 bytes (immediate)
             // Operands: [
@@ -2838,7 +2838,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x0A => Instruction::RRC,
+            0x0A => Ok(Instruction::RRC),
 
             // Instruction: RRC 2 bytes (immediate)
             // Operands: [
@@ -2853,7 +2853,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x0B => Instruction::RRC,
+            0x0B => Ok(Instruction::RRC),
 
             // Instruction: RRC 2 bytes (immediate)
             // Operands: [
@@ -2868,7 +2868,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x0C => Instruction::RRC,
+            0x0C => Ok(Instruction::RRC),
 
             // Instruction: RRC 2 bytes (immediate)
             // Operands: [
@@ -2883,7 +2883,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x0D => Instruction::RRC,
+            0x0D => Ok(Instruction::RRC),
 
             // Instruction: RRC 2 bytes 
             // Operands: [
@@ -2898,7 +2898,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x0E => Instruction::RRC,
+            0x0E => Ok(Instruction::RRC),
 
             // Instruction: RRC 2 bytes (immediate)
             // Operands: [
@@ -2913,7 +2913,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x0F => Instruction::RRC,
+            0x0F => Ok(Instruction::RRC),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -2932,7 +2932,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xC0 => Instruction::SET,
+            0xC0 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -2951,7 +2951,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xC1 => Instruction::SET,
+            0xC1 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -2970,7 +2970,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xC2 => Instruction::SET,
+            0xC2 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -2989,7 +2989,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xC3 => Instruction::SET,
+            0xC3 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3008,7 +3008,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xC4 => Instruction::SET,
+            0xC4 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3027,7 +3027,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xC5 => Instruction::SET,
+            0xC5 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes 
             // Operands: [
@@ -3046,7 +3046,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xC6 => Instruction::SET,
+            0xC6 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3065,7 +3065,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xC7 => Instruction::SET,
+            0xC7 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3084,7 +3084,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xC8 => Instruction::SET,
+            0xC8 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3103,7 +3103,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xC9 => Instruction::SET,
+            0xC9 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3122,7 +3122,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xCA => Instruction::SET,
+            0xCA => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3141,7 +3141,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xCB => Instruction::SET,
+            0xCB => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3160,7 +3160,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xCC => Instruction::SET,
+            0xCC => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3179,7 +3179,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xCD => Instruction::SET,
+            0xCD => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes 
             // Operands: [
@@ -3198,7 +3198,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xCE => Instruction::SET,
+            0xCE => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3217,7 +3217,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xCF => Instruction::SET,
+            0xCF => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3236,7 +3236,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xD0 => Instruction::SET,
+            0xD0 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3255,7 +3255,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xD1 => Instruction::SET,
+            0xD1 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3274,7 +3274,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xD2 => Instruction::SET,
+            0xD2 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3293,7 +3293,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xD3 => Instruction::SET,
+            0xD3 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3312,7 +3312,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xD4 => Instruction::SET,
+            0xD4 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3331,7 +3331,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xD5 => Instruction::SET,
+            0xD5 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes 
             // Operands: [
@@ -3350,7 +3350,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xD6 => Instruction::SET,
+            0xD6 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3369,7 +3369,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xD7 => Instruction::SET,
+            0xD7 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3388,7 +3388,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xD8 => Instruction::SET,
+            0xD8 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3407,7 +3407,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xD9 => Instruction::SET,
+            0xD9 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3426,7 +3426,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xDA => Instruction::SET,
+            0xDA => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3445,7 +3445,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xDB => Instruction::SET,
+            0xDB => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3464,7 +3464,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xDC => Instruction::SET,
+            0xDC => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3483,7 +3483,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xDD => Instruction::SET,
+            0xDD => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes 
             // Operands: [
@@ -3502,7 +3502,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xDE => Instruction::SET,
+            0xDE => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3521,7 +3521,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xDF => Instruction::SET,
+            0xDF => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3540,7 +3540,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xE0 => Instruction::SET,
+            0xE0 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3559,7 +3559,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xE1 => Instruction::SET,
+            0xE1 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3578,7 +3578,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xE2 => Instruction::SET,
+            0xE2 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3597,7 +3597,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xE3 => Instruction::SET,
+            0xE3 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3616,7 +3616,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xE4 => Instruction::SET,
+            0xE4 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3635,7 +3635,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xE5 => Instruction::SET,
+            0xE5 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes 
             // Operands: [
@@ -3654,7 +3654,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xE6 => Instruction::SET,
+            0xE6 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3673,7 +3673,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xE7 => Instruction::SET,
+            0xE7 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3692,7 +3692,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xE8 => Instruction::SET,
+            0xE8 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3711,7 +3711,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xE9 => Instruction::SET,
+            0xE9 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3730,7 +3730,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xEA => Instruction::SET,
+            0xEA => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3749,7 +3749,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xEB => Instruction::SET,
+            0xEB => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3768,7 +3768,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xEC => Instruction::SET,
+            0xEC => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3787,7 +3787,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xED => Instruction::SET,
+            0xED => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes 
             // Operands: [
@@ -3806,7 +3806,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xEE => Instruction::SET,
+            0xEE => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3825,7 +3825,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xEF => Instruction::SET,
+            0xEF => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3844,7 +3844,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xF0 => Instruction::SET,
+            0xF0 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3863,7 +3863,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xF1 => Instruction::SET,
+            0xF1 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3882,7 +3882,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xF2 => Instruction::SET,
+            0xF2 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3901,7 +3901,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xF3 => Instruction::SET,
+            0xF3 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3920,7 +3920,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xF4 => Instruction::SET,
+            0xF4 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3939,7 +3939,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xF5 => Instruction::SET,
+            0xF5 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes 
             // Operands: [
@@ -3958,7 +3958,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xF6 => Instruction::SET,
+            0xF6 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3977,7 +3977,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xF7 => Instruction::SET,
+            0xF7 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -3996,7 +3996,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xF8 => Instruction::SET,
+            0xF8 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -4015,7 +4015,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xF9 => Instruction::SET,
+            0xF9 => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -4034,7 +4034,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xFA => Instruction::SET,
+            0xFA => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -4053,7 +4053,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xFB => Instruction::SET,
+            0xFB => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -4072,7 +4072,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xFC => Instruction::SET,
+            0xFC => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -4091,7 +4091,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xFD => Instruction::SET,
+            0xFD => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes 
             // Operands: [
@@ -4110,7 +4110,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xFE => Instruction::SET,
+            0xFE => Ok(Instruction::SET),
 
             // Instruction: SET 2 bytes (immediate)
             // Operands: [
@@ -4129,7 +4129,7 @@ impl Instruction {
             //   "H": "-",
             //   "C": "-"
             // }
-            0xFF => Instruction::SET,
+            0xFF => Ok(Instruction::SET),
 
             // Instruction: SLA 2 bytes (immediate)
             // Operands: [
@@ -4144,7 +4144,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x20 => Instruction::SLA,
+            0x20 => Ok(Instruction::SLA),
 
             // Instruction: SLA 2 bytes (immediate)
             // Operands: [
@@ -4159,7 +4159,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x21 => Instruction::SLA,
+            0x21 => Ok(Instruction::SLA),
 
             // Instruction: SLA 2 bytes (immediate)
             // Operands: [
@@ -4174,7 +4174,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x22 => Instruction::SLA,
+            0x22 => Ok(Instruction::SLA),
 
             // Instruction: SLA 2 bytes (immediate)
             // Operands: [
@@ -4189,7 +4189,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x23 => Instruction::SLA,
+            0x23 => Ok(Instruction::SLA),
 
             // Instruction: SLA 2 bytes (immediate)
             // Operands: [
@@ -4204,7 +4204,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x24 => Instruction::SLA,
+            0x24 => Ok(Instruction::SLA),
 
             // Instruction: SLA 2 bytes (immediate)
             // Operands: [
@@ -4219,7 +4219,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x25 => Instruction::SLA,
+            0x25 => Ok(Instruction::SLA),
 
             // Instruction: SLA 2 bytes 
             // Operands: [
@@ -4234,7 +4234,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x26 => Instruction::SLA,
+            0x26 => Ok(Instruction::SLA),
 
             // Instruction: SLA 2 bytes (immediate)
             // Operands: [
@@ -4249,7 +4249,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x27 => Instruction::SLA,
+            0x27 => Ok(Instruction::SLA),
 
             // Instruction: SRA 2 bytes (immediate)
             // Operands: [
@@ -4264,7 +4264,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x28 => Instruction::SRA,
+            0x28 => Ok(Instruction::SRA),
 
             // Instruction: SRA 2 bytes (immediate)
             // Operands: [
@@ -4279,7 +4279,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x29 => Instruction::SRA,
+            0x29 => Ok(Instruction::SRA),
 
             // Instruction: SRA 2 bytes (immediate)
             // Operands: [
@@ -4294,7 +4294,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x2A => Instruction::SRA,
+            0x2A => Ok(Instruction::SRA),
 
             // Instruction: SRA 2 bytes (immediate)
             // Operands: [
@@ -4309,7 +4309,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x2B => Instruction::SRA,
+            0x2B => Ok(Instruction::SRA),
 
             // Instruction: SRA 2 bytes (immediate)
             // Operands: [
@@ -4324,7 +4324,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x2C => Instruction::SRA,
+            0x2C => Ok(Instruction::SRA),
 
             // Instruction: SRA 2 bytes (immediate)
             // Operands: [
@@ -4339,7 +4339,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x2D => Instruction::SRA,
+            0x2D => Ok(Instruction::SRA),
 
             // Instruction: SRA 2 bytes 
             // Operands: [
@@ -4354,7 +4354,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x2E => Instruction::SRA,
+            0x2E => Ok(Instruction::SRA),
 
             // Instruction: SRA 2 bytes (immediate)
             // Operands: [
@@ -4369,7 +4369,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x2F => Instruction::SRA,
+            0x2F => Ok(Instruction::SRA),
 
             // Instruction: SRL 2 bytes (immediate)
             // Operands: [
@@ -4384,7 +4384,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x38 => Instruction::SRL,
+            0x38 => Ok(Instruction::SRL),
 
             // Instruction: SRL 2 bytes (immediate)
             // Operands: [
@@ -4399,7 +4399,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x39 => Instruction::SRL,
+            0x39 => Ok(Instruction::SRL),
 
             // Instruction: SRL 2 bytes (immediate)
             // Operands: [
@@ -4414,7 +4414,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x3A => Instruction::SRL,
+            0x3A => Ok(Instruction::SRL),
 
             // Instruction: SRL 2 bytes (immediate)
             // Operands: [
@@ -4429,7 +4429,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x3B => Instruction::SRL,
+            0x3B => Ok(Instruction::SRL),
 
             // Instruction: SRL 2 bytes (immediate)
             // Operands: [
@@ -4444,7 +4444,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x3C => Instruction::SRL,
+            0x3C => Ok(Instruction::SRL),
 
             // Instruction: SRL 2 bytes (immediate)
             // Operands: [
@@ -4459,7 +4459,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x3D => Instruction::SRL,
+            0x3D => Ok(Instruction::SRL),
 
             // Instruction: SRL 2 bytes 
             // Operands: [
@@ -4474,7 +4474,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x3E => Instruction::SRL,
+            0x3E => Ok(Instruction::SRL),
 
             // Instruction: SRL 2 bytes (immediate)
             // Operands: [
@@ -4489,7 +4489,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "C"
             // }
-            0x3F => Instruction::SRL,
+            0x3F => Ok(Instruction::SRL),
 
             // Instruction: SWAP 2 bytes (immediate)
             // Operands: [
@@ -4504,7 +4504,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "0"
             // }
-            0x30 => Instruction::SWAP,
+            0x30 => Ok(Instruction::SWAP),
 
             // Instruction: SWAP 2 bytes (immediate)
             // Operands: [
@@ -4519,7 +4519,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "0"
             // }
-            0x31 => Instruction::SWAP,
+            0x31 => Ok(Instruction::SWAP),
 
             // Instruction: SWAP 2 bytes (immediate)
             // Operands: [
@@ -4534,7 +4534,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "0"
             // }
-            0x32 => Instruction::SWAP,
+            0x32 => Ok(Instruction::SWAP),
 
             // Instruction: SWAP 2 bytes (immediate)
             // Operands: [
@@ -4549,7 +4549,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "0"
             // }
-            0x33 => Instruction::SWAP,
+            0x33 => Ok(Instruction::SWAP),
 
             // Instruction: SWAP 2 bytes (immediate)
             // Operands: [
@@ -4564,7 +4564,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "0"
             // }
-            0x34 => Instruction::SWAP,
+            0x34 => Ok(Instruction::SWAP),
 
             // Instruction: SWAP 2 bytes (immediate)
             // Operands: [
@@ -4579,7 +4579,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "0"
             // }
-            0x35 => Instruction::SWAP,
+            0x35 => Ok(Instruction::SWAP),
 
             // Instruction: SWAP 2 bytes 
             // Operands: [
@@ -4594,7 +4594,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "0"
             // }
-            0x36 => Instruction::SWAP,
+            0x36 => Ok(Instruction::SWAP),
 
             // Instruction: SWAP 2 bytes (immediate)
             // Operands: [
@@ -4609,7 +4609,7 @@ impl Instruction {
             //   "H": "0",
             //   "C": "0"
             // }
-            0x37 => Instruction::SWAP,
+            0x37 => Ok(Instruction::SWAP),
 
 
 
