@@ -31,9 +31,13 @@ const parseOpcode = (
   data: (typeof opcodeModes[Mode])[keyof typeof opcodeModes[Mode]]
 ): string[] => {
   const comments = [
-    `Instruction: ${data.mnemonic} ${data.bytes} byte${data.bytes === 1 ? '' : 's'} ${data.immediate ? '(immediate)' : ''}`,
-    `Operands: ${jsonToPrettyInline(data.operands)}`,
-    `Flags: ${jsonToPrettyInline(data.flags)}`,
+    `Instruction: ${data.mnemonic} ${data.immediate ? '(immediate)' : ''}`,
+    `{ bytes: ${data.bytes}, cycles: ${data.cycles.length === 1 ? data.cycles : JSON.stringify(data.cycles)} }`,
+    // `Bytes: ${data.bytes}`,
+    // `Cycles: ${data.cycles}`,
+    `Operands: ${data.operands.map(x => `\n    ${x.name} ${x.immediate ? '(immediate)' : ''}`)}`,
+    `Flags: Z N H C\n` +
+    `       ${data.flags.Z} ${data.flags.N} ${data.flags.H} ${data.flags.C}`,
   ]
 
   return [

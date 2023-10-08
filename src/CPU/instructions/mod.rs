@@ -37,6 +37,9 @@ pub enum Instruction {
     ///   flags.C = 1 if carry_per_bit[7] else 0
     /// ```
     ADD(ArithmeticTarget),
+
+    AND(ArithmeticTarget),
+
     // /// Load values from memory
     // LD(LoadType),
     // /// Load halfword
