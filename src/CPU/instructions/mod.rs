@@ -40,6 +40,11 @@ pub enum Instruction {
 
     AND(ArithmeticTarget),
 
+    CALL {
+        address: u16,
+        condition: JumpCondition,
+    }
+
     // /// Load values from memory
     // LD(LoadType),
     // /// Load halfword
@@ -99,4 +104,19 @@ pub enum ArithmeticTarget {
     SignedU8ToSP { value: i8 },
     /// Add to the combined 16-bit `HL` register the data is inside of the Stack Pointer
     StackPointer,
+}
+
+
+/// Condition wether the CPU should execute JP-like instructions
+pub enum JumpCondition {
+    /// Jump if the Z(ero) flag is set to `0`
+    NotZero,
+    /// Jump if the Z(ero) flag is set to `!`
+    Zero,
+    /// Jump if the C(arry) flag is set to `0`
+    NotCarry,
+    /// Jump if the C(arry) flag is set to `1`
+    Carry,
+    /// Always jump
+    Always,
 }

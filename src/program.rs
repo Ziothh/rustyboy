@@ -1,4 +1,4 @@
-use crate::{hardware::memory::MemoryBus, CPU::Instruction};
+use crate::{prelude::NibbleFrom16bit, hardware::memory::MemoryBus, CPU::Instruction};
 
 /// An iterator that iterates over all of the program bytes and parses them into `Instruction`s
 pub struct Program {
@@ -46,7 +46,20 @@ impl Program {
         return byte;
     }
 
-    /// Decodes the next instruction of the program
+    /// Reads the next 2 bytes and combines them to create a `u16`.
+    ///
+    /// The `program_counter` is incremented by `2` (`1` for each byte).
+    ///
+    /// Read bytes:
+    ///  - first byte is the lower nibble (lsb)
+    ///  - second byte is the upper nibble (msb)
+    pub fn next_u16(&mut self) -> u16 {
+        u16::from_nibbles(*self.next_byte(), *self.next_byte())
+    }
+
+    /// Decodes the next instruction of the program.
+    ///
+    /// The `program_counter` is incremented by `n` (based on the instruction).
     ///
     /// @alias self.next()
     #[inline]

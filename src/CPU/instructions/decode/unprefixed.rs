@@ -220,7 +220,7 @@ impl Instruction {
             //     B (immediate)
             // Flags: Z N H C
             //        Z 0 1 0
-            0xA0 => Ok(Instruction::AND),
+            0xA0 => Ok(Instruction::AND(ArithmeticTarget::Reg8(Reg8::B))),
 
             // Instruction: AND (immediate)
             // { bytes: 1, cycles: 4 }
@@ -229,7 +229,7 @@ impl Instruction {
             //     C (immediate)
             // Flags: Z N H C
             //        Z 0 1 0
-            0xA1 => Ok(Instruction::AND),
+            0xA1 => Ok(Instruction::AND(ArithmeticTarget::Reg8(Reg8::C))),
 
             // Instruction: AND (immediate)
             // { bytes: 1, cycles: 4 }
@@ -238,7 +238,7 @@ impl Instruction {
             //     D (immediate)
             // Flags: Z N H C
             //        Z 0 1 0
-            0xA2 => Ok(Instruction::AND),
+            0xA2 => Ok(Instruction::AND(ArithmeticTarget::Reg8(Reg8::D))),
 
             // Instruction: AND (immediate)
             // { bytes: 1, cycles: 4 }
@@ -247,7 +247,7 @@ impl Instruction {
             //     E (immediate)
             // Flags: Z N H C
             //        Z 0 1 0
-            0xA3 => Ok(Instruction::AND),
+            0xA3 => Ok(Instruction::AND(ArithmeticTarget::Reg8(Reg8::E))),
 
             // Instruction: AND (immediate)
             // { bytes: 1, cycles: 4 }
@@ -256,7 +256,7 @@ impl Instruction {
             //     H (immediate)
             // Flags: Z N H C
             //        Z 0 1 0
-            0xA4 => Ok(Instruction::AND),
+            0xA4 => Ok(Instruction::AND(ArithmeticTarget::Reg8(Reg8::H))),
 
             // Instruction: AND (immediate)
             // { bytes: 1, cycles: 4 }
@@ -265,7 +265,7 @@ impl Instruction {
             //     L (immediate)
             // Flags: Z N H C
             //        Z 0 1 0
-            0xA5 => Ok(Instruction::AND),
+            0xA5 => Ok(Instruction::AND(ArithmeticTarget::Reg8(Reg8::L))),
 
             // Instruction: AND 
             // { bytes: 1, cycles: 8 }
@@ -274,7 +274,7 @@ impl Instruction {
             //     HL 
             // Flags: Z N H C
             //        Z 0 1 0
-            0xA6 => Ok(Instruction::AND),
+            0xA6 => Ok(Instruction::AND(ArithmeticTarget::Indirect)),
 
             // Instruction: AND (immediate)
             // { bytes: 1, cycles: 4 }
@@ -283,7 +283,7 @@ impl Instruction {
             //     A (immediate)
             // Flags: Z N H C
             //        Z 0 1 0
-            0xA7 => Ok(Instruction::AND),
+            0xA7 => Ok(Instruction::AND(ArithmeticTarget::Reg8(Reg8::A))),
 
             // Instruction: AND (immediate)
             // { bytes: 2, cycles: 8 }
@@ -292,7 +292,7 @@ impl Instruction {
             //     n8 (immediate)
             // Flags: Z N H C
             //        Z 0 1 0
-            0xE6 => Ok(Instruction::AND),
+            0xE6 => Ok(Instruction::AND(ArithmeticTarget::Immediate { value: *program.next_byte() })),
 
             // Instruction: CALL (immediate)
             // { bytes: 3, cycles: [24,12] }
@@ -301,7 +301,10 @@ impl Instruction {
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xC4 => Ok(Instruction::CALL),
+            0xC4 => Ok(Instruction::CALL { 
+                address: program.next_u16(),
+                condition: crate::CPU::instructions::JumpCondition::NotZero,
+            }),
 
             // Instruction: CALL (immediate)
             // { bytes: 3, cycles: [24,12] }
@@ -310,7 +313,10 @@ impl Instruction {
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xCC => Ok(Instruction::CALL),
+            0xCC => Ok(Instruction::CALL { 
+                address: program.next_u16(),
+                condition: crate::CPU::instructions::JumpCondition::Zero,
+            }),
 
             // Instruction: CALL (immediate)
             // { bytes: 3, cycles: 24 }
@@ -318,7 +324,10 @@ impl Instruction {
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xCD => Ok(Instruction::CALL),
+            0xCD => Ok(Instruction::CALL { 
+                address: program.next_u16(),
+                condition: crate::CPU::instructions::JumpCondition::Always,
+            }),
 
             // Instruction: CALL (immediate)
             // { bytes: 3, cycles: [24,12] }
@@ -327,7 +336,10 @@ impl Instruction {
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xD4 => Ok(Instruction::CALL),
+            0xD4 => Ok(Instruction::CALL { 
+                address: program.next_u16(),
+                condition: crate::CPU::instructions::JumpCondition::NotCarry,
+            }),
 
             // Instruction: CALL (immediate)
             // { bytes: 3, cycles: [24,12] }
@@ -336,7 +348,10 @@ impl Instruction {
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xDC => Ok(Instruction::CALL),
+            0xDC => Ok(Instruction::CALL { 
+                address: program.next_u16(),
+                condition: crate::CPU::instructions::JumpCondition::NotCarry,
+            }),
 
             // Instruction: CCF (immediate)
             // { bytes: 1, cycles: 4 }
