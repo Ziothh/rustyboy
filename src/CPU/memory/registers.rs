@@ -112,7 +112,7 @@ pub enum Reg16 {
     BC,
     DE,
     HL,
-    // SP,
+    SP,
 }
 
 pub struct FlagsRegister {

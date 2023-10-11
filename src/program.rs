@@ -20,7 +20,10 @@ impl Program {
         }
     }
 
-    /// Returns the Program Counter (PC)
+    /// Returns the Program Counter (PC), the index into the program
+    ///
+    /// On the Game Boy this is a 16-bit register on the CPU, 
+    /// but we keep it here for separation on concerns
     pub fn pc(&self) -> u16 {
         self.program_counter
     }
@@ -46,6 +49,12 @@ impl Program {
         return byte;
     }
 
+    /// Reads the next byte as an `i8`.
+    /// Increments the `program_counter` by `1`.
+    pub fn next_i8(&mut self) -> i8 {
+        *self.next_byte() as i8
+    }
+
     /// Reads the next 2 bytes and combines them to create a `u16`.
     ///
     /// The `program_counter` is incremented by `2` (`1` for each byte).
@@ -65,6 +74,12 @@ impl Program {
     #[inline]
     pub fn next_instruction(&mut self) -> Option<Instruction> {
         self.next()
+    }
+
+    /// Skips the next byte in the program by incrementing the the `program_counter` by `1`
+    pub fn skip_byte(&mut self) -> &mut Self {
+        self.program_counter += 1;
+        return self;
     }
 }
 

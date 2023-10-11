@@ -1,4 +1,4 @@
-use super::memory::{Reg8, Reg16};
+use super::memory::{Reg8, Reg16, Address};
 
 mod decode;
 
@@ -140,6 +140,47 @@ pub enum Instruction {
     /// Increment the Stack Pointer
     INC16_SP,
 
+    /// Jump
+    JP {
+        target: JumpAddress,
+        condition: JumpCondition,
+    },
+
+    /// Jump Relative
+    JR {
+        /// The address to jump to, relative to the `program_counter`
+        target: i8,
+        condition: JumpCondition,
+    },
+
+    /// # Load (LD & LDH)
+    /// Load the value from the `source` into the `destination`.
+    LD {
+        destination: LoadTarget,
+        source: LoadTarget,
+    },
+    LD16 {
+        /// The immediate 16-bit value.
+        /// `u16::from_nibles(lsb=mem[PC++], msb=mem[PC++])`
+        value: u16,
+        destination: Reg16,
+    },
+    /// Load into the address at the immediate address nn, the value of the Stack Pointer
+    ///
+    /// ```ignore
+    /// nn = u16::from_nibles(lsb=mem[PC++], msb=mem[PC++])
+    /// mem[nn] = PC
+    /// ```
+    LD_nn_SP(u16),
+    /// Add the offset `i8` to the Stack Pointer and load that into memory at `HL`.
+    /// `mem[HL] = SP + e`
+    LD_HL_SP_e(i8),
+    /// Load the value of the 16-bit combined register `HL` into the Stack Pointer
+    LD_SP_HL,
+
+    /// Doesn't do anything, just takes one mcycle (4 cycles)
+    NOP,
+
 
     /// The opcode (depending on prefix) does NOT have an instruction that relates to it.
     /// It is a "Undefined instruction".
@@ -225,4 +266,21 @@ pub enum JumpCondition {
     Carry,
     /// Always jump
     Always,
+}
+
+pub enum JumpAddress {
+
+    /// The absolute address, stored in `u16::from_nibbles(lsb=mem[PC++], msb=mem[PC++])`
+    Immediate(u16),
+    /// The absolute address is stored in the combined 16-bit `HL` register
+    HL,
+
+}
+
+/// 8-bit load target
+pub enum LoadTarget {
+    /// Direct from/into 8-bit register
+    Reg8(Reg8),
+    /// Direct from/into memory address
+    Address(Address),
 }

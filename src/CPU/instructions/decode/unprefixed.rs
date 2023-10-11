@@ -1,4 +1,11 @@
-use crate::{CPU::{Instruction, instructions::ArithmeticTarget, memory::{Reg8, Reg16}}, program::Program};
+use crate::{
+    program::Program,
+    CPU::{
+        instructions::{ArithmeticTarget, JumpAddress, JumpCondition, LoadTarget},
+        memory::{Address, Reg16, Reg8},
+        Instruction,
+    },
+};
 
 impl Instruction {
     pub fn try_from_opcode_unprefixed(byte: u8, program: &mut Program) -> Result<Self, String> {
@@ -6,7 +13,7 @@ impl Instruction {
             /* [ADC] */
             // Instruction: ADC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     B (immediate)
             // Flags: Z N H C
@@ -15,7 +22,7 @@ impl Instruction {
 
             // Instruction: ADC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     C (immediate)
             // Flags: Z N H C
@@ -24,7 +31,7 @@ impl Instruction {
 
             // Instruction: ADC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     D (immediate)
             // Flags: Z N H C
@@ -33,7 +40,7 @@ impl Instruction {
 
             // Instruction: ADC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     E (immediate)
             // Flags: Z N H C
@@ -42,7 +49,7 @@ impl Instruction {
 
             // Instruction: ADC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     H (immediate)
             // Flags: Z N H C
@@ -51,25 +58,25 @@ impl Instruction {
 
             // Instruction: ADC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        Z 0 H C
             0x8D => Ok(Instruction::ADC(ArithmeticTarget::Reg8(Reg8::L))),
 
-            // Instruction: ADC 
+            // Instruction: ADC
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        Z 0 H C
             0x8E => Ok(Instruction::ADC(ArithmeticTarget::Indirect)),
 
             // Instruction: ADC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     A (immediate)
             // Flags: Z N H C
@@ -78,17 +85,19 @@ impl Instruction {
 
             // Instruction: ADC (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
             //        Z 0 H C
-            0xCE => Ok(Instruction::ADC(ArithmeticTarget::Immediate { value: *program.next_byte() })),
+            0xCE => Ok(Instruction::ADC(ArithmeticTarget::Immediate {
+                value: *program.next_byte(),
+            })),
 
             /* [ADD] */
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL (immediate),
             //     BC (immediate)
             // Flags: Z N H C
@@ -97,7 +106,7 @@ impl Instruction {
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL (immediate),
             //     DE (immediate)
             // Flags: Z N H C
@@ -106,7 +115,7 @@ impl Instruction {
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL (immediate),
             //     HL (immediate)
             // Flags: Z N H C
@@ -115,7 +124,7 @@ impl Instruction {
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL (immediate),
             //     SP (immediate)
             // Flags: Z N H C
@@ -124,7 +133,7 @@ impl Instruction {
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     B (immediate)
             // Flags: Z N H C
@@ -133,7 +142,7 @@ impl Instruction {
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     C (immediate)
             // Flags: Z N H C
@@ -142,7 +151,7 @@ impl Instruction {
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     D (immediate)
             // Flags: Z N H C
@@ -151,7 +160,7 @@ impl Instruction {
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     E (immediate)
             // Flags: Z N H C
@@ -160,7 +169,7 @@ impl Instruction {
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     H (immediate)
             // Flags: Z N H C
@@ -169,25 +178,25 @@ impl Instruction {
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        Z 0 H C
             0x85 => Ok(Instruction::ADD(ArithmeticTarget::Reg8(Reg8::L))),
 
-            // Instruction: ADD 
+            // Instruction: ADD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        Z 0 H C
             0x86 => Ok(Instruction::ADD(ArithmeticTarget::Indirect)),
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     A (immediate)
             // Flags: Z N H C
@@ -196,16 +205,18 @@ impl Instruction {
 
             // Instruction: ADD (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
             //        Z 0 H C
-            0xC6 => Ok(Instruction::ADD(ArithmeticTarget::Immediate { value: *program.next_byte() })),
+            0xC6 => Ok(Instruction::ADD(ArithmeticTarget::Immediate {
+                value: *program.next_byte(),
+            })),
 
             // Instruction: ADD (immediate)
             // { bytes: 2, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     SP (immediate),
             //     e8 (immediate)
             // Flags: Z N H C
@@ -215,7 +226,7 @@ impl Instruction {
             /* [AND] */
             // Instruction: AND (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     B (immediate)
             // Flags: Z N H C
@@ -224,7 +235,7 @@ impl Instruction {
 
             // Instruction: AND (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     C (immediate)
             // Flags: Z N H C
@@ -233,7 +244,7 @@ impl Instruction {
 
             // Instruction: AND (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     D (immediate)
             // Flags: Z N H C
@@ -242,7 +253,7 @@ impl Instruction {
 
             // Instruction: AND (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     E (immediate)
             // Flags: Z N H C
@@ -251,7 +262,7 @@ impl Instruction {
 
             // Instruction: AND (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     H (immediate)
             // Flags: Z N H C
@@ -260,25 +271,25 @@ impl Instruction {
 
             // Instruction: AND (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        Z 0 1 0
             0xA5 => Ok(Instruction::AND(ArithmeticTarget::Reg8(Reg8::L))),
 
-            // Instruction: AND 
+            // Instruction: AND
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        Z 0 1 0
             0xA6 => Ok(Instruction::AND(ArithmeticTarget::Indirect)),
 
             // Instruction: AND (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     A (immediate)
             // Flags: Z N H C
@@ -287,82 +298,84 @@ impl Instruction {
 
             // Instruction: AND (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
             //        Z 0 1 0
-            0xE6 => Ok(Instruction::AND(ArithmeticTarget::Immediate { value: *program.next_byte() })),
+            0xE6 => Ok(Instruction::AND(ArithmeticTarget::Immediate {
+                value: *program.next_byte(),
+            })),
 
             // Instruction: CALL (immediate)
             // { bytes: 3, cycles: [24,12] }
-            // Operands: 
+            // Operands:
             //     NZ (immediate),
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xC4 => Ok(Instruction::CALL { 
+            0xC4 => Ok(Instruction::CALL {
                 address: program.next_u16(),
                 condition: crate::CPU::instructions::JumpCondition::NotZero,
             }),
 
             // Instruction: CALL (immediate)
             // { bytes: 3, cycles: [24,12] }
-            // Operands: 
+            // Operands:
             //     Z (immediate),
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xCC => Ok(Instruction::CALL { 
+            0xCC => Ok(Instruction::CALL {
                 address: program.next_u16(),
                 condition: crate::CPU::instructions::JumpCondition::Zero,
             }),
 
             // Instruction: CALL (immediate)
             // { bytes: 3, cycles: 24 }
-            // Operands: 
+            // Operands:
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xCD => Ok(Instruction::CALL { 
+            0xCD => Ok(Instruction::CALL {
                 address: program.next_u16(),
                 condition: crate::CPU::instructions::JumpCondition::Always,
             }),
 
             // Instruction: CALL (immediate)
             // { bytes: 3, cycles: [24,12] }
-            // Operands: 
+            // Operands:
             //     NC (immediate),
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xD4 => Ok(Instruction::CALL { 
+            0xD4 => Ok(Instruction::CALL {
                 address: program.next_u16(),
                 condition: crate::CPU::instructions::JumpCondition::NotCarry,
             }),
 
             // Instruction: CALL (immediate)
             // { bytes: 3, cycles: [24,12] }
-            // Operands: 
+            // Operands:
             //     C (immediate),
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xDC => Ok(Instruction::CALL { 
+            0xDC => Ok(Instruction::CALL {
                 address: program.next_u16(),
                 condition: crate::CPU::instructions::JumpCondition::NotCarry,
             }),
 
             // Instruction: CCF (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        - 0 0 C
             0x3F => Ok(Instruction::CCF),
 
             // Instruction: CP (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     B (immediate)
             // Flags: Z N H C
@@ -371,7 +384,7 @@ impl Instruction {
 
             // Instruction: CP (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     C (immediate)
             // Flags: Z N H C
@@ -380,7 +393,7 @@ impl Instruction {
 
             // Instruction: CP (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     D (immediate)
             // Flags: Z N H C
@@ -389,7 +402,7 @@ impl Instruction {
 
             // Instruction: CP (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     E (immediate)
             // Flags: Z N H C
@@ -398,7 +411,7 @@ impl Instruction {
 
             // Instruction: CP (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     H (immediate)
             // Flags: Z N H C
@@ -407,25 +420,25 @@ impl Instruction {
 
             // Instruction: CP (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        Z 1 H C
             0xBD => Ok(Instruction::CP(ArithmeticTarget::Reg8(Reg8::L))),
 
-            // Instruction: CP 
+            // Instruction: CP
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        Z 1 H C
             0xBE => Ok(Instruction::CP(ArithmeticTarget::Indirect)),
 
             // Instruction: CP (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     A (immediate)
             // Flags: Z N H C
@@ -434,30 +447,32 @@ impl Instruction {
 
             // Instruction: CP (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
             //        Z 1 H C
-            0xFE => Ok(Instruction::CP(ArithmeticTarget::Immediate { value: *program.next_byte() })),
+            0xFE => Ok(Instruction::CP(ArithmeticTarget::Immediate {
+                value: *program.next_byte(),
+            })),
 
             // Instruction: CPL (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        - 1 1 -
             0x2F => Ok(Instruction::CPL),
 
             // Instruction: DAA (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        Z - 0 C
             0x27 => Ok(Instruction::DAA),
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     B (immediate)
             // Flags: Z N H C
             //        Z 1 H -
@@ -465,7 +480,7 @@ impl Instruction {
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     BC (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -473,7 +488,7 @@ impl Instruction {
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     C (immediate)
             // Flags: Z N H C
             //        Z 1 H -
@@ -481,7 +496,7 @@ impl Instruction {
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     D (immediate)
             // Flags: Z N H C
             //        Z 1 H -
@@ -489,7 +504,7 @@ impl Instruction {
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     DE (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -497,7 +512,7 @@ impl Instruction {
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     E (immediate)
             // Flags: Z N H C
             //        Z 1 H -
@@ -505,7 +520,7 @@ impl Instruction {
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     H (immediate)
             // Flags: Z N H C
             //        Z 1 H -
@@ -513,7 +528,7 @@ impl Instruction {
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -521,23 +536,23 @@ impl Instruction {
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     L (immediate)
             // Flags: Z N H C
             //        Z 1 H -
             0x2D => Ok(Instruction::DEC(ArithmeticTarget::Reg8(Reg8::L))),
 
-            // Instruction: DEC 
+            // Instruction: DEC
             // { bytes: 1, cycles: 12 }
-            // Operands: 
-            //     HL 
+            // Operands:
+            //     HL
             // Flags: Z N H C
             //        Z 1 H -
             0x35 => Ok(Instruction::DEC(ArithmeticTarget::Indirect)),
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     SP (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -545,7 +560,7 @@ impl Instruction {
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate)
             // Flags: Z N H C
             //        Z 1 H -
@@ -553,29 +568,28 @@ impl Instruction {
 
             // Instruction: DI (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        - - - -
             0xF3 => Ok(Instruction::DI),
 
             // Instruction: EI (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        - - - -
             0xFB => Ok(Instruction::EI),
 
             // Instruction: HALT (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        - - - -
             0x76 => Ok(Instruction::HALT),
 
-
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     BC (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -583,7 +597,7 @@ impl Instruction {
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     B (immediate)
             // Flags: Z N H C
             //        Z 0 H -
@@ -591,7 +605,7 @@ impl Instruction {
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     C (immediate)
             // Flags: Z N H C
             //        Z 0 H -
@@ -599,7 +613,7 @@ impl Instruction {
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     DE (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -607,7 +621,7 @@ impl Instruction {
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     D (immediate)
             // Flags: Z N H C
             //        Z 0 H -
@@ -615,7 +629,7 @@ impl Instruction {
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     E (immediate)
             // Flags: Z N H C
             //        Z 0 H -
@@ -623,7 +637,7 @@ impl Instruction {
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -631,7 +645,7 @@ impl Instruction {
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     H (immediate)
             // Flags: Z N H C
             //        Z 0 H -
@@ -639,7 +653,7 @@ impl Instruction {
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     L (immediate)
             // Flags: Z N H C
             //        Z 0 H -
@@ -647,23 +661,23 @@ impl Instruction {
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     SP (immediate)
             // Flags: Z N H C
             //        - - - -
             0x33 => Ok(Instruction::INC16_SP),
 
-            // Instruction: INC 
+            // Instruction: INC
             // { bytes: 1, cycles: 12 }
-            // Operands: 
-            //     HL 
+            // Operands:
+            //     HL
             // Flags: Z N H C
             //        Z 0 H -
             0x34 => Ok(Instruction::INC(ArithmeticTarget::Indirect)),
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate)
             // Flags: Z N H C
             //        Z 0 H -
@@ -671,939 +685,1239 @@ impl Instruction {
 
             // Instruction: JP (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     HL (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xE9 => Ok(Instruction::JP),
+            0xE9 => Ok(Instruction::JP {
+                target: JumpAddress::HL,
+                condition: JumpCondition::Always,
+            }),
 
             // Instruction: JP (immediate)
             // { bytes: 3, cycles: [16,12] }
-            // Operands: 
+            // Operands:
             //     NZ (immediate),
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xC2 => Ok(Instruction::JP),
+            0xC2 => Ok(Instruction::JP {
+                target: JumpAddress::Immediate(program.next_u16()),
+                condition: JumpCondition::NotZero,
+            }),
 
             // Instruction: JP (immediate)
             // { bytes: 3, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xC3 => Ok(Instruction::JP),
+            0xC3 => Ok(Instruction::JP {
+                target: JumpAddress::Immediate(program.next_u16()),
+                condition: JumpCondition::Always,
+            }),
 
             // Instruction: JP (immediate)
             // { bytes: 3, cycles: [16,12] }
-            // Operands: 
+            // Operands:
             //     Z (immediate),
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xCA => Ok(Instruction::JP),
+            0xCA => Ok(Instruction::JP {
+                target: JumpAddress::Immediate(program.next_u16()),
+                condition: JumpCondition::Zero,
+            }),
 
             // Instruction: JP (immediate)
             // { bytes: 3, cycles: [16,12] }
-            // Operands: 
+            // Operands:
             //     NC (immediate),
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xD2 => Ok(Instruction::JP),
+            0xD2 => Ok(Instruction::JP {
+                target: JumpAddress::Immediate(program.next_u16()),
+                condition: JumpCondition::NotCarry,
+            }),
 
             // Instruction: JP (immediate)
             // { bytes: 3, cycles: [16,12] }
-            // Operands: 
+            // Operands:
             //     C (immediate),
             //     a16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xDA => Ok(Instruction::JP),
+            0xDA => Ok(Instruction::JP {
+                target: JumpAddress::Immediate(program.next_u16()),
+                condition: JumpCondition::Carry,
+            }),
 
             // Instruction: JR (immediate)
             // { bytes: 2, cycles: 12 }
-            // Operands: 
+            // Operands:
             //     e8 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x18 => Ok(Instruction::JR),
+            0x18 => Ok(Instruction::JR {
+                target: program.next_i8(),
+                condition: JumpCondition::Always,
+            }),
 
             // Instruction: JR (immediate)
             // { bytes: 2, cycles: [12,8] }
-            // Operands: 
+            // Operands:
             //     NZ (immediate),
             //     e8 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x20 => Ok(Instruction::JR),
+            0x20 => Ok(Instruction::JR {
+                target: program.next_i8(),
+                condition: JumpCondition::NotZero,
+            }),
 
             // Instruction: JR (immediate)
             // { bytes: 2, cycles: [12,8] }
-            // Operands: 
+            // Operands:
             //     Z (immediate),
             //     e8 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x28 => Ok(Instruction::JR),
+            0x28 => Ok(Instruction::JR {
+                target: program.next_i8(),
+                condition: JumpCondition::Zero,
+            }),
 
             // Instruction: JR (immediate)
             // { bytes: 2, cycles: [12,8] }
-            // Operands: 
+            // Operands:
             //     NC (immediate),
             //     e8 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x30 => Ok(Instruction::JR),
+            0x30 => Ok(Instruction::JR {
+                target: program.next_i8(),
+                condition: JumpCondition::NotCarry,
+            }),
 
             // Instruction: JR (immediate)
             // { bytes: 2, cycles: [12,8] }
-            // Operands: 
+            // Operands:
             //     C (immediate),
             //     e8 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x38 => Ok(Instruction::JR),
+            0x38 => Ok(Instruction::JR {
+                target: program.next_i8(),
+                condition: JumpCondition::Carry,
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     BC ,
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x02 => Ok(Instruction::LD),
+            0x02 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::BC),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     BC 
+            //     BC
             // Flags: Z N H C
             //        - - - -
-            0x0A => Ok(Instruction::LD),
+            0x0A => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Address(Address::BC),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     DE ,
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x12 => Ok(Instruction::LD),
+            0x12 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::DE),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     DE 
+            //     DE
             // Flags: Z N H C
             //        - - - -
-            0x1A => Ok(Instruction::LD),
+            0x1A => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Address(Address::DE),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL ,
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x22 => Ok(Instruction::LD),
+            0x22 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::HLI),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        - - - -
-            0x2A => Ok(Instruction::LD),
+            0x2A => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Address(Address::HLI),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL ,
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x32 => Ok(Instruction::LD),
+            0x32 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::HLD),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        - - - -
-            0x3A => Ok(Instruction::LD),
+            0x3A => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Address(Address::HLD),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     B (immediate),
             //     B (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x40 => Ok(Instruction::LD),
+            0x40 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::B),
+                source: LoadTarget::Reg8(Reg8::B),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     B (immediate),
             //     C (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x41 => Ok(Instruction::LD),
+            0x41 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::B),
+                source: LoadTarget::Reg8(Reg8::C),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     B (immediate),
             //     D (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x42 => Ok(Instruction::LD),
+            0x42 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::B),
+                source: LoadTarget::Reg8(Reg8::D),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     B (immediate),
             //     E (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x43 => Ok(Instruction::LD),
+            0x43 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::B),
+                source: LoadTarget::Reg8(Reg8::E),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     B (immediate),
             //     H (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x44 => Ok(Instruction::LD),
+            0x44 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::B),
+                source: LoadTarget::Reg8(Reg8::H),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     B (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x45 => Ok(Instruction::LD),
+            0x45 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::B),
+                source: LoadTarget::Reg8(Reg8::L),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     B (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        - - - -
-            0x46 => Ok(Instruction::LD),
+            0x46 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::B),
+                source: LoadTarget::Address(Address::HL),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     B (immediate),
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x47 => Ok(Instruction::LD),
+            0x47 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::B),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     C (immediate),
             //     B (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x48 => Ok(Instruction::LD),
+            0x48 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::C),
+                source: LoadTarget::Reg8(Reg8::B),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     C (immediate),
             //     C (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x49 => Ok(Instruction::LD),
+            0x49 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::C),
+                source: LoadTarget::Reg8(Reg8::C),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     C (immediate),
             //     D (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x4A => Ok(Instruction::LD),
+            0x4A => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::C),
+                source: LoadTarget::Reg8(Reg8::D),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     C (immediate),
             //     E (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x4B => Ok(Instruction::LD),
+            0x4B => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::C),
+                source: LoadTarget::Reg8(Reg8::E),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     C (immediate),
             //     H (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x4C => Ok(Instruction::LD),
+            0x4C => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::C),
+                source: LoadTarget::Reg8(Reg8::H),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     C (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x4D => Ok(Instruction::LD),
+            0x4D => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::C),
+                source: LoadTarget::Reg8(Reg8::L),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     C (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        - - - -
-            0x4E => Ok(Instruction::LD),
+            0x4E => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::C),
+                source: LoadTarget::Address(Address::HL),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     C (immediate),
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x4F => Ok(Instruction::LD),
+            0x4F => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::C),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     D (immediate),
             //     B (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x50 => Ok(Instruction::LD),
+            0x50 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::D),
+                source: LoadTarget::Reg8(Reg8::B),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     D (immediate),
             //     C (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x51 => Ok(Instruction::LD),
+            0x51 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::D),
+                source: LoadTarget::Reg8(Reg8::C),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     D (immediate),
             //     D (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x52 => Ok(Instruction::LD),
+            0x52 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::D),
+                source: LoadTarget::Reg8(Reg8::D),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     D (immediate),
             //     E (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x53 => Ok(Instruction::LD),
+            0x53 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::D),
+                source: LoadTarget::Reg8(Reg8::E),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     D (immediate),
             //     H (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x54 => Ok(Instruction::LD),
+            0x54 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::D),
+                source: LoadTarget::Reg8(Reg8::H),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     D (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x55 => Ok(Instruction::LD),
+            0x55 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::D),
+                source: LoadTarget::Reg8(Reg8::L),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     D (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        - - - -
-            0x56 => Ok(Instruction::LD),
+            0x56 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::D),
+                source: LoadTarget::Address(Address::HL),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     D (immediate),
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x57 => Ok(Instruction::LD),
+            0x57 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::D),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     E (immediate),
             //     B (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x58 => Ok(Instruction::LD),
+            0x58 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::E),
+                source: LoadTarget::Reg8(Reg8::B),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     E (immediate),
             //     C (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x59 => Ok(Instruction::LD),
+            0x59 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::E),
+                source: LoadTarget::Reg8(Reg8::C),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     E (immediate),
             //     D (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x5A => Ok(Instruction::LD),
+            0x5A => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::E),
+                source: LoadTarget::Reg8(Reg8::D),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     E (immediate),
             //     E (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x5B => Ok(Instruction::LD),
+            0x5B => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::E),
+                source: LoadTarget::Reg8(Reg8::E),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     E (immediate),
             //     H (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x5C => Ok(Instruction::LD),
+            0x5C => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::E),
+                source: LoadTarget::Reg8(Reg8::H),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     E (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x5D => Ok(Instruction::LD),
+            0x5D => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::E),
+                source: LoadTarget::Reg8(Reg8::L),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     E (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        - - - -
-            0x5E => Ok(Instruction::LD),
+            0x5E => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::E),
+                source: LoadTarget::Address(Address::HL),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     E (immediate),
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x5F => Ok(Instruction::LD),
+            0x5F => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::E),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     H (immediate),
             //     B (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x60 => Ok(Instruction::LD),
+            0x60 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::H),
+                source: LoadTarget::Reg8(Reg8::B),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     H (immediate),
             //     C (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x61 => Ok(Instruction::LD),
+            0x61 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::H),
+                source: LoadTarget::Reg8(Reg8::C),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     H (immediate),
             //     D (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x62 => Ok(Instruction::LD),
+            0x62 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::H),
+                source: LoadTarget::Reg8(Reg8::D),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     H (immediate),
             //     E (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x63 => Ok(Instruction::LD),
+            0x63 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::H),
+                source: LoadTarget::Reg8(Reg8::E),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     H (immediate),
             //     H (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x64 => Ok(Instruction::LD),
+            0x64 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::H),
+                source: LoadTarget::Reg8(Reg8::H),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     H (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x65 => Ok(Instruction::LD),
+            0x65 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::H),
+                source: LoadTarget::Reg8(Reg8::L),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     H (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        - - - -
-            0x66 => Ok(Instruction::LD),
+            0x66 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::H),
+                source: LoadTarget::Address(Address::HL),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     H (immediate),
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x67 => Ok(Instruction::LD),
+            0x67 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::H),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     L (immediate),
             //     B (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x68 => Ok(Instruction::LD),
+            0x68 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::L),
+                source: LoadTarget::Reg8(Reg8::B),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     L (immediate),
             //     C (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x69 => Ok(Instruction::LD),
+            0x69 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::L),
+                source: LoadTarget::Reg8(Reg8::C),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     L (immediate),
             //     D (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x6A => Ok(Instruction::LD),
+            0x6A => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::L),
+                source: LoadTarget::Reg8(Reg8::D),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     L (immediate),
             //     E (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x6B => Ok(Instruction::LD),
+            0x6B => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::L),
+                source: LoadTarget::Reg8(Reg8::E),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     L (immediate),
             //     H (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x6C => Ok(Instruction::LD),
+            0x6C => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::L),
+                source: LoadTarget::Reg8(Reg8::H),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     L (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x6D => Ok(Instruction::LD),
+            0x6D => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::L),
+                source: LoadTarget::Reg8(Reg8::L),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     L (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        - - - -
-            0x6E => Ok(Instruction::LD),
+            0x6E => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::L),
+                source: LoadTarget::Address(Address::HL),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     L (immediate),
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x6F => Ok(Instruction::LD),
+            0x6F => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::L),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL ,
             //     B (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x70 => Ok(Instruction::LD),
+            0x70 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Reg8(Reg8::B),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL ,
             //     C (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x71 => Ok(Instruction::LD),
+            0x71 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Reg8(Reg8::C),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL ,
             //     D (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x72 => Ok(Instruction::LD),
+            0x72 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Reg8(Reg8::D),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL ,
             //     E (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x73 => Ok(Instruction::LD),
+            0x73 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Reg8(Reg8::E),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL ,
             //     H (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x74 => Ok(Instruction::LD),
+            0x74 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Reg8(Reg8::H),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL ,
             //     L (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x75 => Ok(Instruction::LD),
+            0x75 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Reg8(Reg8::L),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     HL ,
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x77 => Ok(Instruction::LD),
+            0x77 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     B (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x78 => Ok(Instruction::LD),
+            0x78 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Reg8(Reg8::B),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     C (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x79 => Ok(Instruction::LD),
+            0x79 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Reg8(Reg8::C),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     D (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x7A => Ok(Instruction::LD),
+            0x7A => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Reg8(Reg8::D),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     E (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x7B => Ok(Instruction::LD),
+            0x7B => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Reg8(Reg8::E),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     H (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x7C => Ok(Instruction::LD),
+            0x7C => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Reg8(Reg8::H),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x7D => Ok(Instruction::LD),
+            0x7D => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Reg8(Reg8::L),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        - - - -
-            0x7E => Ok(Instruction::LD),
+            0x7E => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Address(Address::HL),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x7F => Ok(Instruction::LD),
+            0x7F => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     C ,
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xE2 => Ok(Instruction::LD),
+            0xE2 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::ZeroPageC),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     C 
+            //     C
             // Flags: Z N H C
             //        - - - -
-            0xF2 => Ok(Instruction::LD),
+            0xF2 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Address(Address::ZeroPageC),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     SP (immediate),
             //     HL (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xF9 => Ok(Instruction::LD),
+            0xF9 => Ok(Instruction::LD_SP_HL),
 
             // Instruction: LD (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     B (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x06 => Ok(Instruction::LD),
+            0x06 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::B),
+                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     C (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x0E => Ok(Instruction::LD),
+            0x0E => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::C),
+                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     D (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x16 => Ok(Instruction::LD),
+            0x16 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::D),
+                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     E (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x1E => Ok(Instruction::LD),
+            0x1E => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::E),
+                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     H (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x26 => Ok(Instruction::LD),
+            0x26 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::H),
+                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     L (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x2E => Ok(Instruction::LD),
+            0x2E => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::L),
+                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 2, cycles: 12 }
-            // Operands: 
+            // Operands:
             //     HL ,
             //     n8 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x36 => Ok(Instruction::LD),
+            0x36 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x3E => Ok(Instruction::LD),
+            0x3E => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::B),
+                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 2, cycles: 12 }
-            // Operands: 
+            // Operands:
             //     HL (immediate),
             //     SP (immediate),
             //     e8 (immediate)
             // Flags: Z N H C
             //        0 0 H C
-            0xF8 => Ok(Instruction::LD),
+            0xF8 => Ok(Instruction::LD_HL_SP_e(program.next_i8())),
 
             // Instruction: LD (immediate)
             // { bytes: 3, cycles: 12 }
-            // Operands: 
+            // Operands:
             //     BC (immediate),
             //     n16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x01 => Ok(Instruction::LD),
+            0x01 => Ok(Instruction::LD16 {
+                destination: Reg16::BC,
+                value: program.next_u16(),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 3, cycles: 20 }
-            // Operands: 
+            // Operands:
             //     a16 ,
             //     SP (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x08 => Ok(Instruction::LD),
+            0x08 => Ok(Instruction::LD_nn_SP(program.next_u16())),
 
             // Instruction: LD (immediate)
             // { bytes: 3, cycles: 12 }
-            // Operands: 
+            // Operands:
             //     DE (immediate),
             //     n16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x11 => Ok(Instruction::LD),
+            0x11 => Ok(Instruction::LD16 {
+                destination: Reg16::DE,
+                value: program.next_u16(),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 3, cycles: 12 }
-            // Operands: 
+            // Operands:
             //     HL (immediate),
             //     n16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x21 => Ok(Instruction::LD),
+            0x21 => Ok(Instruction::LD16 {
+                destination: Reg16::HL,
+                value: program.next_u16(),
+            }),
 
             // Instruction: LD (immediate)
             // { bytes: 3, cycles: 12 }
-            // Operands: 
+            // Operands:
             //     SP (immediate),
             //     n16 (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x31 => Ok(Instruction::LD),
+            0x31 => Ok(Instruction::LD16 {
+                destination: Reg16::SP,
+                value: program.next_u16(),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 3, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     a16 ,
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xEA => Ok(Instruction::LD),
+            0xEA => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
-            // Instruction: LD 
+            // Instruction: LD
             // { bytes: 3, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     a16 
+            //     a16
             // Flags: Z N H C
             //        - - - -
-            0xFA => Ok(Instruction::LD),
+            0xFA => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+            }),
 
-            // Instruction: LDH 
+            // Instruction: LDH
             // { bytes: 2, cycles: 12 }
-            // Operands: 
+            // Operands:
             //     a8 ,
             //     A (immediate)
             // Flags: Z N H C
             //        - - - -
-            0xE0 => Ok(Instruction::LDH),
+            0xE0 => Ok(Instruction::LD {
+                destination: LoadTarget::Address(Address::ZeroPage { lsb: *program.next_byte() }),
+                source: LoadTarget::Reg8(Reg8::A),
+            }),
 
-            // Instruction: LDH 
+            // Instruction: LDH
             // { bytes: 2, cycles: 12 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     a8 
+            //     a8
             // Flags: Z N H C
             //        - - - -
-            0xF0 => Ok(Instruction::LDH),
+            0xF0 => Ok(Instruction::LD {
+                destination: LoadTarget::Reg8(Reg8::A),
+                source: LoadTarget::Address(Address::ZeroPage { lsb: *program.next_byte() }),
+            }),
 
             // Instruction: NOP (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        - - - -
             0x00 => Ok(Instruction::NOP),
 
             // Instruction: OR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     B (immediate)
             // Flags: Z N H C
@@ -1612,7 +1926,7 @@ impl Instruction {
 
             // Instruction: OR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     C (immediate)
             // Flags: Z N H C
@@ -1621,7 +1935,7 @@ impl Instruction {
 
             // Instruction: OR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     D (immediate)
             // Flags: Z N H C
@@ -1630,7 +1944,7 @@ impl Instruction {
 
             // Instruction: OR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     E (immediate)
             // Flags: Z N H C
@@ -1639,7 +1953,7 @@ impl Instruction {
 
             // Instruction: OR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     H (immediate)
             // Flags: Z N H C
@@ -1648,25 +1962,25 @@ impl Instruction {
 
             // Instruction: OR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        Z 0 0 0
             0xB5 => Ok(Instruction::OR),
 
-            // Instruction: OR 
+            // Instruction: OR
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        Z 0 0 0
             0xB6 => Ok(Instruction::OR),
 
             // Instruction: OR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     A (immediate)
             // Flags: Z N H C
@@ -1675,7 +1989,7 @@ impl Instruction {
 
             // Instruction: OR (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
@@ -1684,7 +1998,7 @@ impl Instruction {
 
             // Instruction: POP (immediate)
             // { bytes: 1, cycles: 12 }
-            // Operands: 
+            // Operands:
             //     BC (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1692,7 +2006,7 @@ impl Instruction {
 
             // Instruction: POP (immediate)
             // { bytes: 1, cycles: 12 }
-            // Operands: 
+            // Operands:
             //     DE (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1700,7 +2014,7 @@ impl Instruction {
 
             // Instruction: POP (immediate)
             // { bytes: 1, cycles: 12 }
-            // Operands: 
+            // Operands:
             //     HL (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1708,7 +2022,7 @@ impl Instruction {
 
             // Instruction: POP (immediate)
             // { bytes: 1, cycles: 12 }
-            // Operands: 
+            // Operands:
             //     AF (immediate)
             // Flags: Z N H C
             //        Z N H C
@@ -1716,14 +2030,14 @@ impl Instruction {
 
             // Instruction: PREFIX (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        - - - -
             0xCB => Ok(Instruction::PREFIX),
 
             // Instruction: PUSH (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     BC (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1731,7 +2045,7 @@ impl Instruction {
 
             // Instruction: PUSH (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     DE (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1739,7 +2053,7 @@ impl Instruction {
 
             // Instruction: PUSH (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     HL (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1747,7 +2061,7 @@ impl Instruction {
 
             // Instruction: PUSH (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     AF (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1755,7 +2069,7 @@ impl Instruction {
 
             // Instruction: RET (immediate)
             // { bytes: 1, cycles: [20,8] }
-            // Operands: 
+            // Operands:
             //     NZ (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1763,7 +2077,7 @@ impl Instruction {
 
             // Instruction: RET (immediate)
             // { bytes: 1, cycles: [20,8] }
-            // Operands: 
+            // Operands:
             //     Z (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1771,14 +2085,14 @@ impl Instruction {
 
             // Instruction: RET (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        - - - -
             0xC9 => Ok(Instruction::RET),
 
             // Instruction: RET (immediate)
             // { bytes: 1, cycles: [20,8] }
-            // Operands: 
+            // Operands:
             //     NC (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1786,7 +2100,7 @@ impl Instruction {
 
             // Instruction: RET (immediate)
             // { bytes: 1, cycles: [20,8] }
-            // Operands: 
+            // Operands:
             //     C (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1794,42 +2108,42 @@ impl Instruction {
 
             // Instruction: RETI (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        - - - -
             0xD9 => Ok(Instruction::RETI),
 
             // Instruction: RLA (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        0 0 0 C
             0x17 => Ok(Instruction::RLA),
 
             // Instruction: RLCA (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        0 0 0 C
             0x07 => Ok(Instruction::RLCA),
 
             // Instruction: RRA (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        0 0 0 C
             0x1F => Ok(Instruction::RRA),
 
             // Instruction: RRCA (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        0 0 0 C
             0x0F => Ok(Instruction::RRCA),
 
             // Instruction: RST (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     $00 (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1837,7 +2151,7 @@ impl Instruction {
 
             // Instruction: RST (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     $08 (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1845,7 +2159,7 @@ impl Instruction {
 
             // Instruction: RST (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     $10 (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1853,7 +2167,7 @@ impl Instruction {
 
             // Instruction: RST (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     $18 (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1861,7 +2175,7 @@ impl Instruction {
 
             // Instruction: RST (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     $20 (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1869,7 +2183,7 @@ impl Instruction {
 
             // Instruction: RST (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     $28 (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1877,7 +2191,7 @@ impl Instruction {
 
             // Instruction: RST (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     $30 (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1885,7 +2199,7 @@ impl Instruction {
 
             // Instruction: RST (immediate)
             // { bytes: 1, cycles: 16 }
-            // Operands: 
+            // Operands:
             //     $38 (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1893,7 +2207,7 @@ impl Instruction {
 
             // Instruction: SBC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     B (immediate)
             // Flags: Z N H C
@@ -1902,7 +2216,7 @@ impl Instruction {
 
             // Instruction: SBC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     C (immediate)
             // Flags: Z N H C
@@ -1911,7 +2225,7 @@ impl Instruction {
 
             // Instruction: SBC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     D (immediate)
             // Flags: Z N H C
@@ -1920,7 +2234,7 @@ impl Instruction {
 
             // Instruction: SBC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     E (immediate)
             // Flags: Z N H C
@@ -1929,7 +2243,7 @@ impl Instruction {
 
             // Instruction: SBC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     H (immediate)
             // Flags: Z N H C
@@ -1938,25 +2252,25 @@ impl Instruction {
 
             // Instruction: SBC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        Z 1 H C
             0x9D => Ok(Instruction::SBC),
 
-            // Instruction: SBC 
+            // Instruction: SBC
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        Z 1 H C
             0x9E => Ok(Instruction::SBC),
 
             // Instruction: SBC (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     A (immediate)
             // Flags: Z N H C
@@ -1965,7 +2279,7 @@ impl Instruction {
 
             // Instruction: SBC (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
@@ -1974,14 +2288,14 @@ impl Instruction {
 
             // Instruction: SCF (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             // Flags: Z N H C
             //        - 0 0 1
             0x37 => Ok(Instruction::SCF),
 
             // Instruction: STOP (immediate)
             // { bytes: 2, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     n8 (immediate)
             // Flags: Z N H C
             //        - - - -
@@ -1989,7 +2303,7 @@ impl Instruction {
 
             // Instruction: SUB (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     B (immediate)
             // Flags: Z N H C
@@ -1998,7 +2312,7 @@ impl Instruction {
 
             // Instruction: SUB (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     C (immediate)
             // Flags: Z N H C
@@ -2007,7 +2321,7 @@ impl Instruction {
 
             // Instruction: SUB (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     D (immediate)
             // Flags: Z N H C
@@ -2016,7 +2330,7 @@ impl Instruction {
 
             // Instruction: SUB (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     E (immediate)
             // Flags: Z N H C
@@ -2025,7 +2339,7 @@ impl Instruction {
 
             // Instruction: SUB (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     H (immediate)
             // Flags: Z N H C
@@ -2034,25 +2348,25 @@ impl Instruction {
 
             // Instruction: SUB (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        Z 1 H C
             0x95 => Ok(Instruction::SUB),
 
-            // Instruction: SUB 
+            // Instruction: SUB
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        Z 1 H C
             0x96 => Ok(Instruction::SUB),
 
             // Instruction: SUB (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     A (immediate)
             // Flags: Z N H C
@@ -2061,7 +2375,7 @@ impl Instruction {
 
             // Instruction: SUB (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
@@ -2070,7 +2384,7 @@ impl Instruction {
 
             // Instruction: XOR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     B (immediate)
             // Flags: Z N H C
@@ -2079,7 +2393,7 @@ impl Instruction {
 
             // Instruction: XOR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     C (immediate)
             // Flags: Z N H C
@@ -2088,7 +2402,7 @@ impl Instruction {
 
             // Instruction: XOR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     D (immediate)
             // Flags: Z N H C
@@ -2097,7 +2411,7 @@ impl Instruction {
 
             // Instruction: XOR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     E (immediate)
             // Flags: Z N H C
@@ -2106,7 +2420,7 @@ impl Instruction {
 
             // Instruction: XOR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     H (immediate)
             // Flags: Z N H C
@@ -2115,25 +2429,25 @@ impl Instruction {
 
             // Instruction: XOR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     L (immediate)
             // Flags: Z N H C
             //        Z 0 0 0
             0xAD => Ok(Instruction::XOR),
 
-            // Instruction: XOR 
+            // Instruction: XOR
             // { bytes: 1, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
-            //     HL 
+            //     HL
             // Flags: Z N H C
             //        Z 0 0 0
             0xAE => Ok(Instruction::XOR),
 
             // Instruction: XOR (immediate)
             // { bytes: 1, cycles: 4 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     A (immediate)
             // Flags: Z N H C
@@ -2142,14 +2456,16 @@ impl Instruction {
 
             // Instruction: XOR (immediate)
             // { bytes: 2, cycles: 8 }
-            // Operands: 
+            // Operands:
             //     A (immediate),
             //     n8 (immediate)
             // Flags: Z N H C
             //        Z 0 0 0
             0xEE => Ok(Instruction::XOR),
 
-            0xd3 | 0xdb | 0xdd | 0xe3 | 0xe4 | 0xeb | 0xec | 0xed | 0xf4 | 0xfc | 0xfd => Ok(Instruction::UNDEFINED)
+            0xD3 | 0xDB | 0xDD | 0xE3 | 0xE4 | 0xEB | 0xEC | 0xED | 0xF4 | 0xFC | 0xFD => {
+                Ok(Instruction::UNDEFINED)
+            }
         }
     }
 }

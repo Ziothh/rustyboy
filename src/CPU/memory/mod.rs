@@ -25,12 +25,13 @@ pub enum Address {
     HLI,
     /// The 2 bytes (nibbles) following the current Program Counter on the opcode
     /// contain the pointer to the memory address
-    Direct { 
-        /// First byte folling the Program Counter of the current opcode
-        lsb: u8, 
-        /// Second byte folling the Program Counter of the current opcode
-        msb: u8 
-    },
+    Direct(u16),
+    // { 
+    //     /// First byte following the Program Counter of the current opcode
+    //     lsb: u8, 
+    //     /// Second byte following the Program Counter of the current opcode
+    //     msb: u8 
+    // },
     /// The pointer is the value of `0xFF{lsb}`
     ZeroPage { lsb: u8 },
     /// The pointer is the value of `0xFF{Reg8::C.read()}`
