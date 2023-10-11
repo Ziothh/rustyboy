@@ -5,6 +5,7 @@ mod decode;
 mod execute;
 
 
+#[allow(non_camel_case_types)]
 pub enum Instruction {
     /// Adds to the 8-bit `A` register, the carry flag and a value (based on ArithmeticTarget), 
     /// and stores the result back into the `A` register.
@@ -37,13 +38,113 @@ pub enum Instruction {
     ///   flags.C = 1 if carry_per_bit[7] else 0
     /// ```
     ADD(ArithmeticTarget),
+    /// Add to the combined `HL` register the data is inside of a combined 16-bit register
+    ADD16(Reg16),
+    /// Add to the combined 16-bit `HL` register the data is inside of the Stack Pointer
+    ADD16_SP,
+    /// Add a signed `u8` at `mem[PC++]` to the `Stack Pointer`
+    ADD_SP_i8(i8),
 
     AND(ArithmeticTarget),
 
+    /// Conditional function call to the absolute address specified by the 16-bit operand `address`.
     CALL {
+        /// The memory address, read from the program at [PC++, PC++]
         address: u16,
+        /// The condition wether the function should be executed (= jumped to).
         condition: JumpCondition,
-    }
+    },
+
+    /// # Complement carry flag (CCF)
+    /// Flips the `C`(arry) flag, and clears the `N` and `H` flags.
+    ///
+    /// ## Pseudocode
+    /// ```ignore
+    /// flags.N = 0
+    /// flags.H = 0
+    /// flags.C = !flags.C
+    /// ```
+    CCF,
+    /// # Complement accumulator (CPL)
+    /// Flips all the bits in the 8-bit A register, and sets the N and H flags.
+    ///
+    /// ## Pseudocode
+    /// ```ignore
+    /// A = !A
+    /// flags.N = 1
+    /// flags.H = 1
+    /// ```
+    CPL,
+
+    /// # Compare (CP)
+    ///
+    /// ## Register
+    /// Subtracts from the 8-bit `A` register, the 8-bit register r, 
+    /// and updates flags based on the result. 
+    ///
+    /// This instruction is basically identical to SUB r, but does not update the A register.
+    ///
+    /// ## Indirect (HL)
+    /// Subtracts from the 8-bit A register, 
+    /// data from the absolute address specified by the 16-bit register HL, 
+    /// and updates flags based on the result. 
+    ///
+    /// This instruction is basically identical to SUB (HL), 
+    /// but does not update the A register.
+    ///
+    /// ## Immediate
+    ///
+    /// Subtracts from the 8-bit A register, 
+    /// the immediate data n, and updates flags based on the result. 
+    ///
+    /// This instruction is basically identical to SUB n, but does not update the A register
+    CP(ArithmeticTarget),
+
+    /// Decimal adjust accumulator
+    DAA,
+
+    /// # Decrement
+    ///
+    /// ## `r`
+    /// Decrement the 8-bit register `r`
+    ///
+    /// ## Indirect HL
+    /// Decrements data at the absolute address specified by the 16-bit register `HL`.
+    DEC(ArithmeticTarget),
+    /// Decrement the immediate value inside of a combined 16-bit register
+    DEC16(Reg16),
+    /// Decrement the Stack Pointer
+    DEC16_SP,
+
+    /// # Disable interrupts
+    /// Disables interrupt handling by setting IME=0 and cancelling any scheduled effects of the EI instruction if any.
+    DI,
+
+    /// # Enable interrupts
+    /// Schedules interrupt handling to be enabled after the next machine cycle.
+    EI,
+
+    /// Halt system clock
+    HALT,
+
+    /// # Decrement
+    ///
+    /// ## `r`
+    /// Increment the 8-bit register `r`
+    ///
+    /// ## Indirect HL
+    /// Increments data at the absolute address specified by the 16-bit register `HL`.
+    INC(ArithmeticTarget),
+    /// Increment the immediate value inside of a combined 16-bit register
+    INC16(Reg16),
+    /// Increment the Stack Pointer
+    INC16_SP,
+
+
+    /// The opcode (depending on prefix) does NOT have an instruction that relates to it.
+    /// It is a "Undefined instruction".
+    /// { bytes: 1, cycles: 4 }
+    UNDEFINED,
 
     // /// Load values from memory
     // LD(LoadType),
@@ -91,19 +192,24 @@ pub enum Instruction {
     // SWAP (swap nibbles) - switch upper and lower nibble of a specific register
 }
 
+/// NOTE
+///
+/// Immediate is only available for the following instructions:
+///  - ADD & ADC
 pub enum ArithmeticTarget {
     /// Add to the `A` register the data is inside of a 8-bit register
     Reg8(Reg8),
-    /// Add to the combined `HL` register the data is inside of a combined 16-bit register
-    Reg16(Reg16),
     /// The HL register contains the memory address of the 8-bit value
     Indirect,
     /// The value is equal to `mem[PC++]`
     Immediate { value: u8 },
-    /// The stack pointer is incremented by a signed 8-bit value at `mem[PC++]`
-    SignedU8ToSP { value: i8 },
-    /// Add to the combined 16-bit `HL` register the data is inside of the Stack Pointer
-    StackPointer,
+
+    // /// Add to the combined `HL` register the data is inside of a combined 16-bit register
+    // Reg16(Reg16),
+    // /// The stack pointer is incremented by a signed 8-bit value at `mem[PC++]`
+    // SignedU8ToSP { value: i8 },
+    // /// Add to the combined 16-bit `HL` register the data is inside of the Stack Pointer
+    // StackPointer,
 }
 
 

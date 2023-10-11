@@ -93,7 +93,7 @@ impl Instruction {
             //     BC (immediate)
             // Flags: Z N H C
             //        - 0 H C
-            0x09 => Ok(Instruction::ADD(ArithmeticTarget::Reg16(Reg16::BC))),
+            0x09 => Ok(Instruction::ADD16(Reg16::BC)),
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 8 }
@@ -102,7 +102,7 @@ impl Instruction {
             //     DE (immediate)
             // Flags: Z N H C
             //        - 0 H C
-            0x19 => Ok(Instruction::ADD(ArithmeticTarget::Reg16(Reg16::DE))),
+            0x19 => Ok(Instruction::ADD16(Reg16::DE)),
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 8 }
@@ -111,7 +111,7 @@ impl Instruction {
             //     HL (immediate)
             // Flags: Z N H C
             //        - 0 H C
-            0x29 => Ok(Instruction::ADD(ArithmeticTarget::Reg16(Reg16::HL))),
+            0x29 => Ok(Instruction::ADD16(Reg16::HL)),
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 8 }
@@ -120,7 +120,7 @@ impl Instruction {
             //     SP (immediate)
             // Flags: Z N H C
             //        - 0 H C
-            0x39 => Ok(Instruction::ADD(ArithmeticTarget::StackPointer)),
+            0x39 => Ok(Instruction::ADD16_SP),
 
             // Instruction: ADD (immediate)
             // { bytes: 1, cycles: 4 }
@@ -210,7 +210,7 @@ impl Instruction {
             //     e8 (immediate)
             // Flags: Z N H C
             //        0 0 H C
-            0xE8 => Ok(Instruction::ADD(ArithmeticTarget::SignedU8ToSP { value: *program.next_byte() as i8 })),
+            0xE8 => Ok(Instruction::ADD_SP_i8(*program.next_byte() as i8)),
 
             /* [AND] */
             // Instruction: AND (immediate)
@@ -367,7 +367,7 @@ impl Instruction {
             //     B (immediate)
             // Flags: Z N H C
             //        Z 1 H C
-            0xB8 => Ok(Instruction::CP),
+            0xB8 => Ok(Instruction::CP(ArithmeticTarget::Reg8(Reg8::B))),
 
             // Instruction: CP (immediate)
             // { bytes: 1, cycles: 4 }
@@ -376,7 +376,7 @@ impl Instruction {
             //     C (immediate)
             // Flags: Z N H C
             //        Z 1 H C
-            0xB9 => Ok(Instruction::CP),
+            0xB9 => Ok(Instruction::CP(ArithmeticTarget::Reg8(Reg8::C))),
 
             // Instruction: CP (immediate)
             // { bytes: 1, cycles: 4 }
@@ -385,7 +385,7 @@ impl Instruction {
             //     D (immediate)
             // Flags: Z N H C
             //        Z 1 H C
-            0xBA => Ok(Instruction::CP),
+            0xBA => Ok(Instruction::CP(ArithmeticTarget::Reg8(Reg8::D))),
 
             // Instruction: CP (immediate)
             // { bytes: 1, cycles: 4 }
@@ -394,7 +394,7 @@ impl Instruction {
             //     E (immediate)
             // Flags: Z N H C
             //        Z 1 H C
-            0xBB => Ok(Instruction::CP),
+            0xBB => Ok(Instruction::CP(ArithmeticTarget::Reg8(Reg8::E))),
 
             // Instruction: CP (immediate)
             // { bytes: 1, cycles: 4 }
@@ -403,7 +403,7 @@ impl Instruction {
             //     H (immediate)
             // Flags: Z N H C
             //        Z 1 H C
-            0xBC => Ok(Instruction::CP),
+            0xBC => Ok(Instruction::CP(ArithmeticTarget::Reg8(Reg8::H))),
 
             // Instruction: CP (immediate)
             // { bytes: 1, cycles: 4 }
@@ -412,7 +412,7 @@ impl Instruction {
             //     L (immediate)
             // Flags: Z N H C
             //        Z 1 H C
-            0xBD => Ok(Instruction::CP),
+            0xBD => Ok(Instruction::CP(ArithmeticTarget::Reg8(Reg8::L))),
 
             // Instruction: CP 
             // { bytes: 1, cycles: 8 }
@@ -421,7 +421,7 @@ impl Instruction {
             //     HL 
             // Flags: Z N H C
             //        Z 1 H C
-            0xBE => Ok(Instruction::CP),
+            0xBE => Ok(Instruction::CP(ArithmeticTarget::Indirect)),
 
             // Instruction: CP (immediate)
             // { bytes: 1, cycles: 4 }
@@ -430,7 +430,7 @@ impl Instruction {
             //     A (immediate)
             // Flags: Z N H C
             //        1 1 0 0
-            0xBF => Ok(Instruction::CP),
+            0xBF => Ok(Instruction::CP(ArithmeticTarget::Reg8(Reg8::A))),
 
             // Instruction: CP (immediate)
             // { bytes: 2, cycles: 8 }
@@ -439,7 +439,7 @@ impl Instruction {
             //     n8 (immediate)
             // Flags: Z N H C
             //        Z 1 H C
-            0xFE => Ok(Instruction::CP),
+            0xFE => Ok(Instruction::CP(ArithmeticTarget::Immediate { value: *program.next_byte() })),
 
             // Instruction: CPL (immediate)
             // { bytes: 1, cycles: 4 }
@@ -461,7 +461,7 @@ impl Instruction {
             //     B (immediate)
             // Flags: Z N H C
             //        Z 1 H -
-            0x05 => Ok(Instruction::DEC),
+            0x05 => Ok(Instruction::DEC(ArithmeticTarget::Reg8(Reg8::B))),
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 8 }
@@ -469,7 +469,7 @@ impl Instruction {
             //     BC (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x0B => Ok(Instruction::DEC),
+            0x0B => Ok(Instruction::DEC16(Reg16::BC)),
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 4 }
@@ -477,7 +477,7 @@ impl Instruction {
             //     C (immediate)
             // Flags: Z N H C
             //        Z 1 H -
-            0x0D => Ok(Instruction::DEC),
+            0x0D => Ok(Instruction::DEC(ArithmeticTarget::Reg8(Reg8::C))),
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 4 }
@@ -485,7 +485,7 @@ impl Instruction {
             //     D (immediate)
             // Flags: Z N H C
             //        Z 1 H -
-            0x15 => Ok(Instruction::DEC),
+            0x15 => Ok(Instruction::DEC(ArithmeticTarget::Reg8(Reg8::D))),
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 8 }
@@ -493,7 +493,7 @@ impl Instruction {
             //     DE (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x1B => Ok(Instruction::DEC),
+            0x1B => Ok(Instruction::DEC16(Reg16::DE)),
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 4 }
@@ -501,7 +501,7 @@ impl Instruction {
             //     E (immediate)
             // Flags: Z N H C
             //        Z 1 H -
-            0x1D => Ok(Instruction::DEC),
+            0x1D => Ok(Instruction::DEC(ArithmeticTarget::Reg8(Reg8::E))),
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 4 }
@@ -509,7 +509,7 @@ impl Instruction {
             //     H (immediate)
             // Flags: Z N H C
             //        Z 1 H -
-            0x25 => Ok(Instruction::DEC),
+            0x25 => Ok(Instruction::DEC(ArithmeticTarget::Reg8(Reg8::H))),
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 8 }
@@ -517,7 +517,7 @@ impl Instruction {
             //     HL (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x2B => Ok(Instruction::DEC),
+            0x2B => Ok(Instruction::DEC16(Reg16::HL)),
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 4 }
@@ -525,7 +525,7 @@ impl Instruction {
             //     L (immediate)
             // Flags: Z N H C
             //        Z 1 H -
-            0x2D => Ok(Instruction::DEC),
+            0x2D => Ok(Instruction::DEC(ArithmeticTarget::Reg8(Reg8::L))),
 
             // Instruction: DEC 
             // { bytes: 1, cycles: 12 }
@@ -533,7 +533,7 @@ impl Instruction {
             //     HL 
             // Flags: Z N H C
             //        Z 1 H -
-            0x35 => Ok(Instruction::DEC),
+            0x35 => Ok(Instruction::DEC(ArithmeticTarget::Indirect)),
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 8 }
@@ -541,7 +541,7 @@ impl Instruction {
             //     SP (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x3B => Ok(Instruction::DEC),
+            0x3B => Ok(Instruction::DEC16_SP),
 
             // Instruction: DEC (immediate)
             // { bytes: 1, cycles: 4 }
@@ -549,7 +549,7 @@ impl Instruction {
             //     A (immediate)
             // Flags: Z N H C
             //        Z 1 H -
-            0x3D => Ok(Instruction::DEC),
+            0x3D => Ok(Instruction::DEC(ArithmeticTarget::Reg8(Reg8::A))),
 
             // Instruction: DI (immediate)
             // { bytes: 1, cycles: 4 }
@@ -572,82 +572,6 @@ impl Instruction {
             //        - - - -
             0x76 => Ok(Instruction::HALT),
 
-            // Instruction: ILLEGAL_D3 (immediate)
-            // { bytes: 1, cycles: 4 }
-            // Operands: 
-            // Flags: Z N H C
-            //        - - - -
-            0xD3 => Ok(Instruction::ILLEGAL_D3),
-
-            // Instruction: ILLEGAL_DB (immediate)
-            // { bytes: 1, cycles: 4 }
-            // Operands: 
-            // Flags: Z N H C
-            //        - - - -
-            0xDB => Ok(Instruction::ILLEGAL_DB),
-
-            // Instruction: ILLEGAL_DD (immediate)
-            // { bytes: 1, cycles: 4 }
-            // Operands: 
-            // Flags: Z N H C
-            //        - - - -
-            0xDD => Ok(Instruction::ILLEGAL_DD),
-
-            // Instruction: ILLEGAL_E3 (immediate)
-            // { bytes: 1, cycles: 4 }
-            // Operands: 
-            // Flags: Z N H C
-            //        - - - -
-            0xE3 => Ok(Instruction::ILLEGAL_E3),
-
-            // Instruction: ILLEGAL_E4 (immediate)
-            // { bytes: 1, cycles: 4 }
-            // Operands: 
-            // Flags: Z N H C
-            //        - - - -
-            0xE4 => Ok(Instruction::ILLEGAL_E4),
-
-            // Instruction: ILLEGAL_EB (immediate)
-            // { bytes: 1, cycles: 4 }
-            // Operands: 
-            // Flags: Z N H C
-            //        - - - -
-            0xEB => Ok(Instruction::ILLEGAL_EB),
-
-            // Instruction: ILLEGAL_EC (immediate)
-            // { bytes: 1, cycles: 4 }
-            // Operands: 
-            // Flags: Z N H C
-            //        - - - -
-            0xEC => Ok(Instruction::ILLEGAL_EC),
-
-            // Instruction: ILLEGAL_ED (immediate)
-            // { bytes: 1, cycles: 4 }
-            // Operands: 
-            // Flags: Z N H C
-            //        - - - -
-            0xED => Ok(Instruction::ILLEGAL_ED),
-
-            // Instruction: ILLEGAL_F4 (immediate)
-            // { bytes: 1, cycles: 4 }
-            // Operands: 
-            // Flags: Z N H C
-            //        - - - -
-            0xF4 => Ok(Instruction::ILLEGAL_F4),
-
-            // Instruction: ILLEGAL_FC (immediate)
-            // { bytes: 1, cycles: 4 }
-            // Operands: 
-            // Flags: Z N H C
-            //        - - - -
-            0xFC => Ok(Instruction::ILLEGAL_FC),
-
-            // Instruction: ILLEGAL_FD (immediate)
-            // { bytes: 1, cycles: 4 }
-            // Operands: 
-            // Flags: Z N H C
-            //        - - - -
-            0xFD => Ok(Instruction::ILLEGAL_FD),
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 8 }
@@ -655,7 +579,7 @@ impl Instruction {
             //     BC (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x03 => Ok(Instruction::INC),
+            0x03 => Ok(Instruction::INC16(Reg16::BC)),
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
@@ -663,7 +587,7 @@ impl Instruction {
             //     B (immediate)
             // Flags: Z N H C
             //        Z 0 H -
-            0x04 => Ok(Instruction::INC),
+            0x04 => Ok(Instruction::INC(ArithmeticTarget::Reg8(Reg8::B))),
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
@@ -671,7 +595,7 @@ impl Instruction {
             //     C (immediate)
             // Flags: Z N H C
             //        Z 0 H -
-            0x0C => Ok(Instruction::INC),
+            0x0C => Ok(Instruction::INC(ArithmeticTarget::Reg8(Reg8::C))),
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 8 }
@@ -679,7 +603,7 @@ impl Instruction {
             //     DE (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x13 => Ok(Instruction::INC),
+            0x13 => Ok(Instruction::INC16(Reg16::DE)),
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
@@ -687,7 +611,7 @@ impl Instruction {
             //     D (immediate)
             // Flags: Z N H C
             //        Z 0 H -
-            0x14 => Ok(Instruction::INC),
+            0x14 => Ok(Instruction::INC(ArithmeticTarget::Reg8(Reg8::D))),
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
@@ -695,7 +619,7 @@ impl Instruction {
             //     E (immediate)
             // Flags: Z N H C
             //        Z 0 H -
-            0x1C => Ok(Instruction::INC),
+            0x1C => Ok(Instruction::INC(ArithmeticTarget::Reg8(Reg8::E))),
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 8 }
@@ -703,7 +627,7 @@ impl Instruction {
             //     HL (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x23 => Ok(Instruction::INC),
+            0x23 => Ok(Instruction::INC16(Reg16::HL)),
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
@@ -711,7 +635,7 @@ impl Instruction {
             //     H (immediate)
             // Flags: Z N H C
             //        Z 0 H -
-            0x24 => Ok(Instruction::INC),
+            0x24 => Ok(Instruction::INC(ArithmeticTarget::Reg8(Reg8::H))),
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
@@ -719,7 +643,7 @@ impl Instruction {
             //     L (immediate)
             // Flags: Z N H C
             //        Z 0 H -
-            0x2C => Ok(Instruction::INC),
+            0x2C => Ok(Instruction::INC(ArithmeticTarget::Reg8(Reg8::L))),
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 8 }
@@ -727,7 +651,7 @@ impl Instruction {
             //     SP (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x33 => Ok(Instruction::INC),
+            0x33 => Ok(Instruction::INC16_SP),
 
             // Instruction: INC 
             // { bytes: 1, cycles: 12 }
@@ -735,7 +659,7 @@ impl Instruction {
             //     HL 
             // Flags: Z N H C
             //        Z 0 H -
-            0x34 => Ok(Instruction::INC),
+            0x34 => Ok(Instruction::INC(ArithmeticTarget::Indirect)),
 
             // Instruction: INC (immediate)
             // { bytes: 1, cycles: 4 }
@@ -743,7 +667,7 @@ impl Instruction {
             //     A (immediate)
             // Flags: Z N H C
             //        Z 0 H -
-            0x3C => Ok(Instruction::INC),
+            0x3C => Ok(Instruction::INC(ArithmeticTarget::Reg8(Reg8::A))),
 
             // Instruction: JP (immediate)
             // { bytes: 1, cycles: 4 }
@@ -2225,9 +2149,7 @@ impl Instruction {
             //        Z 0 0 0
             0xEE => Ok(Instruction::XOR),
 
-
-
-}
-
-}
+            0xd3 | 0xdb | 0xdd | 0xe3 | 0xe4 | 0xeb | 0xec | 0xed | 0xf4 | 0xfc | 0xfd => Ok(Instruction::UNDEFINED)
+        }
+    }
 }
