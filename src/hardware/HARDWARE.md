@@ -1,6 +1,6 @@
 # Hardware
 ## CPU
- - DMG-01 (~= ZiLOG Z80)
+ - Model: DMG-01 (~= ZiLOG Z80)
  - Clock: 4.16MHz (acts like 1MHz)
  - 16-bit
 
@@ -18,3 +18,5 @@
 ## Memory
  - 8kb work RAM
  - 8kb VRAM
+
+## ROM

@@ -4,7 +4,7 @@ pub use registers::{Reg16, Reg8, Registers};
 mod stack;
 pub use stack::Stack;
 
-use crate::CPU::CPU;
+use crate::cpu::CPU;
 
 /// A representation of for the reading of the "immediate" memory at the `program_counter` position.
 pub struct Immediate8;

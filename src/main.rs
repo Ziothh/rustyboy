@@ -1,6 +1,6 @@
 mod prelude;
 mod hardware;
-mod CPU;
+mod cpu;
 mod program;
 
 fn main() {

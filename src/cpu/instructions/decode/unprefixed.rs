@@ -1,10 +1,10 @@
 use crate::{
-    program::Program,
-    CPU::{
+    cpu::{
         instructions::{ArithmeticTarget, JumpAddress, JumpCondition, LoadTarget},
         memory::{Address, Reg16, Reg8},
         Instruction,
     },
+    program::Program,
 };
 
 impl Instruction {
@@ -91,7 +91,7 @@ impl Instruction {
             // Flags: Z N H C
             //        Z 0 H C
             0xCE => Ok(Instruction::ADC(ArithmeticTarget::Immediate {
-                value: *program.next_byte(),
+                value: program.next_byte(),
             })),
 
             /* [ADD] */
@@ -211,7 +211,7 @@ impl Instruction {
             // Flags: Z N H C
             //        Z 0 H C
             0xC6 => Ok(Instruction::ADD(ArithmeticTarget::Immediate {
-                value: *program.next_byte(),
+                value: program.next_byte(),
             })),
 
             // Instruction: ADD (immediate)
@@ -221,7 +221,7 @@ impl Instruction {
             //     e8 (immediate)
             // Flags: Z N H C
             //        0 0 H C
-            0xE8 => Ok(Instruction::ADD_SP_i8(*program.next_byte() as i8)),
+            0xE8 => Ok(Instruction::ADD_SP_i8(program.next_i8())),
 
             /* [AND] */
             // Instruction: AND (immediate)
@@ -304,7 +304,7 @@ impl Instruction {
             // Flags: Z N H C
             //        Z 0 1 0
             0xE6 => Ok(Instruction::AND(ArithmeticTarget::Immediate {
-                value: *program.next_byte(),
+                value: program.next_byte(),
             })),
 
             // Instruction: CALL (immediate)
@@ -316,7 +316,7 @@ impl Instruction {
             //        - - - -
             0xC4 => Ok(Instruction::CALL {
                 address: program.next_u16(),
-                condition: crate::CPU::instructions::JumpCondition::NotZero,
+                condition: JumpCondition::NotZero,
             }),
 
             // Instruction: CALL (immediate)
@@ -328,7 +328,7 @@ impl Instruction {
             //        - - - -
             0xCC => Ok(Instruction::CALL {
                 address: program.next_u16(),
-                condition: crate::CPU::instructions::JumpCondition::Zero,
+                condition: JumpCondition::Zero,
             }),
 
             // Instruction: CALL (immediate)
@@ -339,7 +339,7 @@ impl Instruction {
             //        - - - -
             0xCD => Ok(Instruction::CALL {
                 address: program.next_u16(),
-                condition: crate::CPU::instructions::JumpCondition::Always,
+                condition: JumpCondition::Always,
             }),
 
             // Instruction: CALL (immediate)
@@ -351,7 +351,7 @@ impl Instruction {
             //        - - - -
             0xD4 => Ok(Instruction::CALL {
                 address: program.next_u16(),
-                condition: crate::CPU::instructions::JumpCondition::NotCarry,
+                condition: JumpCondition::NotCarry,
             }),
 
             // Instruction: CALL (immediate)
@@ -363,7 +363,7 @@ impl Instruction {
             //        - - - -
             0xDC => Ok(Instruction::CALL {
                 address: program.next_u16(),
-                condition: crate::CPU::instructions::JumpCondition::NotCarry,
+                condition: JumpCondition::NotCarry,
             }),
 
             // Instruction: CCF (immediate)
@@ -453,7 +453,7 @@ impl Instruction {
             // Flags: Z N H C
             //        Z 1 H C
             0xFE => Ok(Instruction::CP(ArithmeticTarget::Immediate {
-                value: *program.next_byte(),
+                value: program.next_byte(),
             })),
 
             // Instruction: CPL (immediate)
@@ -1892,7 +1892,9 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xE0 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::ZeroPage { lsb: *program.next_byte() }),
+                destination: LoadTarget::Address(Address::ZeroPage {
+                    lsb: program.next_byte(),
+                }),
                 source: LoadTarget::Reg8(Reg8::A),
             }),
 
@@ -1905,7 +1907,9 @@ impl Instruction {
             //        - - - -
             0xF0 => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::A),
-                source: LoadTarget::Address(Address::ZeroPage { lsb: *program.next_byte() }),
+                source: LoadTarget::Address(Address::ZeroPage {
+                    lsb: program.next_byte(),
+                }),
             }),
 
             // Instruction: NOP (immediate)

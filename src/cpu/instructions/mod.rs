@@ -269,12 +269,10 @@ pub enum JumpCondition {
 }
 
 pub enum JumpAddress {
-
     /// The absolute address, stored in `u16::from_nibbles(lsb=mem[PC++], msb=mem[PC++])`
     Immediate(u16),
     /// The absolute address is stored in the combined 16-bit `HL` register
     HL,
-
 }
 
 /// 8-bit load target

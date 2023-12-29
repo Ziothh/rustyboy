@@ -1,37 +1,34 @@
 // This file extends the std library
 
-pub trait NibbleFrom16bit<T, U> {
-    fn top_nibble(&self) -> T;
-    fn bottom_nibble(&self) -> T;
-
-    /// @param `lsb` the least significant byte
-    /// @param `msb` the most significant byte
-    fn from_nibbles(lsb: T, msb: T) -> U;
+/// Trait for parsing and storing values in a little endian format.
+///
+/// Meaning that bytes are stored in memory from least significant to most significant.
+pub trait LittleEndian<Bytes> {
+    /// Gets the least significant byte from the value.
+    fn lsb(&self) -> u8;
+    /// Gets the most significant byte from the value.
+    fn msb(&self) -> u8;
+    /// Constructs `Self` from the `bytes` which should be ordered from least significant to
+    /// most significant.
+    fn from_bytes(bytes: Bytes) -> Self;
+    /// Returns a sequence of bytes, ordered from least significant to most significant, that are parsed from `self`.
+    fn as_bytes(&self) -> Bytes;
 }
 
-impl NibbleFrom16bit<u8, u16> for u16 {
-    fn top_nibble(&self) -> u8 {
+impl LittleEndian<(u8, u8)> for u16 {
+    fn msb(&self) -> u8 {
         ((self & 0xFF00) >> 8) as u8
     }
 
-    fn bottom_nibble(&self) -> u8 {
+    fn lsb(&self) -> u8 {
         (self & 0xFF) as u8
     }
 
-    fn from_nibbles(lsb: u8, msb: u8) -> u16 {
+    fn from_bytes((msb, lsb): (u8, u8)) -> Self {
         ((msb as u16) << 8) | (lsb as u16)
     }
-}
-impl NibbleFrom16bit<u8, u16> for &u16 {
-    fn top_nibble(&self) -> u8 {
-        ((*self & 0xFF00) >> 8) as u8
-    }
 
-    fn bottom_nibble(&self) -> u8 {
-        (*self & 0xFF) as u8
-    }
-
-    fn from_nibbles(lsb: u8, msb: u8) -> u16 {
-        u16::from_nibbles(lsb, msb)
+    fn as_bytes(&self) -> (u8, u8) {
+        (self.lsb(), self.msb())
     }
 }

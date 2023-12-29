@@ -2,14 +2,11 @@
  * This file implements the CPU instructions, based on https://gekkio.fi/files/gb-docs/gbctr.pdf
  */
 
-use crate::CPU::CPU;
+use crate::cpu;
 
-use super::decode::*;
-
-
-impl CPU {
+impl cpu::CPU {
     /// Executes a single instruction
-    pub fn execute(&mut self, instruction: Instruction) {
+    pub fn execute(&mut self, instruction: cpu::Instruction) {
         match instruction {
             // Instruction::LD(load_type) => match load_type {
             //     LoadType::Byte(target, source) => {
