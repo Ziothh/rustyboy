@@ -1,15 +1,15 @@
-use super::memory::{Reg8, Reg16, Address};
+use super::memory::{Address, Reg16, Reg8};
 
 mod decode;
 
 mod execute;
 
-
 #[allow(non_camel_case_types)]
 pub enum Instruction {
-    /// Adds to the 8-bit `A` register, the carry flag and a value (based on ArithmeticTarget), 
+    // [Arithmetic operations]
+    /// Adds to the 8-bit `A` register, the carry flag and a value (based on ArithmeticTarget),
     /// and stores the result back into the `A` register.
-    /// 
+    ///
     /// # Example
     /// ```ignore
     /// // Example: ADC B
@@ -22,7 +22,7 @@ pub enum Instruction {
     ///   flags.C = 1 if carry_per_bit[7] else 0
     /// ```
     ADC(ArithmeticTarget),
-    /// Adds to the 8-bit `A` register, a value (based on ArithmeticTarget), 
+    /// Adds to the 8-bit `A` register, a value (based on ArithmeticTarget),
     /// and stores the result back into the `A` register.
     ///
     /// # Example
@@ -47,6 +47,30 @@ pub enum Instruction {
 
     AND(ArithmeticTarget),
 
+    /// # **SBC**: Subtract with carry
+    /// Subtracts from the 8-bit `A` register, the `carry flag` and the 8-bit `value`, and stores the result back into the `A`
+    /// register.
+    ///
+    /// ## Opcode
+    /// `0b10011xxx`/various r
+    /// `0b10011110`/`0x9E` (HL)
+    ///
+    /// ## Flags:
+    /// Z N H C
+    /// Z 1 H C
+    ///
+    /// ## Pseudocode: SBC B
+    /// ```ignore
+    /// result, carry_per_bit = A - flags.C - B
+    /// A = result
+    /// flags.Z = 1 if result == 0 else 0
+    /// flags.N = 1
+    /// flags.H = 1 if carry_per_bit[3] else 0
+    /// flags.C = 1 if carry_per_bit[7] else 0
+    /// ```
+    SBC(ArithmeticTarget),
+
+    // [Call]
     /// Conditional function call to the absolute address specified by the 16-bit operand `address`.
     CALL {
         /// The memory address, read from the program at [PC++, PC++]
@@ -54,6 +78,21 @@ pub enum Instruction {
         /// The condition wether the function should be executed (= jumped to).
         condition: JumpCondition,
     },
+    /// # **RST n**: Restart / Call function (implied)
+    /// Unconditional function call to the absolute fixed address defined by the opcode.
+    ///
+    /// ## Opcode
+    /// `0b11xxx111`/various
+    ///
+    /// ## Pseudocode
+    /// ```ignore
+    /// n = rst_address(opcode)
+    /// SP--
+    /// write(SP--, msb(PC))
+    /// write(SP, lsb(PC))
+    /// PC = unsigned_16(lsb=n, msb=0x00)
+    /// ```
+    RST(u16),
 
     /// # Complement carry flag (CCF)
     /// Flips the `C`(arry) flag, and clears the `N` and `H` flags.
@@ -79,23 +118,23 @@ pub enum Instruction {
     /// # Compare (CP)
     ///
     /// ## Register
-    /// Subtracts from the 8-bit `A` register, the 8-bit register r, 
-    /// and updates flags based on the result. 
+    /// Subtracts from the 8-bit `A` register, the 8-bit register r,
+    /// and updates flags based on the result.
     ///
     /// This instruction is basically identical to SUB r, but does not update the A register.
     ///
     /// ## Indirect (HL)
-    /// Subtracts from the 8-bit A register, 
-    /// data from the absolute address specified by the 16-bit register HL, 
-    /// and updates flags based on the result. 
+    /// Subtracts from the 8-bit A register,
+    /// data from the absolute address specified by the 16-bit register HL,
+    /// and updates flags based on the result.
     ///
-    /// This instruction is basically identical to SUB (HL), 
+    /// This instruction is basically identical to SUB (HL),
     /// but does not update the A register.
     ///
     /// ## Immediate
     ///
-    /// Subtracts from the 8-bit A register, 
-    /// the immediate data n, and updates flags based on the result. 
+    /// Subtracts from the 8-bit A register,
+    /// the immediate data n, and updates flags based on the result.
     ///
     /// This instruction is basically identical to SUB n, but does not update the A register
     CP(ArithmeticTarget),
@@ -181,12 +220,141 @@ pub enum Instruction {
     /// Doesn't do anything, just takes one mcycle (4 cycles)
     NOP,
 
+    /// # OR
+    /// Performs a bitwise OR operation between the 8-bit `A` register and the 8-bit `source`, and stores the result back
+    /// into the `A` register.
+    ///
+    /// ## Opcode
+    /// 0b10110xxx/various
+    ///
+    /// ## Flags
+    /// Z N H C
+    /// Z 0 0 0
+    ///
+    /// ## Example: OR B
+    /// ```ignore
+    /// result = A | B
+    /// A = result
+    /// flags.Z = 1 if result == 0 else 0
+    /// flags.N = 0
+    /// flags.H = 0
+    /// flags.C = 0
+    /// ```
+    OR {
+        source: ArithmeticTarget,
+    },
 
+    // [Stack instructions]
+    /// # **POP r**: Pop from stack
+    /// Pops to the 16-bit register `rr`, data from the stack memory.
+    /// This instruction does not do calculations that affect flags, but POP AF completely replaces the F register
+    /// value, so all flags are changed based on the 8-bit data that is read from memory
+    ///
+    /// ## Opcode
+    /// `0b11xx0001`/various
+    ///
+    /// ## Example: POP BC
+    /// ```ignore
+    /// BC = unsigned_16(lsb=read(SP++), msb=read(SP++))
+    /// ```
+    POP(Reg16),
+    /// # **PUSH rr**: Push to stack
+    /// Push to the stack memory, data from the 16-bit register `rr`.
+    ///
+    /// ## Opcode
+    /// `0b11xx0101`/various
+    ///
+    /// ## Example: PUSH BC
+    /// ```ignore
+    /// SP--
+    /// write(SP--, msb(BC))
+    /// write(SP, lsb(BC))
+    /// ```
+    ///
+    /// ## Flags
+    /// Z N H C
+    /// \- - - -
+    PUSH(Reg16),
+    /// # **RET**: Return from function
+    ///
+    ///
+    /// ## Example
+    /// ```ignore
+    /// if (condition):
+    ///   PC = unsigned_16(lsb=read(SP++), msb=read(SP++)    
+    /// ```
+    /// ## Flags:
+    /// Z N H C
+    /// \- - - -
+    RET(JumpCondition),
+    /// # **RETI**: Return from interrupt handler
+    /// Unconditional return from a function. Also enables interrupts by setting `IME=1`.
+    ///
+    /// ## Opcode
+    /// `0b11011001`/`0xD9`
+    ///
+    /// ## Example
+    /// ```ignore
+    /// PC = unsigned_16(lsb=read(SP++), msb=read(SP++))
+    /// IME = 1
+    /// ```
+    RETI,
+
+    // [Rotate]
+    /// # **RL r**: Rotate left through carry
+    ///
+    /// ## Flags:
+    /// Z N H C
+    /// 0 0 0 C
+    ///
+    /// ## Example
+    /// ```ignore
+    /// // TODO
+    /// ```
+    RL(ArithmeticTarget),
+    /// # **RL r**: Rotate left
+    ///
+    /// ## Flags:
+    /// Z N H C
+    /// 0 0 0 C
+    ///
+    /// ## Example
+    /// ```ignore
+    /// // TODO
+    /// ```
+    RLC(ArithmeticTarget),
+    /// # **RL r**: Rotate right through carry
+    ///
+    /// ## Flags:
+    /// Z N H C
+    /// 0 0 0 C
+    ///
+    /// ## Example
+    /// ```ignore
+    /// // TODO
+    /// ```
+    RR(ArithmeticTarget),
+    /// # **RL r**: Rotate right
+    ///
+    /// ## Flags:
+    /// Z N H C
+    /// 0 0 0 C
+    ///
+    /// ## Example
+    /// ```ignore
+    /// // TODO
+    /// ```
+    RRC(ArithmeticTarget),
+
+    /// Opcode prefix byte `0xCB` has been read while not in prefixed mode.
+    ///
+    /// Set instruction parsing to prefixed mode so that the next instruction will be parsed from
+    /// the prefixed opcode table instead of the default table.
+    PREFIX,
     /// The opcode (depending on prefix) does NOT have an instruction that relates to it.
     /// It is a "Undefined instruction".
     /// { bytes: 1, cycles: 4 }
     UNDEFINED,
-
     // /// Load values from memory
     // LD(LoadType),
     // /// Load halfword
@@ -239,12 +407,17 @@ pub enum Instruction {
 ///  - ADD & ADC
 pub enum ArithmeticTarget {
     /// Add to the `A` register the data is inside of a 8-bit register
+    ///
+    /// Indication: `{REG_NAME} (immediate)`
     Reg8(Reg8),
-    /// The HL register contains the memory address of the 8-bit value
+    /// The `HL` register contains the **memory address** of the 8-bit value
+    ///
+    /// Indication: `HL`
     Indirect,
     /// The value is equal to `mem[PC++]`
+    ///
+    /// Indication: `n8 (immediate)`
     Immediate { value: u8 },
-
     // /// Add to the combined `HL` register the data is inside of a combined 16-bit register
     // Reg16(Reg16),
     // /// The stack pointer is incremented by a signed 8-bit value at `mem[PC++]`
@@ -252,7 +425,6 @@ pub enum ArithmeticTarget {
     // /// Add to the combined 16-bit `HL` register the data is inside of the Stack Pointer
     // StackPointer,
 }
-
 
 /// Condition wether the CPU should execute JP-like instructions
 pub enum JumpCondition {

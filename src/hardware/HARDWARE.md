@@ -6,10 +6,10 @@
 
  - Registers (memory cells, directly integrated in the CPU)
     - 8-bit
-        - A F(lags)
         - B C
         - D E
         - H L
+        - A F(lags)
     - 16-bit
         - SP (Stack Pointer)
         - PC (Program Counter)
@@ -20,3 +20,4 @@
  - 8kb VRAM
 
 ## ROM
+ - 

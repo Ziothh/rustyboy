@@ -1,4 +1,4 @@
-use crate::{hardware::memory::MemoryBus, prelude::NibbleFrom16bit};
+use crate::{hardware::memory::MemoryBus, prelude::LittleEndian};
 
 /// A stack containing a stack pointer
 ///
@@ -14,11 +14,11 @@ impl Stack {
     pub fn push(&mut self, value: u16, memory: &mut MemoryBus) -> &mut Self {
         // Least significant byte
         self.pointer = self.pointer.wrapping_sub(1);
-        memory[self.pointer] = value.top_nibble();
+        memory[self.pointer] = value.msb();
 
         // Most significant byte
         self.pointer = self.pointer.wrapping_sub(1);
-        memory[self.pointer] = value.top_nibble();
+        memory[self.pointer] = value.msb();
 
         return self;
     }
@@ -31,6 +31,6 @@ impl Stack {
         let msb = memory[self.pointer];
         self.pointer = self.pointer.wrapping_add(1);
 
-        return u16::from_nibbles(msb, lsb);
+        return u16::from_bytes((lsb, msb));
     }
 }

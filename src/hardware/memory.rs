@@ -1,11 +1,11 @@
 use std::ops;
 
-use crate::prelude::NibbleFrom16bit;
+use crate::prelude::LittleEndian;
 
 pub struct MemoryBus([u8; u16::MAX as usize]);
 impl MemoryBus {
-    pub fn read8(&self, index: u16) -> u8 {
-        return self[index];
+    pub fn read8(&self, address: u16) -> u8 {
+        return self[address];
     }
 
     /// Reads `u16` from memory.
@@ -14,8 +14,12 @@ impl MemoryBus {
     ///
     /// The Game Boy is **little endian** which means that when you have numbers that are larger than 1 byte, 
     /// the bytes are stored in memory from least significant to most significant.
-    pub fn read16(&self, index: u16) -> u16 {
-        return u16::from_nibbles(self[index], self[index + 1]);
+    ///
+    /// # Panics
+    /// This function panics when reading on `address = u16::MAX` when reading the `msb` because
+    /// it'll read on `mem[address + 1]` which is out of bounds.
+    pub fn read16(&self, address: u16) -> u16 {
+        return u16::from_bytes((self[address], self[address + 1]));
         // ((self[index + 1] as u16) << 8) | (self[index] as u16);
     }
 }

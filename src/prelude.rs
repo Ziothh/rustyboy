@@ -24,7 +24,7 @@ impl LittleEndian<(u8, u8)> for u16 {
         (self & 0xFF) as u8
     }
 
-    fn from_bytes((msb, lsb): (u8, u8)) -> Self {
+    fn from_bytes((lsb, msb): (u8, u8)) -> Self {
         ((msb as u16) << 8) | (lsb as u16)
     }
 

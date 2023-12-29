@@ -33,7 +33,8 @@ impl Registers {
             BC => ((self.b as u16) << 8) | (self.c as u16),
             DE => ((self.d as u16) << 8) | (self.e as u16),
             HL => ((self.h as u16) << 8) | (self.l as u16),
-            // SP => self.sp,
+            // TODO: find a way to better do this
+            SP => unreachable!(),
         }
     }
 
@@ -55,7 +56,8 @@ impl Registers {
             HL => {
                 self.h = (value >> 8) as u8;
                 self.l = value as u8
-            } // SP => self.sp = value,
+            } 
+            SP => unreachable!(),
         }
     }
 }
@@ -108,11 +110,11 @@ impl TryFrom<&u8> for Reg8 {
 #[derive(Clone, Copy, Debug)]
 /// Enum of the virtual 16 bit register names on the CPU
 pub enum Reg16 {
-    AF,
     BC,
     DE,
     HL,
     SP,
+    AF,
 }
 
 pub struct FlagsRegister {
