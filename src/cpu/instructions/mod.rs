@@ -4,6 +4,7 @@ mod decode;
 
 mod execute;
 
+#[derive(Debug)]
 #[allow(non_camel_case_types)]
 pub enum Instruction {
     // [Arithmetic operations]
@@ -474,6 +475,7 @@ pub enum Instruction {
 ///
 /// Immediate is only available for the following instructions:
 ///  - ADD & ADC
+#[derive(Debug)]
 pub enum ArithmeticTarget {
     /// Add to the `A` register the data is inside of a 8-bit register
     ///
@@ -496,6 +498,7 @@ pub enum ArithmeticTarget {
 }
 
 /// Condition wether the CPU should execute JP-like instructions
+#[derive(Debug)]
 pub enum JumpCondition {
     /// Jump if the Z(ero) flag is set to `0`
     NotZero,
@@ -509,6 +512,7 @@ pub enum JumpCondition {
     Always,
 }
 
+#[derive(Debug)]
 pub enum JumpAddress {
     /// The absolute address, stored in `u16::from_nibbles(lsb=mem[PC++], msb=mem[PC++])`
     Immediate(u16),
@@ -517,6 +521,7 @@ pub enum JumpAddress {
 }
 
 /// 8-bit load target
+#[derive(Debug)]
 pub enum LoadTarget {
     /// Direct from/into 8-bit register
     Reg8(Reg8),

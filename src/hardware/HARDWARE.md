@@ -20,4 +20,5 @@
  - 8kb VRAM
 
 ## ROM
+ - [bootrom repo](https://github.com/ISSOtm/gb-bootroms) (TODO: CHECK THIS OUT)
  - 

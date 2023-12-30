@@ -1,4 +1,4 @@
-use crate::{hardware::memory::MemoryBus, program::Program};
+use crate::{hardware::bus::MemoryBus, program::Program};
 
 mod memory;
 use self::memory::{Registers, Stack};

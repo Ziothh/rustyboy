@@ -7,9 +7,11 @@ pub use stack::Stack;
 use crate::cpu::CPU;
 
 /// A representation of for the reading of the "immediate" memory at the `program_counter` position.
+#[derive(Debug)]
 pub struct Immediate8;
 
 /// Memory address pointer variants
+#[derive(Debug)]
 pub enum Address {
     /// BC, a combined 16-bit register, contains the pointer to the memory address
     BC,

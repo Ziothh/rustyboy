@@ -1,4 +1,4 @@
-use crate::{hardware::memory::MemoryBus, prelude::LittleEndian};
+use crate::{hardware::bus::MemoryBus, prelude::LittleEndian};
 
 /// A stack containing a stack pointer
 ///
