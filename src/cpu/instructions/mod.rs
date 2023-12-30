@@ -45,7 +45,73 @@ pub enum Instruction {
     /// Add a signed `u8` at `mem[PC++]` to the `Stack Pointer`
     ADD_SP_i8(i8),
 
+    /// # `SUB`: Subtract
+    /// Subtracts from the 8-bit `A` register, the 8-bit `value`, and stores the result back into the `A` register
+    ///
+    /// ## Opcode
+    /// r:    `0b10010xxx`/various
+    /// (HL): `0b10010110`/`0x96`
+    /// n:    `0b11010110`/`0xD6 + n`
+    ///
+    /// ## Flags:
+    /// Z N H C
+    /// Z 1 H C
+    ///
+    /// ## Pseudocode: SUB B
+    /// ```ignore
+    /// result, carry_per_bit = A - B
+    /// A = result
+    /// flags.Z = 1 if result == 0 else 0
+    /// flags.N = 1
+    /// flags.H = 1 if carry_per_bit[3] else 0
+    /// flags.C = 1 if carry_per_bit[7] else 0
+    /// ```
+    SUB(ArithmeticTarget),
+
+    // [Bitwise operations]
+    /// # **AND**
+    /// TODO
     AND(ArithmeticTarget),
+    /// # **OR**
+    /// Performs a bitwise OR operation between the 8-bit `A` register and the 8-bit `source`, and stores the result back
+    /// into the `A` register.
+    ///
+    /// ## Opcode
+    /// 0b10110xxx/various
+    ///
+    /// ## Flags
+    /// Z N H C
+    /// Z 0 0 0
+    ///
+    /// ## Pseudocode: OR B
+    /// ```ignore
+    /// result = A | B
+    /// A = result
+    /// flags.Z = 1 if result == 0 else 0
+    /// flags.N = 0
+    /// flags.H = 0
+    /// flags.C = 0
+    /// ```
+    OR { source: ArithmeticTarget },
+    /// **XOR**: Bitwise XOR
+    /// Performs a bitwise XOR operation between the 8-bit `A` register and the 8-bit `value`, and stores the result
+    /// back into the `A` register.
+    ///
+    /// ## Opcode
+    /// r:    `0b10101xxx`/various
+    /// (HL): `0b10101110`/`0xAE`
+    /// n:    `0b11101110`/`0xEE + n`
+    ///
+    /// ## Pseudocode: XOR B
+    /// ```
+    /// result = A ^ B
+    /// A = result
+    /// flags.Z = 1 if result == 0 else 0
+    /// flags.N = 0
+    /// flags.H = 0
+    /// flags.C = 0
+    /// ```
+    XOR(ArithmeticTarget),
 
     /// # **SBC**: Subtract with carry
     /// Subtracts from the 8-bit `A` register, the `carry flag` and the 8-bit `value`, and stores the result back into the `A`
@@ -155,17 +221,6 @@ pub enum Instruction {
     /// Decrement the Stack Pointer
     DEC16_SP,
 
-    /// # Disable interrupts
-    /// Disables interrupt handling by setting IME=0 and cancelling any scheduled effects of the EI instruction if any.
-    DI,
-
-    /// # Enable interrupts
-    /// Schedules interrupt handling to be enabled after the next machine cycle.
-    EI,
-
-    /// Halt system clock
-    HALT,
-
     /// # Decrement
     ///
     /// ## `r`
@@ -217,33 +272,6 @@ pub enum Instruction {
     /// Load the value of the 16-bit combined register `HL` into the Stack Pointer
     LD_SP_HL,
 
-    /// Doesn't do anything, just takes one mcycle (4 cycles)
-    NOP,
-
-    /// # OR
-    /// Performs a bitwise OR operation between the 8-bit `A` register and the 8-bit `source`, and stores the result back
-    /// into the `A` register.
-    ///
-    /// ## Opcode
-    /// 0b10110xxx/various
-    ///
-    /// ## Flags
-    /// Z N H C
-    /// Z 0 0 0
-    ///
-    /// ## Example: OR B
-    /// ```ignore
-    /// result = A | B
-    /// A = result
-    /// flags.Z = 1 if result == 0 else 0
-    /// flags.N = 0
-    /// flags.H = 0
-    /// flags.C = 0
-    /// ```
-    OR {
-        source: ArithmeticTarget,
-    },
-
     // [Stack instructions]
     /// # **POP r**: Pop from stack
     /// Pops to the 16-bit register `rr`, data from the stack memory.
@@ -253,7 +281,7 @@ pub enum Instruction {
     /// ## Opcode
     /// `0b11xx0001`/various
     ///
-    /// ## Example: POP BC
+    /// ## Pseudocode: POP BC
     /// ```ignore
     /// BC = unsigned_16(lsb=read(SP++), msb=read(SP++))
     /// ```
@@ -264,7 +292,7 @@ pub enum Instruction {
     /// ## Opcode
     /// `0b11xx0101`/various
     ///
-    /// ## Example: PUSH BC
+    /// ## Pseudocode: PUSH BC
     /// ```ignore
     /// SP--
     /// write(SP--, msb(BC))
@@ -278,7 +306,7 @@ pub enum Instruction {
     /// # **RET**: Return from function
     ///
     ///
-    /// ## Example
+    /// ## Pseudocode
     /// ```ignore
     /// if (condition):
     ///   PC = unsigned_16(lsb=read(SP++), msb=read(SP++)    
@@ -293,7 +321,7 @@ pub enum Instruction {
     /// ## Opcode
     /// `0b11011001`/`0xD9`
     ///
-    /// ## Example
+    /// ## Pseudocode
     /// ```ignore
     /// PC = unsigned_16(lsb=read(SP++), msb=read(SP++))
     /// IME = 1
@@ -307,7 +335,7 @@ pub enum Instruction {
     /// Z N H C
     /// 0 0 0 C
     ///
-    /// ## Example
+    /// ## Pseudocode
     /// ```ignore
     /// // TODO
     /// ```
@@ -318,7 +346,7 @@ pub enum Instruction {
     /// Z N H C
     /// 0 0 0 C
     ///
-    /// ## Example
+    /// ## Pseudocode
     /// ```ignore
     /// // TODO
     /// ```
@@ -340,11 +368,52 @@ pub enum Instruction {
     /// Z N H C
     /// 0 0 0 C
     ///
-    /// ## Example
+    /// ## Pseudocode
     /// ```ignore
     /// // TODO
     /// ```
     RRC(ArithmeticTarget),
+
+    // [Flags]
+    /// # **SCF**: Set carry flag
+    /// Sets the `carry` flag, and clears the `N` and `H` flags.
+    ///
+    /// ## Opcode
+    /// `0b00110111`/`0x37`
+    ///
+    /// ## Flags:
+    /// Z N H C
+    /// - 0 0 1
+    ///
+    /// ## Pseudocode
+    /// ```ignore
+    /// flags.N = 0
+    /// flags.H = 0
+    /// flags.C = 1
+    /// ```
+    SCF,
+
+    // [Misc]
+    /// # **NOP**: No operation
+    /// Doesn't do anything, just takes 1 mcycle (4 cycles)
+    NOP,
+    /// # **STOP**: Stop system and main clocks
+    STOP,
+    /// # **HALT**: Halt system clock
+    HALT,
+
+    /// # Disable interrupts
+    /// Disables interrupt handling by setting `IME=0` and cancelling any scheduled effects of the EI instruction if any.
+    ///
+    /// ## Opcode
+    /// `0b11110011`/`0xF3`
+    DI,
+    /// # Enable interrupts
+    /// Schedules interrupt handling to be enabled after the next machine cycle.
+    ///
+    /// ## Opcode
+    /// `0b11111011`/`0xFB`
+    EI,
 
     /// Opcode prefix byte `0xCB` has been read while not in prefixed mode.
     ///
