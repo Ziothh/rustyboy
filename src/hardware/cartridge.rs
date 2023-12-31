@@ -8,8 +8,6 @@ impl<'a> CartridgeHeader<'a> {
     pub fn read_from_bus(memory_bus: &'a bus::MemoryBus) -> Self {
         let bytes = &memory_bus[bus::regions::CARTRIDGE_HEADER];
 
-        // let logo =
-
         return Self(bytes);
     }
 
@@ -20,6 +18,37 @@ impl<'a> CartridgeHeader<'a> {
         .and_then(|x| Ok(x.trim_end_matches(char::from(0))))
     }
 
+    pub fn licensee(&self) -> Option<&'static str> {
+        let code = self.0[regions::OLD_LICENSEE_CODE as usize - 256];
+
+        return match code {
+            0x33 => licensee::get_new(
+                self.relative_range_inclusive(regions::NEW_LICENSEE_CODE)
+                    .try_into()
+                    .expect("New licensee code should be 2 bytes long"),
+            ),
+            code => licensee::get_old(code),
+        };
+    }
+
+    // /// This doens't work as intended atm
+    // pub fn manufacturer_code(&self) -> Result<&str, std::str::Utf8Error> {
+    //     std::str::from_utf8(self.relative_range_inclusive(regions::MANUFACTURER_CODE))
+    // }
+
+    /// Calculates the header checksum and validates it with the the checksum byte at `$014D`.
+    pub fn validate_checksum(&self) -> bool {
+        self.relative_range_inclusive(0x0134..=0x014C)
+            .iter()
+            .fold(0u8, |checksum, byte| {
+                checksum.wrapping_sub(*byte).wrapping_sub(1)
+            })
+            .eq(&self.relative_read(regions::HEADER_CHECKSUM))
+    }
+
+    fn relative_read(&self, address: u16) -> u8 {
+        self.0[(address - regions::START) as usize]
+    }
     fn relative_range_inclusive(&self, range: ops::RangeInclusive<u16>) -> &[u8] {
         const HEADER_START: u16 = 256;
         let start = range.start() - HEADER_START;
@@ -32,6 +61,10 @@ impl<'a> CartridgeHeader<'a> {
 #[allow(dead_code)]
 pub mod regions {
     use std::ops;
+
+    use crate::hardware::bus;
+
+    pub const START: u16 = *bus::regions::CARTRIDGE_HEADER.start();
 
     /// After displaying the Nintendo logo, the built-in boot ROM jumps to the address $0100, which should then jump to the actual main program in the cartridge. Most commercial games fill this 4-byte area with a nop instruction followed by a jp $0150.
     pub const ENTRY_POINT: ops::RangeInclusive<u16> = 0x0100..=0x0103;
@@ -133,6 +166,229 @@ pub mod regions {
 ///
 /// See [gbdev.io](https://gbdev.io/pandocs/MBCs.html#mbcs)
 enum MBC {}
+
+mod licensee {
+    pub fn get_old(code: u8) -> Option<&'static str> {
+        match code {
+            0x00 => Some("None"),
+            0x01 => Some("Nintendo"),
+            0x08 => Some("Capcom"),
+            0x09 => Some("Hot-B"),
+            0x0A => Some("Jaleco"),
+            0x0B => Some("Coconuts Japan"),
+            0x0C => Some("Elite Systems"),
+            0x13 => Some("EA (Electronic Arts)"),
+            0x18 => Some("Hudsonsoft"),
+            0x19 => Some("ITC Entertainment"),
+            0x1A => Some("Yanoman"),
+            0x1D => Some("Japan Clary"),
+            0x1F => Some("Virgin Interactive"),
+            0x24 => Some("PCM Complete"),
+            0x25 => Some("San-X"),
+            0x28 => Some("Kotobuki Systems"),
+            0x29 => Some("Seta"),
+            0x30 => Some("Infogrames"),
+            0x31 => Some("Nintendo"),
+            0x32 => Some("Bandai"),
+            0x33 => unreachable!("USE NEW_LICENSEE_CODE TABLE INSTEAD"),
+            0x34 => Some("Konami"),
+            0x35 => Some("HectorSoft"),
+            0x38 => Some("Capcom"),
+            0x39 => Some("Banpresto"),
+            0x3C => Some(".Entertainment i"),
+            0x3E => Some("Gremlin"),
+            0x41 => Some("Ubisoft"),
+            0x42 => Some("Atlus"),
+            0x44 => Some("Malibu"),
+            0x46 => Some("Angel"),
+            0x47 => Some("Spectrum Holoby"),
+            0x49 => Some("Irem"),
+            0x4A => Some("Virgin Interactive"),
+            0x4D => Some("Malibu"),
+            0x4F => Some("U.S. Gold"),
+            0x50 => Some("Absolute"),
+            0x51 => Some("Acclaim"),
+            0x52 => Some("Activision"),
+            0x53 => Some("American Sammy"),
+            0x54 => Some("GameTek"),
+            0x55 => Some("Park Place"),
+            0x56 => Some("LJN"),
+            0x57 => Some("Matchbox"),
+            0x59 => Some("Milton Bradley"),
+            0x5A => Some("Mindscape"),
+            0x5B => Some("Romstar"),
+            0x5C => Some("Naxat Soft"),
+            0x5D => Some("Tradewest"),
+            0x60 => Some("Titus"),
+            0x61 => Some("Virgin Interactive"),
+            0x67 => Some("Ocean Interactive"),
+            0x69 => Some("EA (Electronic Arts)"),
+            0x6E => Some("Elite Systems"),
+            0x6F => Some("Electro Brain"),
+            0x70 => Some("Infogrames"),
+            0x71 => Some("Interplay"),
+            0x72 => Some("Broderbund"),
+            0x73 => Some("Sculptered Soft"),
+            0x75 => Some("The Sales Curve"),
+            0x78 => Some("t.hq"),
+            0x79 => Some("Accolade"),
+            0x7A => Some("Triffix Entertainment"),
+            0x7C => Some("Microprose"),
+            0x7F => Some("Kemco"),
+            0x80 => Some("Misawa Entertainment"),
+            0x83 => Some("Lozc"),
+            0x86 => Some("Tokuma Shoten Intermedia"),
+            0x8B => Some("Bullet-Proof Software"),
+            0x8C => Some("Vic Tokai"),
+            0x8E => Some("Ape"),
+            0x8F => Some("I'Max"),
+            0x91 => Some("Chunsoft Co."),
+            0x92 => Some("Video System"),
+            0x93 => Some("Tsubaraya Productions Co."),
+            0x95 => Some("Varie Corporation"),
+            0x96 => Some("Yonezawa/S'Pal"),
+            0x97 => Some("Kaneko"),
+            0x99 => Some("Arc"),
+            0x9A => Some("Nihon Bussan"),
+            0x9B => Some("Tecmo"),
+            0x9C => Some("Imagineer"),
+            0x9D => Some("Banpresto"),
+            0x9F => Some("Nova"),
+            0xA1 => Some("Hori Electric"),
+            0xA2 => Some("Bandai"),
+            0xA4 => Some("Konami"),
+            0xA6 => Some("Kawada"),
+            0xA7 => Some("Takara"),
+            0xA9 => Some("Technos Japan"),
+            0xAA => Some("Broderbund"),
+            0xAC => Some("Toei Animation"),
+            0xAD => Some("Toho"),
+            0xAF => Some("Namco"),
+            0xB0 => Some("acclaim"),
+            0xB1 => Some("ASCII or Nexsoft"),
+            0xB2 => Some("Bandai"),
+            0xB4 => Some("Square Enix"),
+            0xB6 => Some("HAL Laboratory"),
+            0xB7 => Some("SNK"),
+            0xB9 => Some("Pony Canyon"),
+            0xBA => Some("Culture Brain"),
+            0xBB => Some("Sunsoft"),
+            0xBD => Some("Sony Imagesoft"),
+            0xBF => Some("Sammy"),
+            0xC0 => Some("Taito"),
+            0xC2 => Some("Kemco"),
+            0xC3 => Some("Squaresoft"),
+            0xC4 => Some("Tokuma Shoten Intermedia"),
+            0xC5 => Some("Data East"),
+            0xC6 => Some("Tonkinhouse"),
+            0xC8 => Some("Koei"),
+            0xC9 => Some("UFL"),
+            0xCA => Some("Ultra"),
+            0xCB => Some("Vap"),
+            0xCC => Some("Use Corporation"),
+            0xCD => Some("Meldac"),
+            0xCE => Some(".Pony Canyon or"),
+            0xCF => Some("Angel"),
+            0xD0 => Some("Taito"),
+            0xD1 => Some("Sofel"),
+            0xD2 => Some("Quest"),
+            0xD3 => Some("Sigma Enterprises"),
+            0xD4 => Some("ASK Kodansha Co."),
+            0xD6 => Some("Naxat Soft"),
+            0xD7 => Some("Copya System"),
+            0xD9 => Some("Banpresto"),
+            0xDA => Some("Tomy"),
+            0xDB => Some("LJN"),
+            0xDD => Some("NCS"),
+            0xDE => Some("Human"),
+            0xDF => Some("Altron"),
+            0xE0 => Some("Jaleco"),
+            0xE1 => Some("Towa Chiki"),
+            0xE2 => Some("Yutaka"),
+            0xE3 => Some("Varie"),
+            0xE5 => Some("Epcoh"),
+            0xE7 => Some("Athena"),
+            0xE8 => Some("Asmik ACE Entertainment"),
+            0xE9 => Some("Natsume"),
+            0xEA => Some("King Records"),
+            0xEB => Some("Atlus"),
+            0xEC => Some("Epic/Sony Records"),
+            0xEE => Some("IGS"),
+            0xF0 => Some("A Wave"),
+            0xF3 => Some("Extreme Entertainment"),
+            0xFF => Some("LJN"),
+            _ => None,
+        }
+    }
+
+    pub fn get_new(code: [u8; 2]) -> Option<&'static str> {
+        match code {
+            [b'0', b'0'] => Some("None"),
+            [b'0', b'1'] => Some("Nintendo R&D1"),
+            [b'0', b'8'] => Some("Capcom"),
+            [b'1', b'3'] => Some("Electronic Arts"),
+            [b'1', b'8'] => Some("Hudson Soft"),
+            [b'1', b'9'] => Some("b-ai"),
+            [b'2', b'0'] => Some("kss"),
+            [b'2', b'2'] => Some("pow"),
+            [b'2', b'4'] => Some("PCM Complete"),
+            [b'2', b'5'] => Some("san-x"),
+            [b'2', b'8'] => Some("Kemco Japan"),
+            [b'2', b'9'] => Some("seta"),
+            [b'3', b'0'] => Some("Viacom"),
+            [b'3', b'1'] => Some("Nintendo"),
+            [b'3', b'2'] => Some("Bandai"),
+            [b'3', b'3'] => Some("Ocean/Acclaim"),
+            [b'3', b'4'] => Some("Konami"),
+            [b'3', b'5'] => Some("Hector"),
+            [b'3', b'7'] => Some("Taito"),
+            [b'3', b'8'] => Some("Hudson"),
+            [b'3', b'9'] => Some("Banpresto"),
+            [b'4', b'1'] => Some("Ubi Soft"),
+            [b'4', b'2'] => Some("Atlus"),
+            [b'4', b'4'] => Some("Malibu"),
+            [b'4', b'6'] => Some("angel"),
+            [b'4', b'7'] => Some("Bullet-Proof"),
+            [b'4', b'9'] => Some("irem"),
+            [b'5', b'0'] => Some("Absolute"),
+            [b'5', b'1'] => Some("Acclaim"),
+            [b'5', b'2'] => Some("Activision"),
+            [b'5', b'3'] => Some("American sammy"),
+            [b'5', b'4'] => Some("Konami"),
+            [b'5', b'5'] => Some("Hi tech entertainment"),
+            [b'5', b'6'] => Some("LJN"),
+            [b'5', b'7'] => Some("Matchbox"),
+            [b'5', b'8'] => Some("Mattel"),
+            [b'5', b'9'] => Some("Milton Bradley"),
+            [b'6', b'0'] => Some("Titus"),
+            [b'6', b'1'] => Some("Virgin"),
+            [b'6', b'4'] => Some("LucasArts"),
+            [b'6', b'7'] => Some("Ocean"),
+            [b'6', b'9'] => Some("Electronic Arts"),
+            [b'7', b'0'] => Some("Infogrames"),
+            [b'7', b'1'] => Some("Interplay"),
+            [b'7', b'2'] => Some("Broderbund"),
+            [b'7', b'3'] => Some("sculptured"),
+            [b'7', b'5'] => Some("sci"),
+            [b'7', b'8'] => Some("THQ"),
+            [b'7', b'9'] => Some("Accolade"),
+            [b'8', b'0'] => Some("misawa"),
+            [b'8', b'3'] => Some("lozc"),
+            [b'8', b'6'] => Some("Tokuma Shoten Intermedia"),
+            [b'8', b'7'] => Some("Tsukuda Original"),
+            [b'9', b'1'] => Some("Chunsoft"),
+            [b'9', b'2'] => Some("Video system"),
+            [b'9', b'3'] => Some("Ocean/Acclaim"),
+            [b'9', b'5'] => Some("Varie"),
+            [b'9', b'6'] => Some("Yonezawa/s'pal"),
+            [b'9', b'7'] => Some("Kaneko"),
+            [b'9', b'9'] => Some("Pack in soft"),
+            [b'9', b'H'] => Some("Bottom Up"),
+            [b'A', b'4'] => Some("Konami (Yu-Gi-Oh!)"),
+            _ => None,
+        }
+    }
+}
 
 // #[derive(Debug)]
 // struct ROM {

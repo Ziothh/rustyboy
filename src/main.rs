@@ -6,12 +6,11 @@ mod prelude;
 mod program;
 
 fn main() {
-    let super_mario_land_rom =
-        ROM::try_new("./roms/gb/Super-Mario-Land-4.gb").expect("Failed to find rom");
-    // let pokemon_rom = ROM::try_new("./roms/gb/Pokemon-Red.gb").expect("Failed to find rom");
+    // let rom = ROM::try_new("./roms/gb/Super-Mario-Land-4.gb").expect("Failed to find rom");
+    let rom = ROM::try_new("./roms/gb/Pokemon-Red.gb").expect("Failed to find rom");
 
     let mut bus = hardware::bus::MemoryBus::new();
-    bus.load(&super_mario_land_rom.read().unwrap()[0..u16::MAX as usize]);
+    bus.load(&rom.read().unwrap()[0..u16::MAX as usize]);
 
     // let program = program::Program::new(bus);
     //
@@ -24,11 +23,13 @@ fn main() {
     // let title = std::str::from_utf8(&bus[hardware::cartridge::regions::TITLE])
     //     .expect("Title is not valid ascii")
     //     .trim_end_matches(char::from(0));
-    
-    let header =hardware::cartridge::CartridgeHeader::read_from_bus(&bus);
+
+    let header = hardware::cartridge::CartridgeHeader::read_from_bus(&bus);
     let title = header.title();
 
     dbg!(title);
+    dbg!(&header.licensee());
+    dbg!(&header.validate_checksum());
 }
 
 #[derive(Debug)]
