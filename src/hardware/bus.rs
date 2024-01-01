@@ -99,7 +99,7 @@ pub mod regions {
     pub const ROM_BANK_00: ops::RangeInclusive<u16> = 0x0000..=0x3FFF;
     /// 16 KiB ROM Bank 01~NN
     /// From cartridge, switchable bank via mapper (if any)
-    pub const ROM_BANK_01: ops::RangeInclusive<u16> = 0x4000..=0x7FFF;
+    pub const ROM_BANK_NN: ops::RangeInclusive<u16> = 0x4000..=0x7FFF;
     /// 8 KiB Video RAM (VRAM)
     /// From cartridge, switchable bank if any
     pub const VRAM: ops::RangeInclusive<u16> = 0x8000..=0x9FFF;
@@ -117,7 +117,11 @@ pub mod regions {
     /// Object attribute memory (OAM)
     pub const OAM: ops::RangeInclusive<u16> = 0xFE00..=0xFE9F;
     /// Not Usable
+    ///
     /// Nintendo says use of this area is prohibited
+    /// This area returns $FF when OAM is blocked, and otherwise the behavior depends on the hardware revision.
+    /// On DMG, MGB, SGB, and SGB2, reads during OAM block trigger OAM corruption. 
+    /// Reads otherwise return $00
     pub const NOT_USABLE: ops::RangeInclusive<u16> = 0xFEA0..=0xFEFF;
     /// I/O Registers
     pub const IO_REGISTERS: ops::RangeInclusive<u16> = 0xFF00..=0xFF7F;
@@ -125,6 +129,30 @@ pub mod regions {
     pub const HRAM: ops::RangeInclusive<u16> = 0xFF80..=0xFFFE;
     /// Interrupt Enable register (IE)
     pub const IE: ops::RangeInclusive<u16> = 0xFFFF..=0xFFFF;
+
+    /// Currently only includes DMG register maps
+    ///
+    /// See [gbdev.io](https://gbdev.io/pandocs/Hardware_Reg_List.html) for more info
+    pub mod io_registers {
+        use std::ops;
+        
+        const JOYPAD: u16 = 0xFF00;
+        const SERIAL_TRANSFER: ops::RangeInclusive<u16> = 0xFF01..=0xFF02;
+        const TIME_AND_DIVIDER: ops::RangeInclusive<u16> = 0xFF04..=0xFF07;
+        const AUDIO: ops::RangeInclusive<u16> = 0xFF10..=0xFF26;
+        const WAVE_PATTERN: ops::RangeInclusive<u16> = 0xFF30..=0xFF3F;
+        /// LCD Control, Status, Position, Scrolling, and Palettes
+        const LCD: ops::RangeInclusive<u16> = 0xFF40..=0xFF4B;
+        // Disabled because it first appeared on CGB instead of DMG
+        // const VRAM_BANK_SELECT: u16 = 0xFF4F;
+        /// Set to non-zero to disable boot ROM
+        const DISABLE_BOOT_ROM: u16 = 0xFF50;
+
+        // CGB only registers so I'm not tackling this atm
+        // $FF51	$FF55	CGB	VRAM DMA
+        // $FF68	$FF6B	CGB	BG / OBJ Palettes
+        // $FF70		CGB	WRAM Bank Select
+    }
 
     #[allow(dead_code)]
     pub mod jump_vectors {

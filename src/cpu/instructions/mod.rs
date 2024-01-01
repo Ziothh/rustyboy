@@ -104,7 +104,7 @@ pub enum Instruction {
     /// n:    `0b11101110`/`0xEE + n`
     ///
     /// ## Pseudocode: XOR B
-    /// ```
+    /// ```ignore
     /// result = A ^ B
     /// A = result
     /// flags.Z = 1 if result == 0 else 0

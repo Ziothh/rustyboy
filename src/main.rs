@@ -1,9 +1,6 @@
 use std::{fs, io::prelude::*, path};
 
-mod cpu;
-mod hardware;
-mod prelude;
-mod program;
+use gb::hardware;
 
 fn main() {
     // let rom = ROM::try_new("./roms/gb/Super-Mario-Land-4.gb").expect("Failed to find rom");
