@@ -12,7 +12,7 @@ pub enum Instruction {
     /// and stores the result back into the `A` register.
     ///
     /// # Example
-    /// ```ignore
+    /// ```text
     /// // Example: ADC B
     /// if opcode == 0x88:
     ///   result, carry_per_bit = A + flags.C + B
@@ -27,7 +27,7 @@ pub enum Instruction {
     /// and stores the result back into the `A` register.
     ///
     /// # Example
-    /// ```ignore
+    /// ```text
     /// // Example: ADD (HL)
     /// if opcode == 0x86:
     ///   data = read(HL)
@@ -59,7 +59,7 @@ pub enum Instruction {
     /// Z 1 H C
     ///
     /// ## Pseudocode: SUB B
-    /// ```ignore
+    /// ```text
     /// result, carry_per_bit = A - B
     /// A = result
     /// flags.Z = 1 if result == 0 else 0
@@ -85,7 +85,7 @@ pub enum Instruction {
     /// Z 0 0 0
     ///
     /// ## Pseudocode: OR B
-    /// ```ignore
+    /// ```text
     /// result = A | B
     /// A = result
     /// flags.Z = 1 if result == 0 else 0
@@ -104,7 +104,7 @@ pub enum Instruction {
     /// n:    `0b11101110`/`0xEE + n`
     ///
     /// ## Pseudocode: XOR B
-    /// ```ignore
+    /// ```text
     /// result = A ^ B
     /// A = result
     /// flags.Z = 1 if result == 0 else 0
@@ -127,7 +127,7 @@ pub enum Instruction {
     /// Z 1 H C
     ///
     /// ## Pseudocode: SBC B
-    /// ```ignore
+    /// ```text
     /// result, carry_per_bit = A - flags.C - B
     /// A = result
     /// flags.Z = 1 if result == 0 else 0
@@ -152,7 +152,7 @@ pub enum Instruction {
     /// `0b11xxx111`/various
     ///
     /// ## Pseudocode
-    /// ```ignore
+    /// ```text
     /// n = rst_address(opcode)
     /// SP--
     /// write(SP--, msb(PC))
@@ -165,7 +165,7 @@ pub enum Instruction {
     /// Flips the `C`(arry) flag, and clears the `N` and `H` flags.
     ///
     /// ## Pseudocode
-    /// ```ignore
+    /// ```text
     /// flags.N = 0
     /// flags.H = 0
     /// flags.C = !flags.C
@@ -175,7 +175,7 @@ pub enum Instruction {
     /// Flips all the bits in the 8-bit A register, and sets the N and H flags.
     ///
     /// ## Pseudocode
-    /// ```ignore
+    /// ```text
     /// A = !A
     /// flags.N = 1
     /// flags.H = 1
@@ -262,7 +262,7 @@ pub enum Instruction {
     },
     /// Load into the address at the immediate address nn, the value of the Stack Pointer
     ///
-    /// ```ignore
+    /// ```text
     /// nn = u16::from_nibles(lsb=mem[PC++], msb=mem[PC++])
     /// mem[nn] = PC
     /// ```
@@ -283,7 +283,7 @@ pub enum Instruction {
     /// `0b11xx0001`/various
     ///
     /// ## Pseudocode: POP BC
-    /// ```ignore
+    /// ```text
     /// BC = unsigned_16(lsb=read(SP++), msb=read(SP++))
     /// ```
     POP(Reg16),
@@ -294,7 +294,7 @@ pub enum Instruction {
     /// `0b11xx0101`/various
     ///
     /// ## Pseudocode: PUSH BC
-    /// ```ignore
+    /// ```text
     /// SP--
     /// write(SP--, msb(BC))
     /// write(SP, lsb(BC))
@@ -308,7 +308,7 @@ pub enum Instruction {
     ///
     ///
     /// ## Pseudocode
-    /// ```ignore
+    /// ```text
     /// if (condition):
     ///   PC = unsigned_16(lsb=read(SP++), msb=read(SP++)    
     /// ```
@@ -323,7 +323,7 @@ pub enum Instruction {
     /// `0b11011001`/`0xD9`
     ///
     /// ## Pseudocode
-    /// ```ignore
+    /// ```text
     /// PC = unsigned_16(lsb=read(SP++), msb=read(SP++))
     /// IME = 1
     /// ```
@@ -337,7 +337,7 @@ pub enum Instruction {
     /// 0 0 0 C
     ///
     /// ## Pseudocode
-    /// ```ignore
+    /// ```text
     /// // TODO
     /// ```
     RL(ArithmeticTarget),
@@ -348,7 +348,7 @@ pub enum Instruction {
     /// 0 0 0 C
     ///
     /// ## Pseudocode
-    /// ```ignore
+    /// ```text
     /// // TODO
     /// ```
     RLC(ArithmeticTarget),
@@ -359,7 +359,7 @@ pub enum Instruction {
     /// 0 0 0 C
     ///
     /// ## Example
-    /// ```ignore
+    /// ```text
     /// // TODO
     /// ```
     RR(ArithmeticTarget),
@@ -370,7 +370,7 @@ pub enum Instruction {
     /// 0 0 0 C
     ///
     /// ## Pseudocode
-    /// ```ignore
+    /// ```text
     /// // TODO
     /// ```
     RRC(ArithmeticTarget),
@@ -387,7 +387,7 @@ pub enum Instruction {
     /// - 0 0 1
     ///
     /// ## Pseudocode
-    /// ```ignore
+    /// ```text
     /// flags.N = 0
     /// flags.H = 0
     /// flags.C = 1

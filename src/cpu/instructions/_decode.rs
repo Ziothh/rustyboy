@@ -116,7 +116,7 @@ pub enum LoadType {
     /// Load the bytes from the `source` register into the `destination` register.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// // example: LD B, C
     /// B = C
     /// ```
@@ -130,7 +130,7 @@ pub enum LoadType {
     /// Load the bytes from the immidiate memory address at the `program_counter` into the `destination` register.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// // example: LD B, n
     /// B = read(PC++)
     /// ```
@@ -139,7 +139,7 @@ pub enum LoadType {
     /// Load the bytes from the memory address pointed to by the `HL` combined register into the `destination` register.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// // example: LD B, (HL)
     /// B = read(HL)
     /// ```
@@ -153,7 +153,7 @@ pub enum LoadType {
     /// Load to the 8-bit register, data from the absolute address specified by the 16-bit register.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// // example: LD (HL), B
     /// write(HL, B)
     /// ```
@@ -167,7 +167,7 @@ pub enum LoadType {
     /// Load the bytes from `destination` register into the memory address pointed to by the `HL` register.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// n = read(PC++)
     /// write(HL, n)
     /// ```
@@ -176,7 +176,7 @@ pub enum LoadType {
     /// Load to the 8-bit register, data from the absolute address specified by the 16-bit operand nn
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// nn = unsigned_16(lsb=read(PC++), msb=read(PC++))
     /// A = read(nn)
     /// ```
@@ -190,7 +190,7 @@ pub enum LoadType {
     /// Load to the absolute address specified by the 16-bit operand nn, data from the 8-bit register.    
     /// 
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// nn = unsigned_16(lsb=read(PC++), msb=read(PC++))
     /// write(nn, A)
     /// ```
@@ -205,7 +205,7 @@ pub enum LoadType {
     /// The value of `HL` is decremented after the memory read.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// A = read(HL--)
     /// ```
     DecFromIndirect,
@@ -213,7 +213,7 @@ pub enum LoadType {
     /// The value of HL is decremented after the memory write.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// write(HL--, A)
     /// ```
     DecToIndirect,
@@ -222,7 +222,7 @@ pub enum LoadType {
     /// The value of `HL` is incremented after the memory read.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// A = read(HL++)
     /// ```
     IncFromIndirect,
@@ -230,7 +230,7 @@ pub enum LoadType {
     /// The value of `HL` is incremented after the memory write.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// write(HL++, A)
     /// ```
     IncToIndirect,
@@ -238,7 +238,7 @@ pub enum LoadType {
     /// Load to the 16-bit register `Reg16`, the immediate 16-bit data nn.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// nn = unsigned_16(lsb=read(PC++), msb=read(PC++))
     /// BC = nn
     /// ```
@@ -251,7 +251,7 @@ pub enum LoadHalfwordType {
     /// and the least significant byte to the value of `source`, so the possible range is `0xFF00..=0xFFFF`.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// // Example
     ///
     /// A = read(unsigned_16(lsb=C, msb=0xFF))
@@ -266,7 +266,7 @@ pub enum LoadHalfwordType {
     /// and the least significant byte to the value of `destination`, so the possible range is `0xFF00..=0xFFFF`.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// // Example
     ///
     /// write(unsigned_16(lsb=C, msb=0xFF), A)
@@ -281,7 +281,7 @@ pub enum LoadHalfwordType {
     /// to the value of `source`, so the possible range is `0xFF00..=0xFFFF`.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// // Example
     ///
     /// n = read(PC++)
@@ -297,7 +297,7 @@ pub enum LoadHalfwordType {
     /// and the least significant byte to the value of `A`, so the possible range is `0xFF00-0xFFFF`.
     ///
     /// # Pseudo code
-    /// ```ignore
+    /// ```text
     /// // Example
     ///
     /// n = read(PC++)

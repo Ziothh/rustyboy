@@ -11,7 +11,7 @@ pub struct Registers {
     /// the lower four bits of the register are always 0s and
     /// the CPU automatically writes to the upper four bits when certain things happen.
     ///
-    /// ```ignore
+    /// ```text
     ///   ┌-> Carry
     /// ┌-+> Subtraction
     /// | |
@@ -126,7 +126,7 @@ pub struct FlagsRegister {
     pub carry: bool,
     /// Set to `true` if there is an operation results in an overflow from the lower nibble (the lower four bits) to the upper nibble (the upper four bits).
     ///
-    /// ```ignore
+    /// ```text
     /// // Example
     ///
     ///       lower nibble            lower nibble

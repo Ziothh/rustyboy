@@ -146,7 +146,7 @@ pub mod regions {
     pub const ROM_VERSION_NUMBER: u16 = 0x014C;
 
     /// This byte contains an 8-bit checksum computed from the cartridge header bytes $0134–014C. The boot ROM computes the checksum as follows:
-    /// ```ignore
+    /// ```text
     /// uint8_t checksum = 0;
     /// for (uint16_t address = 0x0134; address <= 0x014C; address++) {
     ///   checksum = checksum - rom[address] - 1;
