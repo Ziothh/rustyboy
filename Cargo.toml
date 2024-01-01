@@ -7,6 +7,11 @@ name = "gb-emu"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "misc"
+path = "src/lib/mod.rs"
+test = false
+
 [[bin]]
 name = "gb"
 path = "src/main.rs"
