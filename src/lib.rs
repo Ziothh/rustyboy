@@ -7,6 +7,5 @@
 
 pub mod prelude;
 pub mod hardware;
-pub mod cpu;
 pub mod program;
 pub mod io;

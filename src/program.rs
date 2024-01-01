@@ -1,4 +1,4 @@
-use crate::{cpu, hardware::bus::MemoryBus, prelude::LittleEndian};
+use crate::{hardware::{cpu, bus::MemoryBus}, prelude::LittleEndian};
 
 /// An iterator that iterates over all of the program bytes and parses them into `Instruction`s
 pub struct Program {

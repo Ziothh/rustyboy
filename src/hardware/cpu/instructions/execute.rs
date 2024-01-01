@@ -2,7 +2,7 @@
  * This file implements the CPU instructions, based on https://gekkio.fi/files/gb-docs/gbctr.pdf
  */
 
-use crate::cpu;
+use super::super::super::cpu;
 
 impl cpu::CPU {
     /// Executes a single instruction
