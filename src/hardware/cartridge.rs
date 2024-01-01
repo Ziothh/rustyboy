@@ -1,6 +1,6 @@
-use std::ops;
+use std::str;
 
-use super::bus;
+use super::{bus, MemoryBus};
 
 pub struct CartridgeHeader<'a>(&'a [u8]);
 
@@ -9,9 +9,9 @@ impl<'a> CartridgeHeader<'a> {
         Self(&memory_bus[bus::regions::CARTRIDGE_HEADER])
     }
 
-    pub fn title(&self) -> Result<&str, std::str::Utf8Error> {
+    pub fn title(&self) -> Result<&str, str::Utf8Error> {
         std::str::from_utf8(
-            self.relative_range_inclusive(regions::TITLE), // &bus[regions::TITLE]
+            self.read_relative_region(regions::TITLE), // &bus[regions::TITLE]
         )
         .and_then(|x| Ok(x.trim_end_matches(char::from(0))))
     }
@@ -21,7 +21,7 @@ impl<'a> CartridgeHeader<'a> {
 
         return match code {
             0x33 => licensee::get_new(
-                self.relative_range_inclusive(regions::NEW_LICENSEE_CODE)
+                self.read_relative_region(regions::NEW_LICENSEE_CODE)
                     .try_into()
                     .expect("New licensee code should be 2 bytes long"),
             ),
@@ -36,23 +36,23 @@ impl<'a> CartridgeHeader<'a> {
 
     /// Calculates the header checksum and validates it with the the checksum byte at `$014D`.
     pub fn validate_checksum(&self) -> bool {
-        self.relative_range_inclusive(0x0134..=0x014C)
+        self.read_relative_region(0x0134..=0x014C)
             .iter()
             .fold(0u8, |checksum, byte| {
                 checksum.wrapping_sub(*byte).wrapping_sub(1)
             })
-            .eq(&self.relative_read(regions::HEADER_CHECKSUM))
+            .eq(&self.read_relative_addr(regions::HEADER_CHECKSUM))
     }
 
     /// Calculates the `address` relative to the start of the cartridge header
     /// and returns it as a `usize`
-    fn relative_address(address: u16) -> usize {
+    fn relative_address(address: MemoryBus::Addr) -> usize {
         (address - regions::START) as usize
     }
-    fn relative_read(&self, address: u16) -> u8 {
+    fn read_relative_addr(&self, address: MemoryBus::Addr) -> u8 {
         self.0[Self::relative_address(address)]
     }
-    fn relative_range_inclusive(&self, range: ops::RangeInclusive<u16>) -> &[u8] {
+    fn read_relative_region(&self, range: MemoryBus::Region) -> &[u8] {
         &self.0[Self::relative_address(*range.start())..=Self::relative_address(*range.end())]
     }
 }

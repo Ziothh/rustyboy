@@ -65,60 +65,9 @@ enum Layer {
 type Palette = [(); 4];
 
 mod lcd {
-    pub const PX_WIDTH: usize = 160;
-    pub const PX_HEIGHT: usize = 144;
+    pub const WINDOW_WIDTH: usize = 160;
+    pub const WINDOW_HEIGHT: usize = 144;
 }
 
 mod vram_regions {
-    use std::ops;
-
-    /// Each tile takes 16 bytes, thus allows for 384 tiles.
-    pub mod tile_data {
-        use std::ops;
-
-        /// The full VRAM memory range of the tile data
-        /// It contains 384 tiles.
-        const FULL_RANGE: ops::RangeInclusive<u16> = 0x8000..=0x97FF;
-
-        const BLOCK_AMOUNT: usize = 3;
-        const SIZE: u16 = (*FULL_RANGE.end() + 1) - *FULL_RANGE.start();
-        const BLOCK_SIZE: u16 = SIZE / BLOCK_AMOUNT as u16;
-        const TILES_PER_BLOCK: u16 = BLOCK_SIZE / 16;
-
-        const fn calc_block(block_index: u16) -> ops::RangeInclusive<u16> {
-            (*FULL_RANGE.start() + (block_index * BLOCK_SIZE))
-                ..=(*FULL_RANGE.start() - 1 + ((block_index + 1) * BLOCK_SIZE))
-        }
-
-        /// The memory ranges of the 3 blocks of 128 tiles
-        pub const BLOCKS: [ops::RangeInclusive<u16>; BLOCK_AMOUNT] =
-            [calc_block(0), calc_block(1), calc_block(2)];
-
-        /// Tiles are always indexed using an 8-bit integer, but the addressing method may differ.
-        /// The “$8000 method” uses $8000 as its base pointer and uses an unsigned addressing, meaning that tiles 0-127 are in block 0, and tiles 128-255 are in block 1.
-        /// The “$8800 method” uses $9000 as its base pointer and uses a signed addressing, meaning that tiles 0-127 are in block 2, and tiles -128 to -1 are in block 1, or to put it differently, “$8800 addressing” takes tiles 0-127 from block 2 and tiles 128-255 from block 1.
-        /// (You can notice that block 1 is shared by both addressing methods)
-        ///
-        /// Objects always use “$8000 addressing”, but the BG and Window can use either mode, controlled by **LCDC bit 4**.
-        pub fn get_tile() -> ! {
-            todo!()
-        }
-
-        #[cfg(test)]
-        mod test {
-            use super::*;
-
-            #[test]
-            fn check_block_boundries() {
-                assert_eq!(BLOCKS[0].len() / 16, 128);
-                assert_eq!(BLOCKS[1].len() / 16, 128);
-                assert_eq!(BLOCKS[2].len() / 16, 128);
-
-                assert_eq!(*BLOCKS[0].start(), *FULL_RANGE.start());
-                assert_eq!(*BLOCKS[0].end(), *BLOCKS[1].start() - 1);
-                assert_eq!(*BLOCKS[1].end(), *BLOCKS[2].start() - 1);
-                assert_eq!(*BLOCKS[2].end(), *FULL_RANGE.end());
-            }
-        }
-    }
 }

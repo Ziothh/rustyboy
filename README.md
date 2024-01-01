@@ -6,3 +6,6 @@ WIP
  - [ ] Emulate CPU instructions (ongoing)
  - [ ] Display
  - [ ] I/O interrupts
+
+### Cleanup:
+ - [ ] Use MemoryBus::{Addr, Region} where possible
