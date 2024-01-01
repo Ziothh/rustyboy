@@ -122,7 +122,6 @@ mod vram_regions {
 #[cfg(test)]
 mod test {
     use super::*;
-    use super::super::*;
 
     #[test]
     fn check_block_boundries() {

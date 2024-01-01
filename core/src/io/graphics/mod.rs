@@ -1,6 +1,8 @@
 mod tiles;
 pub use tiles::Tile;
 
+pub mod lcd;
+
 /// 2 bit color ID a pixel
 ///
 /// When a tile is used in the Background or Window, these color IDs are associated with a palette.
@@ -64,10 +66,6 @@ enum Layer {
 /// Array of 4 colors
 type Palette = [(); 4];
 
-mod lcd {
-    pub const WINDOW_WIDTH: usize = 160;
-    pub const WINDOW_HEIGHT: usize = 144;
-}
 
 mod vram_regions {
 }

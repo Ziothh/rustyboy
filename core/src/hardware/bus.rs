@@ -2,6 +2,8 @@ use std::ops;
 
 use crate::prelude::LittleEndian;
 
+pub type Addr = u16;
+
 // All information about the memory bus comes from these links:
 // - [gbdev.io](https://gbdev.io/pandocs/Memory_Map.html)
 

@@ -31,6 +31,10 @@
 
       # Libraries that are mostly needed for tauri to work
       libraries = with pkgs; [
+            libxkbcommon
+            libGL
+            # WINIT_UNIX_BACKEND=wayland
+            wayland
       ];
 
       packages = with pkgs; [

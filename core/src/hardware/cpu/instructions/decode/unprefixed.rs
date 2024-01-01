@@ -1,8 +1,7 @@
 use super::super::super::{
-
-        instructions::{ArithmeticTarget, JumpAddress, JumpCondition, LoadTarget},
-        memory::{Address, Reg16, Reg8},
-        Instruction,
+    instructions::{ArithmeticTarget, JumpAddress, JumpCondition, LoadTarget},
+    memory::{Address, Reg16, Reg8},
+    Instruction,
 };
 use crate::program::Program;
 
@@ -1925,7 +1924,9 @@ impl Instruction {
             //     B (immediate)
             // Flags: Z N H C
             //        Z 0 0 0
-            0xB0 => Ok(Instruction::OR { source: ArithmeticTarget::Reg8(Reg8::B) }),
+            0xB0 => Ok(Instruction::OR {
+                source: ArithmeticTarget::Reg8(Reg8::B),
+            }),
 
             // Instruction: OR (immediate)
             // { bytes: 1, cycles: 4 }
@@ -1934,7 +1935,9 @@ impl Instruction {
             //     C (immediate)
             // Flags: Z N H C
             //        Z 0 0 0
-            0xB1 => Ok(Instruction::OR { source: ArithmeticTarget::Reg8(Reg8::C) }),
+            0xB1 => Ok(Instruction::OR {
+                source: ArithmeticTarget::Reg8(Reg8::C),
+            }),
 
             // Instruction: OR (immediate)
             // { bytes: 1, cycles: 4 }
@@ -1943,7 +1946,9 @@ impl Instruction {
             //     D (immediate)
             // Flags: Z N H C
             //        Z 0 0 0
-            0xB2 => Ok(Instruction::OR { source: ArithmeticTarget::Reg8(Reg8::D) }),
+            0xB2 => Ok(Instruction::OR {
+                source: ArithmeticTarget::Reg8(Reg8::D),
+            }),
 
             // Instruction: OR (immediate)
             // { bytes: 1, cycles: 4 }
@@ -1952,7 +1957,9 @@ impl Instruction {
             //     E (immediate)
             // Flags: Z N H C
             //        Z 0 0 0
-            0xB3 => Ok(Instruction::OR { source: ArithmeticTarget::Reg8(Reg8::E) }),
+            0xB3 => Ok(Instruction::OR {
+                source: ArithmeticTarget::Reg8(Reg8::E),
+            }),
 
             // Instruction: OR (immediate)
             // { bytes: 1, cycles: 4 }
@@ -1961,7 +1968,9 @@ impl Instruction {
             //     H (immediate)
             // Flags: Z N H C
             //        Z 0 0 0
-            0xB4 => Ok(Instruction::OR { source: ArithmeticTarget::Reg8(Reg8::H) }),
+            0xB4 => Ok(Instruction::OR {
+                source: ArithmeticTarget::Reg8(Reg8::H),
+            }),
 
             // Instruction: OR (immediate)
             // { bytes: 1, cycles: 4 }
@@ -1970,7 +1979,9 @@ impl Instruction {
             //     L (immediate)
             // Flags: Z N H C
             //        Z 0 0 0
-            0xB5 => Ok(Instruction::OR { source: ArithmeticTarget::Reg8(Reg8::L) }),
+            0xB5 => Ok(Instruction::OR {
+                source: ArithmeticTarget::Reg8(Reg8::L),
+            }),
 
             // Instruction: OR
             // { bytes: 1, cycles: 8 }
@@ -1979,7 +1990,9 @@ impl Instruction {
             //     HL
             // Flags: Z N H C
             //        Z 0 0 0
-            0xB6 => Ok(Instruction::OR { source: ArithmeticTarget::Indirect }),
+            0xB6 => Ok(Instruction::OR {
+                source: ArithmeticTarget::Indirect,
+            }),
 
             // Instruction: OR (immediate)
             // { bytes: 1, cycles: 4 }
@@ -1988,7 +2001,9 @@ impl Instruction {
             //     A (immediate)
             // Flags: Z N H C
             //        Z 0 0 0
-            0xB7 => Ok(Instruction::OR { source: ArithmeticTarget::Reg8(Reg8::A) }),
+            0xB7 => Ok(Instruction::OR {
+                source: ArithmeticTarget::Reg8(Reg8::A),
+            }),
 
             // Instruction: OR (immediate)
             // { bytes: 2, cycles: 8 }
@@ -1997,7 +2012,11 @@ impl Instruction {
             //     n8 (immediate)
             // Flags: Z N H C
             //        Z 0 0 0
-            0xF6 => Ok(Instruction::OR { source: ArithmeticTarget::Immediate { value: program.next_byte() } }),
+            0xF6 => Ok(Instruction::OR {
+                source: ArithmeticTarget::Immediate {
+                    value: program.next_byte(),
+                },
+            }),
 
             // Instruction: POP (immediate)
             // { bytes: 1, cycles: 12 }
@@ -2288,7 +2307,9 @@ impl Instruction {
             //     n8 (immediate)
             // Flags: Z N H C
             //        Z 1 H C
-            0xDE => Ok(Instruction::SBC(ArithmeticTarget::Immediate { value: program.next_byte() })),
+            0xDE => Ok(Instruction::SBC(ArithmeticTarget::Immediate {
+                value: program.next_byte(),
+            })),
 
             // Instruction: SCF (immediate)
             // { bytes: 1, cycles: 4 }
@@ -2384,7 +2405,9 @@ impl Instruction {
             //     n8 (immediate)
             // Flags: Z N H C
             //        Z 1 H C
-            0xD6 => Ok(Instruction::SUB(ArithmeticTarget::Immediate { value: program.next_byte() })),
+            0xD6 => Ok(Instruction::SUB(ArithmeticTarget::Immediate {
+                value: program.next_byte(),
+            })),
 
             // Instruction: XOR (immediate)
             // { bytes: 1, cycles: 4 }
@@ -2465,7 +2488,9 @@ impl Instruction {
             //     n8 (immediate)
             // Flags: Z N H C
             //        Z 0 0 0
-            0xEE => Ok(Instruction::XOR(ArithmeticTarget::Immediate { value: program.next_byte() })),
+            0xEE => Ok(Instruction::XOR(ArithmeticTarget::Immediate {
+                value: program.next_byte(),
+            })),
 
             0xD3 | 0xDB | 0xDD | 0xE3 | 0xE4 | 0xEB | 0xEC | 0xED | 0xF4 | 0xFC | 0xFD => {
                 Ok(Instruction::UNDEFINED)
