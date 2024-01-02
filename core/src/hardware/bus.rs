@@ -129,6 +129,14 @@ pub mod regions {
     /// Nintendo says use of this area is prohibited.
     pub const ECHO_RAM: MemoryBus::Region = 0xE000..=0xFDFF;
     /// Object attribute memory (OAM)
+    ///
+    /// 40 entries consisting of four bytes.
+    /// - Byte 0: Y Position
+    /// - Byte 1: X Position
+    /// - Byte 2: Tile index
+    /// - Byte 3: Attributes/Flags
+    ///
+    /// See [gbdev.io](https://gbdev.io/pandocs/OAM.html) for more info.
     pub const OAM: MemoryBus::Region = 0xFE00..=0xFE9F;
     /// Not Usable
     ///

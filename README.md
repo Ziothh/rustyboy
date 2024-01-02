@@ -2,8 +2,9 @@
 WIP
 
 ## Useful links
- - http://catskull.net/GB-Logo-Generator/
+ - [Cartridge header generation](https://www.emulatorgames.net/roms/gameboy/)
  - [Boot ROM](https://github.com/Hacktix/Bootix/releases/tag/v1.2)
+ - [Game ROM](https://www.emulatorgames.net/roms/gameboy/)
 
 ## TODOs
  - [x] Emulate memory

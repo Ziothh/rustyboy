@@ -10,11 +10,11 @@ impl<'a> Tile<'a> {
     /// The amount of bytes a `Tile` consists of
     const BYTES: usize = 16;
     /// Width in pixels
-    const COLUMNS: usize = 8;
+    pub const PIXEL_WIDTH: usize = 8;
     /// Height in pixels
-    const ROWS: usize = 8;
+    pub const PIXEL_HEIGHT: usize = 8;
     /// Width * height in pixels
-    const AREA: usize = Self::COLUMNS * Self::ROWS;
+    const AREA: usize = Self::PIXEL_WIDTH * Self::PIXEL_HEIGHT;
 
     pub fn new(tile_bytes: &'a [u8; Tile::BYTES]) -> Self {
         Self(tile_bytes)
@@ -63,15 +63,15 @@ impl<'a> Tile<'a> {
         let mut arr = [ColorID::default(); Tile::AREA];
 
         for (i, x) in arr.iter_mut().enumerate() {
-            let row = i / Self::ROWS;
-            let column = i % Self::COLUMNS;
+            let row = i / Self::PIXEL_HEIGHT;
+            let column = i % Self::PIXEL_WIDTH;
 
             let lsb = self.bytes()[row * 2];
             let msb = self.bytes()[row * 2 + 1];
 
             *x = ColorID::new(
-                (0b1 & lsb >> (Self::COLUMNS - 1 - column))
-                    | ((0b1 & msb >> (Self::COLUMNS - 1 - column)) << 1),
+                (0b1 & lsb >> (Self::PIXEL_WIDTH - 1 - column))
+                    | ((0b1 & msb >> (Self::PIXEL_WIDTH - 1 - column)) << 1),
             );
         }
 
@@ -153,7 +153,7 @@ mod test {
         ];
 
         #[rustfmt::skip]
-        const LEAST_SIGNIFICANT_BITS: [u8; Tile::ROWS] = [
+        const LEAST_SIGNIFICANT_BITS: [u8; Tile::PIXEL_HEIGHT] = [
             0b00111100,
             0b01000010,
             0b01000010,
@@ -169,7 +169,7 @@ mod test {
             .zip(LEAST_SIGNIFICANT_BITS)
             .for_each(|(a, b)| assert_eq!(*a, b));
 
-        const MOST_SIGNIFICANT_BITS: [u8; Tile::ROWS] = [
+        const MOST_SIGNIFICANT_BITS: [u8; Tile::PIXEL_HEIGHT] = [
             0b01111110,
             0b01000010,
             0b01000010,
