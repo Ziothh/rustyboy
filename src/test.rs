@@ -9,14 +9,15 @@ fn main() {
     unsafe { run() }
 }
 
-const WIDTH: os::raw::c_int = 800;
-const HEIGHT: os::raw::c_int = 450;
+const SCREEN_WIDTH: os::raw::c_int = 800;
+const SCREEN_HEIGHT: os::raw::c_int = 450;
 
 unsafe fn run() -> () {
-    raylib::SetTraceLogLevel(4);
+    raylib::SetTraceLogLevel(4); // Make INFO logs shut up
 
     // Create a window
-    raylib::InitWindow(WIDTH, HEIGHT, raylib::rl_str!("Game Boy"));
+    raylib::InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, raylib::rl_str!("Game Boy"));
+    raylib::SetTargetFPS(60);
 
     let logo = nintendo_logo::Logo::default();
 
@@ -34,24 +35,22 @@ unsafe fn run() -> () {
         .flatten()
         .collect();
 
+    let width = raylib::GetScreenWidth();
+    let height = raylib::GetScreenHeight();
+
     // Render the window
     while !(raylib::WindowShouldClose()) {
         raylib::BeginDrawing();
         raylib::ClearBackground(raylib::colors::BLACK);
-        let width = raylib::GetScreenWidth();
-        let height = raylib::GetScreenHeight();
 
         for (x, y) in &active_pixels {
-            println!("\n\n");
-            dbg!(x, y);
-            dbg!(width / 48 * *x as i32);
-            dbg!(height / 48 * *y as i32);
+            let pixel_size = width / 48;
 
             raylib::DrawRectangle(
-                width / 48 * *x as i32,
-                height / 48 * *y as i32,
-                width / 48,
-                width / 48,
+                pixel_size * *x as i32,
+                pixel_size * *y as i32,
+                pixel_size,
+                pixel_size,
                 raylib::colors::RED,
             );
         }
