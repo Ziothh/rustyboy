@@ -9,55 +9,45 @@ fn main() {
     unsafe { run() }
 }
 
-const SCREEN_WIDTH: os::raw::c_int = 800;
-const SCREEN_HEIGHT: os::raw::c_int = 450;
+const SCREEN_WIDTH: usize = 800;
 
 unsafe fn run() -> () {
     raylib::SetTraceLogLevel(4); // Make INFO logs shut up
 
-    // Create a window
-    raylib::InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, raylib::rl_str!("Game Boy"));
-    raylib::SetTargetFPS(60);
+    let mut gui = misc::gui::GUI::new(SCREEN_WIDTH / misc::gui::GUI::PX_WIDTH);
 
     let logo = nintendo_logo::Logo::default();
+    let binding = logo.as_pixels();
+    let logo_pixel_rows = binding.iter().flatten();
+    let logo_rows = logo_pixel_rows
+        .size_hint()
+        .1
+        .expect("Failed to get size hint of logo pixels");
 
-    let active_pixels: Vec<_> = logo
-        .as_pixels()
-        .iter()
+    let pixels = logo_pixel_rows
         .flatten()
-        .enumerate()
-        .map(|(ri, row)| {
-            row.iter()
-                .enumerate()
-                .filter(|(_, col)| **col == true)
-                .map(move |(ci, _)| (ci, ri))
+        .map(|lit| {
+            if *lit == true {
+                Some(raylib::colors::RED)
+            } else {
+                None
+            }
         })
-        .flatten()
-        .collect();
+        .collect::<Vec<_>>();
 
-    let width = raylib::GetScreenWidth();
-    let height = raylib::GetScreenHeight();
+    let (width, height) = gui.buf_size();
+    let logo_width = pixels.len() / logo_rows;
+
+    // let logo_height = pixels.len() % logo_rows;
+    gui.render_pixbuf(
+        (width / 2) - (logo_width / 2),
+        height / 2 - (pixels.len() / logo_width / 2),
+        logo_width,
+        pixels.as_slice(),
+    );
 
     // Render the window
-    while !(raylib::WindowShouldClose()) {
-        raylib::BeginDrawing();
-        raylib::ClearBackground(raylib::colors::BLACK);
-
-        for (x, y) in &active_pixels {
-            let pixel_size = width / 48;
-
-            raylib::DrawRectangle(
-                pixel_size * *x as i32,
-                pixel_size * *y as i32,
-                pixel_size,
-                pixel_size,
-                raylib::colors::RED,
-            );
-        }
-
-        raylib::EndDrawing();
+    while !(gui.window_should_close()) {
+        gui.draw();
     }
-
-    // Clean up
-    raylib::CloseWindow();
 }
