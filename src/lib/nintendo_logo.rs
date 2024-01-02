@@ -101,7 +101,7 @@ impl Default for Logo {
 
 impl Display for Logo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for row in self.as_pixels().flatten() {
+        for row in self.as_pixels().iter().flatten() {
             for bit in row {
                 write!(f, "{}", if *bit { 'X' } else { ' ' })?;
             }

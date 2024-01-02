@@ -3,6 +3,7 @@ WIP
 
 ## Useful links
  - http://catskull.net/GB-Logo-Generator/
+ - [Boot ROM](https://github.com/Hacktix/Bootix/releases/tag/v1.2)
 
 ## TODOs
  - [x] Emulate memory
