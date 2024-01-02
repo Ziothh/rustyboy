@@ -1,51 +1,64 @@
 #![feature(let_chains)]
 
+use std::os;
+
 use gb::hardware::cartridge;
-use glium::Surface;
 use misc::nintendo_logo;
-use winit::event::VirtualKeyCode;
 
 fn main() {
-    // 1. The **winit::EventLoop** for handling events.
-    let event_loop = winit::event_loop::EventLoopBuilder::new().build();
-    // 2. Create a glutin context and glium Display
-    let (window, display) = glium::backend::glutin::SimpleWindowBuilder::new()
-        .with_title("Game Boy")
-        .build(&event_loop);
+    unsafe { run() }
+}
 
-    let mut frame = display.draw();
-    frame.clear_color(0.0, 0.0, 0.0, 1.0);
-    frame.finish().unwrap();
+const WIDTH: os::raw::c_int = 800;
+const HEIGHT: os::raw::c_int = 450;
+
+unsafe fn run() -> () {
+    raylib::SetTraceLogLevel(4);
+
+    // Create a window
+    raylib::InitWindow(WIDTH, HEIGHT, raylib::rl_str!("Game Boy"));
 
     let logo = nintendo_logo::Logo::default();
 
+    let active_pixels: Vec<_> = logo
+        .as_pixels()
+        .iter()
+        .flatten()
+        .enumerate()
+        .map(|(ri, row)| {
+            row.iter()
+                .enumerate()
+                .filter(|(_, col)| **col == true)
+                .map(move |(ci, _)| (ci, ri))
+        })
+        .flatten()
+        .collect();
 
-    logo.as_pixels().iter().flatten().enumerate().for_each(|(i, row)| {
+    // Render the window
+    while !(raylib::WindowShouldClose()) {
+        raylib::BeginDrawing();
+        raylib::ClearBackground(raylib::colors::BLACK);
+        let width = raylib::GetScreenWidth();
+        let height = raylib::GetScreenHeight();
 
-    });
+        for (x, y) in &active_pixels {
+            println!("\n\n");
+            dbg!(x, y);
+            dbg!(width / 48 * *x as i32);
+            dbg!(height / 48 * *y as i32);
 
+            raylib::DrawRectangle(
+                width / 48 * *x as i32,
+                height / 48 * *y as i32,
+                width / 48,
+                width / 48,
+                raylib::colors::RED,
+            );
+        }
 
+        raylib::EndDrawing();
+    }
 
-
-    event_loop.run(move |ev, _target, control_flow| match ev {
-        winit::event::Event::WindowEvent { event, .. } => match event {
-            winit::event::WindowEvent::CloseRequested => {
-                *control_flow = winit::event_loop::ControlFlow::Exit;
-            }
-            winit::event::WindowEvent::KeyboardInput {
-                device_id: _,
-                input,
-                is_synthetic: _,
-            } => {
-                if let Some(key) = input.virtual_keycode
-                    && key == VirtualKeyCode::Q
-                {
-                    *control_flow = winit::event_loop::ControlFlow::Exit;
-                    println!("Q has been pressed. Exiting...");
-                }
-            }
-            _ => (),
-        },
-        _ => (),
-    })
+    // Clean up
+    raylib::CloseWindow();
 }

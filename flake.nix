@@ -31,10 +31,28 @@
 
       # Libraries that are mostly needed for tauri to work
       libraries = with pkgs; [
-            libxkbcommon
+            cmake
+            xorg.libX11
+            xorg.libXrandr
+            xorg.libXinerama
+            xorg.libXcursor
+            xorg.libXi
+            xorg.libXi
+            libatomic_ops
+            mesa
+            alsa-lib
             libGL
-            # WINIT_UNIX_BACKEND=wayland
+
+            glibc
+            libcxx # C++ std library
+
+            clang
+            libclang
+
+            # [Wayland]
             wayland
+            wayland-protocols
+            libxkbcommon
       ];
 
       packages = with pkgs; [
