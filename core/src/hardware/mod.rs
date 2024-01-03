@@ -1,5 +1,5 @@
 pub mod bus;
-pub use bus::MemoryBus;
+pub use bus::Interface;
 
 pub mod cpu;
 pub mod cartridge;

@@ -1,4 +1,4 @@
-use crate::{hardware::bus::MemoryBus, program::Program};
+use crate::{hardware::bus::Interface, program::Program};
 
 mod memory;
 use self::memory::{Registers, Stack};
@@ -12,7 +12,7 @@ pub struct CPU {
     // program_counter: u16,
     stack: Stack,
     /// Memory bus
-    bus: MemoryBus,
+    bus: Interface,
 }
 
 impl CPU {

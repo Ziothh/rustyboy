@@ -70,7 +70,10 @@
 
       devShells = {
         default = pkgs.mkShell {
-          inherit buildInputs nativeBuildInputs;
+          inherit buildInputs;
+          nativeBuildInputs = nativeBuildInputs ++ [
+            pkgs.cargo-watch
+          ];
 
           shellHook = ''
           export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath libraries}

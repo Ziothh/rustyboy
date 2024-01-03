@@ -30,7 +30,7 @@ impl<'a> Object<'a> {
         Self(bytes)
     }
 
-    pub fn read_all_from_bus(memory_bus: &'a bus::MemoryBus) -> [Self; Object::OAM_ENTRIES] {
+    pub fn read_all_from_bus(memory_bus: &'a bus::Interface) -> [Self; Object::OAM_ENTRIES] {
         memory_bus[bus::regions::OAM]
             .windows(Object::BYTE_SIZE)
             .step_by(Object::BYTE_SIZE)

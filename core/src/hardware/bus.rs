@@ -8,7 +8,7 @@ use crate::prelude::LittleEndian;
 pub type Addr = u16;
 /// An inclusive range of memory bus addresses
 ///
-/// `Index<MemoryBus::Region> for MemoryBus` has been implemented.
+/// `Index<bus::Region> for MemoryBus` has been implemented.
 pub type Region = ops::RangeInclusive<Addr>;
 
 // All information about the memory bus comes from these links:
@@ -28,15 +28,10 @@ pub type Region = ops::RangeInclusive<Addr>;
 ///
 /// ## Units
 /// 1kB = 1024B (base 2)
-pub struct MemoryBus([u8; u16::MAX as usize]);
+pub struct Interface([u8; u16::MAX as usize]);
 
-impl MemoryBus {
+impl Interface {
     const SIZE: usize = u16::MAX as usize;
-
-    /// TODO: REMOVE ME AND THE UNSTABLE FEATURE ALLOW
-    pub type Addr = u16;
-    /// TODO: REMOVE ME AND THE UNSTABLE FEATURE ALLOW
-    pub type Region = ops::RangeInclusive<Addr>;
 
     pub fn new() -> Self {
         Self([0; u16::MAX as usize])
@@ -74,7 +69,7 @@ impl MemoryBus {
     }
 }
 
-impl ops::Index<u16> for MemoryBus {
+impl ops::Index<u16> for Interface {
     type Output = u8;
 
     #[inline]
@@ -82,7 +77,7 @@ impl ops::Index<u16> for MemoryBus {
         return self.0.index(index as usize);
     }
 }
-impl ops::IndexMut<u16> for MemoryBus {
+impl ops::IndexMut<u16> for Interface {
     #[inline]
     fn index_mut(&mut self, index: u16) -> &mut Self::Output {
         return self.0.index_mut(index as usize);
@@ -96,7 +91,7 @@ impl ops::IndexMut<u16> for MemoryBus {
 //         &self.0[(range.start as usize)..(range.end as usize)]
 //     }
 // }
-impl ops::Index<ops::RangeInclusive<u16>> for MemoryBus {
+impl ops::Index<ops::RangeInclusive<u16>> for Interface {
     type Output = [u8];
 
     #[inline]
@@ -107,74 +102,74 @@ impl ops::Index<ops::RangeInclusive<u16>> for MemoryBus {
 
 #[allow(dead_code)]
 pub mod regions {
-    use super::{MemoryBus, Region};
+    use super::super::bus;
 
     /// Calculates the amount of bytes in the range.
-    pub const fn size(range: Region) -> usize {
+    pub const fn size(range: bus::Region) -> usize {
         (*range.end() + 1 - *range.start()) as usize
     }
 
     /// 16 KiB ROM bank 00
     /// From cartridge, usually a fixed bank
-    pub const ROM_BANK_00: MemoryBus::Region = 0x0000..=0x3FFF;
+    pub const ROM_BANK_00: bus::Region = 0x0000..=0x3FFF;
     /// 16 KiB ROM Bank 01~NN
     /// From cartridge, switchable bank via mapper (if any)
-    pub const ROM_BANK_NN: MemoryBus::Region = 0x4000..=0x7FFF;
+    pub const ROM_BANK_NN: bus::Region = 0x4000..=0x7FFF;
     /// 8 KiB Video RAM (VRAM)
     /// From cartridge, switchable bank if any
-    pub const VRAM: MemoryBus::Region = 0x8000..=0x9FFF;
+    pub const VRAM: bus::Region = 0x8000..=0x9FFF;
     /// 8 KiB External RAM
     /// From cartridge, switchable bank if any
-    pub const EXTERNAL_RAM: MemoryBus::Region = 0xA000..=0xBFFF;
+    pub const EXTERNAL_RAM: bus::Region = 0xA000..=0xBFFF;
     /// 4 KiB Work RAM (WRAM)
-    pub const WRAM_FIXED: MemoryBus::Region = 0xC000..=0xCFFF;
+    pub const WRAM_FIXED: bus::Region = 0xC000..=0xCFFF;
     /// 4 KiB Work RAM (WRAM)
     /// In CGB mode, switchable bank 1~7
-    pub const WRAM_SWITCHABLE: MemoryBus::Region = 0xD000..=0xDFFF;
+    pub const WRAM_SWITCHABLE: bus::Region = 0xD000..=0xDFFF;
     /// Mirror of C000~DDFF (ECHO RAM)
     /// Nintendo says use of this area is prohibited.
-    pub const ECHO_RAM: MemoryBus::Region = 0xE000..=0xFDFF;
+    pub const ECHO_RAM: bus::Region = 0xE000..=0xFDFF;
     /// Object attribute memory (OAM)
-    pub const OAM: Region = 0xFE00..=0xFE9F;
+    pub const OAM: bus::Region = 0xFE00..=0xFE9F;
     /// Not Usable
     ///
     /// Nintendo says use of this area is prohibited
     /// This area returns $FF when OAM is blocked, and otherwise the behavior depends on the hardware revision.
     /// On DMG, MGB, SGB, and SGB2, reads during OAM block trigger OAM corruption.
     /// Reads otherwise return $00
-    pub const NOT_USABLE: MemoryBus::Region = 0xFEA0..=0xFEFF;
+    pub const NOT_USABLE: bus::Region = 0xFEA0..=0xFEFF;
     /// I/O Registers
-    pub const IO_REGISTERS: MemoryBus::Region = 0xFF00..=0xFF7F;
+    pub const IO_REGISTERS: bus::Region = 0xFF00..=0xFF7F;
     /// High RAM (HRAM)
-    pub const HRAM: MemoryBus::Region = 0xFF80..=0xFFFE;
+    pub const HRAM: bus::Region = 0xFF80..=0xFFFE;
     /// Interrupt Enable register (IE)
-    pub const IE: MemoryBus::Region = 0xFFFF..=0xFFFF;
+    pub const IE: bus::Region = 0xFFFF..=0xFFFF;
 
     /// Currently only includes DMG register maps
     ///
     /// See [gbdev.io](https://gbdev.io/pandocs/Hardware_Reg_List.html) for more info
     pub mod io_registers {
-        use super::super::MemoryBus;
+        use super::bus;
 
-        const JOYPAD: MemoryBus::Addr = 0xFF00;
-        const SERIAL_TRANSFER: MemoryBus::Region = 0xFF01..=0xFF02;
-        const TIME_AND_DIVIDER: MemoryBus::Region = 0xFF04..=0xFF07;
-        const AUDIO: MemoryBus::Region = 0xFF10..=0xFF26;
-        const WAVE_PATTERN: MemoryBus::Region = 0xFF30..=0xFF3F;
+        const JOYPAD: bus::Addr = 0xFF00;
+        const SERIAL_TRANSFER: bus::Region = 0xFF01..=0xFF02;
+        const TIME_AND_DIVIDER: bus::Region = 0xFF04..=0xFF07;
+        const AUDIO: bus::Region = 0xFF10..=0xFF26;
+        const WAVE_PATTERN: bus::Region = 0xFF30..=0xFF3F;
         /// LCD Control, Status, Position, Scrolling, and Palettes
-        const LCD: MemoryBus::Region = 0xFF40..=0xFF4B;
+        const LCD: bus::Region = 0xFF40..=0xFF4B;
         /// # OAM Direct Memory Access (DMA) transfer source address & start (R/W)
         /// Writing to this register starts a DMA transfer from ROM or RAM to OAM (Object Attribute Memory).
         ///
         /// The written value specifies the transfer source address divided by `$100`, that is, source and destination are:
         /// Source (ROM):                    $XX00-$XX9F   ;XX = $00 to $DF 
         /// Destination (OAM region in RAM): $FE00-$FE9F 
-        pub const DMA: MemoryBus::Addr = 0xFF46;
+        pub const DMA: bus::Addr = 0xFF46;
 
         // Disabled because it first appeared on CGB instead of DMG
         // const VRAM_BANK_SELECT: u16 = 0xFF4F;
         /// Set to non-zero to disable boot ROM
-        const DISABLE_BOOT_ROM: MemoryBus::Addr = 0xFF50;
+        const DISABLE_BOOT_ROM: bus::Addr = 0xFF50;
 
         // CGB only registers so I'm not tackling this atm
         // $FF51	$FF55	CGB	VRAM DMA
@@ -184,16 +179,16 @@ pub mod regions {
 
     #[allow(dead_code)]
     pub mod jump_vectors {
-        use super::super::MemoryBus;
+        use super::bus;
 
         /// However, this memory area (0000-00FF) may be used for any other purpose in case that your program doesn’t use any (or only some) rst instructions or interrupts. rst is a 1-byte instruction that works similarly to the 3-byte call instruction, except that the destination address is restricted. Since it is 1-byte sized, it is also slightly faster.
-        pub const AREA: MemoryBus::Region = 0x0000..=0x00FF;
-        pub const RST_INSTRUCTION: [MemoryBus::Addr; 8] = [
+        pub const AREA: bus::Region = 0x0000..=0x00FF;
+        pub const RST_INSTRUCTION: [bus::Addr; 8] = [
             0x0000, 0x0008, 0x0010, 0x0018, 0x0020, 0x0028, 0x0030, 0x0038,
         ];
-        pub const INTERRUPTS: [MemoryBus::Addr; 5] = [0x0040, 0x0048, 0x0050, 0x0058, 0x0060];
+        pub const INTERRUPTS: [bus::Addr; 5] = [0x0040, 0x0048, 0x0050, 0x0058, 0x0060];
     }
 
     /// The memory area at 0100-014F contains the cartridge header. This area contains information about the program, its entry point, checksums, information about the used MBC chip, the ROM and RAM sizes, etc. Most of the bytes in this area are required to be specified correctly.
-    pub const CARTRIDGE_HEADER: MemoryBus::Region = 0x0100..=0x014F;
+    pub const CARTRIDGE_HEADER: bus::Region = 0x0100..=0x014F;
 }

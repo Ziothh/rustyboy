@@ -1,4 +1,4 @@
-use crate::hardware::MemoryBus;
+use crate::hardware::bus;
 
 use super::Tile;
 
@@ -7,8 +7,8 @@ const BYTE_HEIGHT: usize = 32;
 const PIXEL_WIDTH: usize = BYTE_WIDTH * Tile::PIXEL_WIDTH;
 const PIXEL_HEIGHT: usize = BYTE_HEIGHT * Tile::PIXEL_HEIGHT;
 
-const TILE_MAP_1: MemoryBus::Region = 0x9800..=0x9BFF;
-const TILE_MAP_2: MemoryBus::Region = 0x9C00..=0x9FFF;
+const TILE_MAP_1: bus::Region = 0x9800..=0x9BFF;
+const TILE_MAP_2: bus::Region = 0x9C00..=0x9FFF;
 
 type Index = u8;
 

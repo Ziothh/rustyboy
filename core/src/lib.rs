@@ -1,9 +1,7 @@
-// TODO: Dev only
-#![allow(dead_code)]
+#![allow(dead_code)] // TODO: Dev only
 
-#![allow(incomplete_features)]
-#![feature(inherent_associated_types)]
-#![feature(iterator_try_collect)]
+// #![feature(inherent_associated_types)] // Cool feature but rust-analyzer doesn't support
+// autocomplete for const values with these types
 
 
 pub mod prelude;

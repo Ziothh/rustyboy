@@ -1,4 +1,4 @@
-use crate::{hardware::{cpu, bus::MemoryBus}, prelude::LittleEndian};
+use crate::{hardware::{cpu, bus::Interface}, prelude::LittleEndian};
 
 /// An iterator that iterates over all of the program bytes and parses them into `Instruction`s
 pub struct Program {
@@ -6,13 +6,13 @@ pub struct Program {
     program_counter: u16,
     /// The memory bus of the Game Boy
     // TODO: Check if this can't be a read-only reference into the ROM part of the memory bus
-    bus: MemoryBus,
+    bus: Interface,
     /// Wether the next opcode is prefixed.
     prefixed: bool,
 }
 
 impl Program {
-    pub fn new(bus: MemoryBus) -> Self {
+    pub fn new(bus: Interface) -> Self {
         Self {
             program_counter: 0,
             prefixed: false,

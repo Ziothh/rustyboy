@@ -83,11 +83,11 @@ impl<'a> Tile<'a> {
 mod vram_regions {
     use std::ops;
 
-    use crate::hardware::MemoryBus;
+    use crate::hardware::bus;
 
     /// The full VRAM memory range of the tile data
     /// It contains 384 tiles.
-    pub const FULL_RANGE: MemoryBus::Region = 0x8000..=0x97FF;
+    pub const FULL_RANGE: bus::Region = 0x8000..=0x97FF;
 
     const BLOCK_AMOUNT: usize = 3;
     const SIZE: u16 = (*FULL_RANGE.end() + 1) - *FULL_RANGE.start();
@@ -100,7 +100,7 @@ mod vram_regions {
     }
 
     /// The memory ranges of the 3 blocks of 128 tiles
-    pub const BLOCKS: [MemoryBus::Region; BLOCK_AMOUNT] =
+    pub const BLOCKS: [bus::Region; BLOCK_AMOUNT] =
         [calc_block(0), calc_block(1), calc_block(2)];
 
     /// Tiles are always indexed using an 8-bit integer, but the addressing method may differ.
