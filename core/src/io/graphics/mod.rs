@@ -1,6 +1,8 @@
 mod tiles;
 pub use tiles::Tile;
 
+pub mod objects;
+
 pub mod lcd;
 
 /// 2 bit color ID a pixel
@@ -84,6 +86,6 @@ enum Layer {
 }
 
 /// Array of 4 colors
+///
+/// TODO
 type Palette = [(); 4];
-
-mod vram_regions {}

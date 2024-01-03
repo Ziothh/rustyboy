@@ -2,7 +2,14 @@ use std::ops;
 
 use crate::prelude::LittleEndian;
 
+/// A memory bus address of a byte
+///
+/// `Index<MemoryBus::Addr> for MemoryBus` has been implemented.
 pub type Addr = u16;
+/// An inclusive range of memory bus addresses
+///
+/// `Index<MemoryBus::Region> for MemoryBus` has been implemented.
+pub type Region = ops::RangeInclusive<Addr>;
 
 // All information about the memory bus comes from these links:
 // - [gbdev.io](https://gbdev.io/pandocs/Memory_Map.html)
@@ -22,20 +29,14 @@ pub type Addr = u16;
 /// ## Units
 /// 1kB = 1024B (base 2)
 pub struct MemoryBus([u8; u16::MAX as usize]);
-impl MemoryBus {
 
-}
 impl MemoryBus {
     const SIZE: usize = u16::MAX as usize;
 
-    /// A memory bus address of a byte
-    ///
-    /// `Index<MemoryBus::Addr> for MemoryBus` has been implemented.
+    /// TODO: REMOVE ME AND THE UNSTABLE FEATURE ALLOW
     pub type Addr = u16;
-    /// An inclusive range of memory bus addresses 
-    ///
-    /// `Index<MemoryBus::Region> for MemoryBus` has been implemented.
-    pub type Region = ops::RangeInclusive<MemoryBus::Addr>;
+    /// TODO: REMOVE ME AND THE UNSTABLE FEATURE ALLOW
+    pub type Region = ops::RangeInclusive<Addr>;
 
     pub fn new() -> Self {
         Self([0; u16::MAX as usize])
@@ -106,7 +107,12 @@ impl ops::Index<ops::RangeInclusive<u16>> for MemoryBus {
 
 #[allow(dead_code)]
 pub mod regions {
-    use super::MemoryBus;
+    use super::{MemoryBus, Region};
+
+    /// Calculates the amount of bytes in the range.
+    pub const fn size(range: Region) -> usize {
+        (*range.end() + 1 - *range.start()) as usize
+    }
 
     /// 16 KiB ROM bank 00
     /// From cartridge, usually a fixed bank
@@ -129,20 +135,12 @@ pub mod regions {
     /// Nintendo says use of this area is prohibited.
     pub const ECHO_RAM: MemoryBus::Region = 0xE000..=0xFDFF;
     /// Object attribute memory (OAM)
-    ///
-    /// 40 entries consisting of four bytes.
-    /// - Byte 0: Y Position
-    /// - Byte 1: X Position
-    /// - Byte 2: Tile index
-    /// - Byte 3: Attributes/Flags
-    ///
-    /// See [gbdev.io](https://gbdev.io/pandocs/OAM.html) for more info.
-    pub const OAM: MemoryBus::Region = 0xFE00..=0xFE9F;
+    pub const OAM: Region = 0xFE00..=0xFE9F;
     /// Not Usable
     ///
     /// Nintendo says use of this area is prohibited
     /// This area returns $FF when OAM is blocked, and otherwise the behavior depends on the hardware revision.
-    /// On DMG, MGB, SGB, and SGB2, reads during OAM block trigger OAM corruption. 
+    /// On DMG, MGB, SGB, and SGB2, reads during OAM block trigger OAM corruption.
     /// Reads otherwise return $00
     pub const NOT_USABLE: MemoryBus::Region = 0xFEA0..=0xFEFF;
     /// I/O Registers
@@ -157,7 +155,7 @@ pub mod regions {
     /// See [gbdev.io](https://gbdev.io/pandocs/Hardware_Reg_List.html) for more info
     pub mod io_registers {
         use super::super::MemoryBus;
-        
+
         const JOYPAD: MemoryBus::Addr = 0xFF00;
         const SERIAL_TRANSFER: MemoryBus::Region = 0xFF01..=0xFF02;
         const TIME_AND_DIVIDER: MemoryBus::Region = 0xFF04..=0xFF07;
@@ -165,6 +163,14 @@ pub mod regions {
         const WAVE_PATTERN: MemoryBus::Region = 0xFF30..=0xFF3F;
         /// LCD Control, Status, Position, Scrolling, and Palettes
         const LCD: MemoryBus::Region = 0xFF40..=0xFF4B;
+        /// # OAM Direct Memory Access (DMA) transfer source address & start (R/W)
+        /// Writing to this register starts a DMA transfer from ROM or RAM to OAM (Object Attribute Memory).
+        ///
+        /// The written value specifies the transfer source address divided by `$100`, that is, source and destination are:
+        /// Source (ROM):                    $XX00-$XX9F   ;XX = $00 to $DF 
+        /// Destination (OAM region in RAM): $FE00-$FE9F 
+        pub const DMA: MemoryBus::Addr = 0xFF46;
+
         // Disabled because it first appeared on CGB instead of DMG
         // const VRAM_BANK_SELECT: u16 = 0xFF4F;
         /// Set to non-zero to disable boot ROM

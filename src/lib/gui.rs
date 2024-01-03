@@ -31,14 +31,24 @@ impl GUI {
         }
     }
 
+    /// Computes the index in the pixel buffer
+    #[inline]
+    pub fn pixel_index(x: usize, y: usize) -> usize {
+        x + (Self::PX_WIDTH * y)
+    }
+
+    pub fn get_pixel(&self, x: usize, y: usize) -> PixelValue {
+        self.pixbuf[Self::pixel_index(x, y)]
+    }
+
     pub fn render_pixel(&mut self, x: usize, y: usize, color: raylib::Color) -> &mut Self {
-        self.pixbuf[x + (Self::PX_WIDTH * y)] = Some(color);
+        self.pixbuf[Self::pixel_index(x, y)] = Some(color);
         return self;
     }
 
+
+    #[rustfmt::skip]
     pub fn render_pixbuf(&mut self, x: usize, y: usize, width: usize, pixbuf: &PixSlice) -> &mut Self {
-
-
         for (i, color) in pixbuf
             .iter()
             .enumerate()
@@ -46,23 +56,23 @@ impl GUI {
         {
             let px = i % width;
             let py = i / width;
-            dbg!(px + x, py + y);
             self.render_pixel(px + x, py + y, color);
         }
 
         return self;
     }
 
+    /// (pixels_width, pixels_height)
     pub fn buf_size(&self) -> (usize, usize) {
         (Self::PX_WIDTH, Self::PX_HEIGHT)
     }
+    /// (screen_height, screen_width)
     pub fn dimensions(&self) -> (usize, usize) {
-        unsafe {
-            let width = raylib::GetScreenWidth();
-            let height = raylib::GetScreenHeight();
-
-            return (width as usize / self.scale, height as usize / self.scale);
-        }
+        #[rustfmt::skip]
+        return unsafe {(
+            raylib::GetScreenWidth() as usize / self.scale,
+            raylib::GetScreenHeight() as usize / self.scale,
+        )};
     }
 
     /// Draws all pixels to the screen

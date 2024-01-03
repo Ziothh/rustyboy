@@ -1,9 +1,9 @@
 #![feature(let_chains)]
 
-use std::os;
-
 use gb::hardware::cartridge;
 use misc::nintendo_logo;
+
+// TODO: read this when displaying objects (https://gbdev.io/pandocs/OAM.html#object-priority-and-conflicts)
 
 fn main() {
     unsafe { run() }

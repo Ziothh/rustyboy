@@ -11,16 +11,19 @@ edition = "2021"
 name = "misc"
 path = "src/lib/mod.rs"
 test = false
+doctest = false
 
 [[bin]]
 name = "gb"
 path = "src/main.rs"
 test = false
+doctest = false
 
 [[bin]]
-name = "test"
-path = "src/test.rs"
+name = "gui"
+path = "src/gui.rs"
 test = false
+doctest = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
