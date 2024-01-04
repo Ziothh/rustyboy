@@ -1,4 +1,4 @@
-use crate::io::graphics::ColorID;
+use crate::io::graphics::colors::ColorID;
 
 /// A tile (8*8 pixels) consists of 16 bytes.
 /// 2 bytes for each row.
@@ -32,35 +32,35 @@ impl<'a> Tile<'a> {
     /// let mut bytes = [0u8; 16];
     /// assert_eq!(
     ///     Tile::new(&bytes.clone()).to_color_ids()[0],
-    ///     ColorID::ZERO
+    ///     ColorID::White
     /// );
     ///
     /// bytes[0] |= 0b1 << 7; // Set lsb of pixel 0
     /// assert_eq!(
     ///     Tile::new(&bytes.clone()).to_color_ids()[0],
-    ///     ColorID::ONE
+    ///     ColorID::LightGray
     /// );
     /// bytes[1] |= 0b1 << 7; // Set msb of pixel 0
     /// assert_eq!(
     ///     Tile::new(&bytes.clone()).to_color_ids()[0],
-    ///     ColorID::THREE
+    ///     ColorID::Black
     /// );
     ///
     /// bytes[2] |= 0b1 << 5; // Set lsb of pixel 10
     /// bytes[3] |= 0b1 << 5; // Set msb of pixel 10
     /// assert_eq!(
     ///     Tile::new(&bytes.clone()).to_color_ids()[10],
-    ///     ColorID::THREE
+    ///     ColorID::Black
     /// );
     ///
     /// bytes[3] |= 0b1 << 4; // Set lsb of pixel 11
     /// assert_eq!(
     ///     Tile::new(&bytes.clone()).to_color_ids()[11],
-    ///     ColorID::TWO
+    ///     ColorID::DarkGray
     /// );
     /// ```
     pub fn to_color_ids(&self) -> [ColorID; Tile::AREA] {
-        let mut arr = [ColorID::default(); Tile::AREA];
+        let mut arr = [ColorID::White; Tile::AREA];
 
         for (i, x) in arr.iter_mut().enumerate() {
             let row = i / Self::PIXEL_HEIGHT;
@@ -69,7 +69,7 @@ impl<'a> Tile<'a> {
             let lsb = self.bytes()[row * 2];
             let msb = self.bytes()[row * 2 + 1];
 
-            *x = ColorID::new(
+            *x = ColorID::from_byte(
                 (0b1 & lsb >> (Self::PIXEL_WIDTH - 1 - column))
                     | ((0b1 & msb >> (Self::PIXEL_WIDTH - 1 - column)) << 1),
             );
@@ -201,7 +201,7 @@ mod test {
         ];
         assert_eq!(
             Tile::new(&TILE_BYTES).to_color_ids(),
-            COLOR_IDS.map(|b| ColorID::new(b))
+            COLOR_IDS.map(|b| ColorID::from_byte(b))
         );
     }
 }

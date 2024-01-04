@@ -1,4 +1,4 @@
-use super::{objects, tiles};
+use super::tiles;
 use crate::{hardware::bus, utils::bit};
 
 /// The pixel width of the actual game boy screen

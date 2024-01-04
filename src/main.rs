@@ -9,6 +9,7 @@ fn main() {
     let mut bus = hardware::bus::Interface::new();
     bus.load(&rom.read().unwrap()[0..u16::MAX as usize]);
 
+
     // let program = program::Program::new(bus);
     //
     // for instruction in program {

@@ -181,31 +181,54 @@ pub mod regions {
             const RANGE: bus::Region = 0xFF40..=0xFF4B;
 
             /// # LCD control
-            ///
             /// LCDC is the main LCD Control register.
             /// Its bits toggle what elements are displayed on the screen, and how.
             pub const LCDC: bus::Addr = 0xFF40;
             /// # LCD Status
             pub const STAT: bus::Addr = 0xFF41;
 
+            /// # Background viewport Y position
+            pub const SCY: bus::Addr = 0xFF42;
+            /// # Background viewport X position
+            pub const SCX: bus::Addr = 0xFF43;
+
             /// # LCD Y coordinate [read-only]
             /// LY indicates the current horizontal line, which might be about to be drawn, being drawn, or just been drawn.
             /// LY can hold any value from 0 to 153, with values from 144 to 153 indicating the VBlank period.
             pub const LY: bus::Addr = 0xFF44;
-
             /// # LYC: LY compare
-            /// The Game Boy constantly compares the value of the LYC and LY registers. 
+            /// The Game Boy constantly compares the value of the LYC and LY registers.
             /// When both values are identical, the “LYC=LY” flag in the STAT register is set, and (if enabled) a STAT interrupt is requested.
             pub const LYC: bus::Addr = 0xFF45;
-        }
 
-        /// # OAM Direct Memory Access (DMA) transfer source address & start (R/W)
-        /// Writing to this register starts a DMA transfer from ROM or RAM to OAM (Object Attribute Memory).
-        ///
-        /// The written value specifies the transfer source address divided by `$100`, that is, source and destination are:
-        /// Source (ROM):                    $XX00-$XX9F   ;XX = $00 to $DF
-        /// Destination (OAM region in RAM): $FE00-$FE9F
-        pub const DMA: bus::Addr = 0xFF46;
+            /// # OAM Direct Memory Access (DMA) transfer source address & start (R/W)
+            /// Writing to this register starts a DMA transfer from ROM or RAM to OAM (Object Attribute Memory).
+            ///
+            /// The written value specifies the transfer source address divided by `$100`, that is, source and destination are:
+            /// Source (ROM):                    $XX00-$XX9F   ;XX = $00 to $DF
+            /// Destination (OAM region in RAM): $FE00-$FE9F
+            pub const DMA: bus::Addr = 0xFF46;
+
+            /// # BG palette data (Non-CGB Mode only)
+            /// This register assigns gray shades to the color IDs of the BG and Window tiles.
+            ///
+            /// Color ID | bits
+            /// ---------------
+            /// Color 3  | \[7, 6]
+            /// Color 2  | \[5, 4]
+            /// Color 1  | \[3, 2]
+            /// Color 0  | \[1, 0]
+            pub const BGP: bus::Addr = 0xFF47;
+            /// # OBJ palette 0, 1 data (Non-CGB Mode only)
+            /// These registers assigns gray shades to the color indexes of the OBJs that use the corresponding palette. 
+            /// They work exactly like BGP, except that the lower two bits are ignored because color index 0 is transparent for OBJs.
+            pub const OBP: [bus::Addr; 2] = [0xFF48, 0xFF49];
+
+            /// # Window Y position
+            pub const WY: bus::Addr = 0xFF4A;
+            /// # Window X position plus 7
+            pub const WX: bus::Addr = 0xFF4B;
+        }
 
         // Disabled because it first appeared on CGB instead of DMG
         // const VRAM_BANK_SELECT: u16 = 0xFF4F;

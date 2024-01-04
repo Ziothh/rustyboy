@@ -1,46 +1,11 @@
 mod tiles;
 pub use tiles::Tile;
 
-pub mod objects;
-
+mod colors;
+pub use colors::ColorID;
+mod objects;
 pub mod lcd;
 
-/// 2 bit color ID a pixel
-///
-/// When a tile is used in the Background or Window, these color IDs are associated with a palette.
-/// When a tile is used in an object, the IDs 1 to 3 are associated with a palette, but ID 0 means transparent.
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
-pub struct ColorID(u8);
-impl ColorID {
-    pub const ZERO: Self = Self(0b0000_0000);
-    pub const ONE: Self = Self(0b0000_0001);
-    pub const TWO: Self = Self(0b0000_0010);
-    pub const THREE: Self = Self(0b0000_0011);
-
-    pub const MIN: u8 = Self::ZERO.as_byte();
-    pub const MAX: u8 = Self::THREE.as_byte();
-
-    #[inline]
-    pub const fn as_byte(&self) -> u8 {
-        self.0
-    }
-
-    /// Masks the `byte` with `0b0000_0011` and returns it as a `ColorID`
-    pub fn new(byte: u8) -> Self {
-        Self(byte & Self::THREE.as_byte())
-    }
-    pub fn try_from_u8(byte: u8) -> Result<Self, u8> {
-        match byte {
-            Self::MIN..=Self::MAX => Ok(Self(byte)),
-            _ => Err(byte),
-        }
-    }
-}
-impl Default for ColorID {
-    fn default() -> Self {
-        Self::ZERO
-    }
-}
 
 /// Ordered from front to back.
 ///
@@ -69,7 +34,7 @@ enum Layer {
     /// (See WX and WY for the definition of “Window visibility”.)
     ///
     /// ## Window Internal Line Counter
-    /// The window keeps an internal line counter that’s functionally similar to LY, and increments alongside it. 
+    /// The window keeps an internal line counter that’s functionally similar to LY, and increments alongside it.
     /// However, it only gets incremented when the window is visible, as described here.
     ///
     /// This line counter determines what window line is to be rendered on the current scanline.
@@ -85,7 +50,23 @@ enum Layer {
     Objects,
 }
 
-/// Array of 4 colors
-///
-/// TODO
-type Palette = [(); 4];
+mod background {
+    use crate::hardware::bus;
+
+    /// (x, y)
+    pub fn calc_bottom_right(memory_bus: &bus::Interface) -> (u8, u8) {
+        (
+            memory_bus[bus::regions::io_registers::lcd::SCX]
+                .overflowing_add(159)
+                .0, // x
+            memory_bus[bus::regions::io_registers::lcd::SCY]
+                .overflowing_add(143)
+                .0, // y
+        )
+    }
+}
+
+/// The Window is visible (if enabled) when both coordinates are in the ranges WX=0..166, WY=0..143 respectively.
+/// Values WX=7, WY=0 place the Window at the top left of the screen, completely covering the background.
+mod window {}
+

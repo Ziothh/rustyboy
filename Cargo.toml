@@ -14,7 +14,7 @@ test = false
 doctest = false
 
 [[bin]]
-name = "gb"
+name = "main"
 path = "src/main.rs"
 test = false
 doctest = false
