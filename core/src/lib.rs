@@ -5,6 +5,7 @@
 
 
 pub mod prelude;
+pub mod utils;
 pub mod hardware;
 pub mod program;
 pub mod io;
