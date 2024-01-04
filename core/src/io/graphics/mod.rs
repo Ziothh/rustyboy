@@ -1,10 +1,14 @@
-mod tiles;
-pub use tiles::Tile;
+pub mod tiles;
+// pub use tiles::*;
 
 mod colors;
-pub use colors::ColorID;
+pub use colors::{ColorID, Palette};
+
 mod objects;
+pub use objects::{Object, ObjectFlag};
+
 pub mod lcd;
+pub use lcd::{LCDControl, LCDStatus};
 
 
 /// Ordered from front to back.

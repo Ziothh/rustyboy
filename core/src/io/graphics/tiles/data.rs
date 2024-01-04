@@ -1,17 +1,22 @@
-use crate::io::graphics::colors::ColorID;
+use crate::{io::graphics::{colors::ColorID, self}, hardware::bus};
 
-/// A tile (8*8 pixels) consists of 16 bytes.
-/// 2 bytes for each row.
-/// Each bit represents a part of the `ColorID`
-/// (e.g. for the first ColorID: byte0\[bit0] = lsb, byte1\[bit0] = msb)
+/// A tile (8*8 pixels) consisting of 16 bytes.
+///
+/// Every row (8 pixels) is represented in memory as 2 bytes.
+///  - 1 pixel (= ColorID) = 2 bits
+///  - The first byte of the row contains the least significant bits
+///  - The second byte of the row contains the most significant bits
+///  - Example: pixel 0 = byte0\[bit0] = lsb, byte1\[bit0] = msb
 pub struct Tile<'a>(&'a [u8; Tile::BYTES]);
 
 impl<'a> Tile<'a> {
     /// The amount of bytes a `Tile` consists of
     const BYTES: usize = 16;
-    /// Width in pixels
+    /// The amount of bytes it takes to represent an 8 pixel row in memory
+    const ROW_BYTES: usize = 2;
+    /// Tile width in pixels
     pub const PIXEL_WIDTH: usize = 8;
-    /// Height in pixels
+    /// Tile height in pixels
     pub const PIXEL_HEIGHT: usize = 8;
     /// Width * height in pixels
     const AREA: usize = Self::PIXEL_WIDTH * Self::PIXEL_HEIGHT;
@@ -20,14 +25,64 @@ impl<'a> Tile<'a> {
         Self(tile_bytes)
     }
 
+    /// Tiles are always indexed using an 8-bit integer, but the addressing method may differ.
+    /// The “$8000 method” uses $8000 as its base pointer and uses an unsigned addressing, meaning that tiles 0-127 are in block 0, and tiles 128-255 are in block 1.
+    /// The “$8800 method” uses $9000 as its base pointer and uses a signed addressing, meaning that tiles 0-127 are in block 2, and tiles -128 to -1 are in block 1, or to put it differently, “$8800 addressing” takes tiles 0-127 from block 2 and tiles 128-255 from block 1.
+    /// (You can notice that block 1 is shared by both addressing methods)
+    ///
+    /// Objects always use “$8000 addressing”, but the BG and Window can use either mode, controlled by **LCDC bit 4**.
+    pub fn from_bus(memory_bus: &'a bus::Interface, pointer: u8, is_object_tile: bool) -> Self {
+        let mode = graphics::LCDControl::from_bus(memory_bus).tile_addressing_mode();
+        
+        let addr: bus::Addr = match !is_object_tile && mode == graphics::tiles::AddresMode::Upper {
+            // $8000: objects & lower addressing
+            false => vram_regions::BLOCKS[0].start() + pointer as u16,
+            // $8800: upper addressing
+            true => {
+                let start = *vram_regions::BLOCKS[2].start() as i32;
+                // TODO: check if this numbers conversion works
+                let index = pointer as i8 as i32;
+                (start + index) as u16
+            },
+        };
+
+        return Self::new(
+            memory_bus[addr..(addr + Self::BYTES as bus::Addr)]
+                .try_into()
+                .expect("Tile should be exactly 16 bytes long")
+        );
+    }
+
     #[inline]
     pub fn bytes(&self) -> &[u8; Tile::BYTES] {
         self.0
     }
 
+    fn get_pixel(&self, x: usize, y: usize) -> ColorID {
+        let lsb = self.bytes()[y * 2];
+        let msb = self.bytes()[y * 2 + 1];
+
+        // TODO: check for vertical flip
+
+        return ColorID::from_byte(
+            (0b1 & lsb >> (Self::PIXEL_WIDTH - 1 - x))
+                | ((0b1 & msb >> (Self::PIXEL_WIDTH - 1 - x)) << 1),
+        );
+    }
+
+    pub fn get_pixel_row(&self, y: u8) -> [ColorID; Tile::PIXEL_WIDTH] {
+        let y = y as usize;
+        (0..Self::PIXEL_WIDTH)
+            .map(|x| self.get_pixel(x, y))
+            .collect::<Vec<_>>()
+            .as_slice()
+            .try_into()
+            .unwrap()
+    }
+
     /// # Example
     /// ```
-    /// use gb::io::graphics::{ColorID, Tile};
+    /// use gb::io::graphics::{ColorID, tiles::Tile};
     ///
     /// let mut bytes = [0u8; 16];
     /// assert_eq!(
@@ -63,15 +118,9 @@ impl<'a> Tile<'a> {
         let mut arr = [ColorID::White; Tile::AREA];
 
         for (i, x) in arr.iter_mut().enumerate() {
-            let row = i / Self::PIXEL_HEIGHT;
-            let column = i % Self::PIXEL_WIDTH;
-
-            let lsb = self.bytes()[row * 2];
-            let msb = self.bytes()[row * 2 + 1];
-
-            *x = ColorID::from_byte(
-                (0b1 & lsb >> (Self::PIXEL_WIDTH - 1 - column))
-                    | ((0b1 & msb >> (Self::PIXEL_WIDTH - 1 - column)) << 1),
+            *x = self.get_pixel(
+                i % Self::PIXEL_WIDTH,
+                i / Self::PIXEL_WIDTH,
             );
         }
 
@@ -102,18 +151,6 @@ mod vram_regions {
     /// The memory ranges of the 3 blocks of 128 tiles
     pub const BLOCKS: [bus::Region; BLOCK_AMOUNT] =
         [calc_block(0), calc_block(1), calc_block(2)];
-
-    /// Tiles are always indexed using an 8-bit integer, but the addressing method may differ.
-    /// The “$8000 method” uses $8000 as its base pointer and uses an unsigned addressing, meaning that tiles 0-127 are in block 0, and tiles 128-255 are in block 1.
-    /// The “$8800 method” uses $9000 as its base pointer and uses a signed addressing, meaning that tiles 0-127 are in block 2, and tiles -128 to -1 are in block 1, or to put it differently, “$8800 addressing” takes tiles 0-127 from block 2 and tiles 128-255 from block 1.
-    /// (You can notice that block 1 is shared by both addressing methods)
-    ///
-    /// Objects always use “$8000 addressing”, but the BG and Window can use either mode, controlled by **LCDC bit 4**.
-    pub fn get_tile() -> ! {
-        todo!()
-    }
-
-    // mod 
 }
 
 
@@ -135,6 +172,8 @@ mod test {
         assert_eq!(*BLOCKS[0].end(), *BLOCKS[1].start() - 1);
         assert_eq!(*BLOCKS[1].end(), *BLOCKS[2].start() - 1);
         assert_eq!(*BLOCKS[2].end(), *FULL_RANGE.end());
+
+        assert_eq!(*BLOCKS[2].start(), 0x9000);
     }
 
 

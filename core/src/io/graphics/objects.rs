@@ -16,7 +16,7 @@
 use crate::hardware::bus;
 
 #[derive(Debug)]
-struct Object<'a>(&'a [u8; Object::BYTE_SIZE]);
+pub struct Object<'a>(&'a [u8; Object::BYTE_SIZE]);
 
 impl Object<'_> {
     /// The byte size in memory for one object

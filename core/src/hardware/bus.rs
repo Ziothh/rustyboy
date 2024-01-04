@@ -137,6 +137,14 @@ impl ops::Index<Region> for Interface {
         return &self.bytes[(*region.start() as usize)..=(*region.end() as usize)];
     }
 }
+impl ops::Index<ops::Range<Addr>> for Interface {
+    type Output = [u8];
+
+    #[inline]
+    fn index(&self, range: ops::Range<Addr>) -> &Self::Output {
+        &self[range.start..=(range.end - 1)]
+    }
+}
 
 #[allow(dead_code)]
 pub mod regions {

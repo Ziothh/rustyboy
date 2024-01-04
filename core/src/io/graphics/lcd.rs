@@ -1,5 +1,8 @@
 use super::tiles;
-use crate::{hardware::bus, utils::bit};
+use crate::{
+    hardware::{bus, ppu},
+    utils::bit,
+};
 
 /// The pixel width of the actual game boy screen
 pub const WINDOW_WIDTH: usize = 160;
@@ -8,7 +11,7 @@ pub const WINDOW_HEIGHT: usize = 144;
 
 /// # LCDC: LCD control
 /// LCDC is the main LCD Control register. Its bits toggle what elements are displayed on the screen, and how.
-struct LCDControl(u8);
+pub struct LCDControl(u8);
 impl LCDControl {
     pub fn from_bus(memory_bus: &bus::Interface) -> Self {
         Self(memory_bus[bus::regions::io_registers::lcd::LCDC])
@@ -46,7 +49,7 @@ impl LCDControl {
     ///
     /// NOTE: SGB not supported atm
     pub fn window_enabled(&self) -> bool {
-        self.bit_at(5)
+        self.bit_at(5) && self.win_bg_enabled()
     }
 
     /// # LCDC.4 BG and Window tile data area
@@ -81,8 +84,18 @@ impl LCDControl {
     pub fn object_enabled(&self) -> bool {
         self.bit_at(1)
     }
-}
 
+    /// # LCDC.0 — BG and Window display
+    /// ## Non-CGB Mode (DMG, SGB and CGB in compatibility mode):
+    /// When Bit 0 is cleared, both background and window become blank (white), and the Window Display Bit is ignored in that case. 
+    /// Only objects may still be displayed (if enabled in Bit 1).
+    ///
+    /// ## CGB Mode
+    /// This means something different on CGB but is not supported atm.
+    pub fn win_bg_enabled(&self) -> bool {
+        self.bit_at(0)
+    }
+}
 
 pub struct LCDStatus(u8);
 impl LCDStatus {
@@ -93,14 +106,14 @@ impl LCDStatus {
     fn bit_at(&self, bit_index: u8) -> bool {
         bit::is_set(self.0, bit_index)
     }
-    
-    /// # STAT.6 — LYC int select (Read/Write): 
+
+    /// # STAT.6 — LYC int select (Read/Write):
     /// If set, selects the LYC == LY condition for the STAT interrupt.
     pub fn lyc_int_select(&self) -> bool {
         self.bit_at(6)
     }
 
-    /// # STAT[3..=5] — Mode 0..=2 int select (Read/Write): 
+    /// # STAT[3..=5] — Mode 0..=2 int select (Read/Write):
     /// If bit x is set, selects the Mode x condition for the STAT interrupt.
     pub fn modes(&self) -> [bool; 3] {
         [
@@ -109,22 +122,29 @@ impl LCDStatus {
             self.bit_at(5), // Mode 2
         ]
     }
-    
 
-    /// # STAT.2 — LYC == LY (Read-only): 
+    /// # STAT.2 — LYC == LY (Read-only):
     /// Set when LY contains the same value as LYC; it is constantly updated.
-    pub fn should_ly_compare(&self) -> bool {
+    pub fn ly_eq_lyc(&self) -> bool {
         self.bit_at(2)
-
     }
 
-    // # STAT[1..=0] — PPU mode (Read-only): 
+    // # STAT[1..=0] — PPU mode (Read-only):
     // Indicates the PPU’s current status.
-    pub fn ppu_mode(&self) -> [bool; 2] {
-        [self.bit_at(1), self.bit_at(0)]
+    pub fn get_ppu_mode(&self) -> ppu::PPUMode {
+        let mode = self.0 & 0b11;
+        match mode {
+            0 => ppu::PPUMode::HorizontalBlank,
+            1 => ppu::PPUMode::VerticalBlank,
+            2 => ppu::PPUMode::OAMScan,
+            3 => ppu::PPUMode::Drawing,
+            _ => unreachable!("Invalid ppu mode {mode:#02b}"),
+        }
     }
+    /// NOTE: PPU mode is Read-only for the CPU so this should only be called by the PPU
+    pub fn set_ppu_mode(memory_bus: &mut bus::Interface, mode: ppu::PPUMode) {
+        let prev = memory_bus[bus::regions::io_registers::lcd::STAT];
 
-
-
-    
+        memory_bus[bus::regions::io_registers::lcd::STAT] = (prev & 0b1111_1100) | mode as u8
+    }
 }
