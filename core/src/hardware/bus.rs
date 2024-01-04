@@ -31,12 +31,18 @@ pub type Addr = u16;
 pub type Region = ops::RangeInclusive<Addr>;
 
 /// The interface to interract with the Game Boys memory bus
-pub struct Interface([u8; Self::SIZE]);
+pub struct Interface {
+    bytes: [u8; Self::SIZE],
+    locked_regions: Vec<Region>,
+}
 impl Interface {
     const SIZE: usize = u16::MAX as usize;
 
     pub fn new() -> Self {
-        Self([0; u16::MAX as usize])
+        Self {
+            bytes: [0; u16::MAX as usize],
+            locked_regions: Vec::new(),
+        }
     }
 
     pub fn load(&mut self, bytes: &[u8]) -> &mut Self {
@@ -45,7 +51,7 @@ impl Interface {
         }
 
         for (i, x) in bytes.iter().enumerate() {
-            self.0[i] = *x;
+            self.bytes[i] = *x;
         }
 
         return self;
@@ -69,36 +75,66 @@ impl Interface {
         return u16::from_bytes((self[address], self[address + 1]));
         // ((self[index + 1] as u16) << 8) | (self[index] as u16);
     }
+
+    pub fn lock_region(&mut self, region: Region) -> &mut Self {
+        self.locked_regions.push(region);
+        return self;
+    }
+    pub fn unlock_region(&mut self, region: Region) -> &mut Self {
+        self.locked_regions.remove(
+            self.locked_regions
+                .iter()
+                .enumerate()
+                .find(|(_, x)| **x == region)
+                .map(|(i, _)| i)
+                .expect("Can not unlock region that's not been locked"),
+        );
+        return self;
+    }
+    fn is_addr_locked(&self, addr: Addr) -> bool {
+        self.locked_regions
+            .iter()
+            .find(|x| x.contains(&addr))
+            .is_some()
+    }
+    fn is_region_locked(&self, region: &Region) -> bool {
+        self.locked_regions
+            .iter()
+            .find(|x| x.start() <= region.start() && x.end() >= region.end())
+            .is_some()
+    }
 }
 
-impl ops::Index<u16> for Interface {
+impl ops::Index<Addr> for Interface {
     type Output = u8;
 
     #[inline]
-    fn index(&self, index: u16) -> &Self::Output {
-        return self.0.index(index as usize);
+    fn index(&self, addr: u16) -> &Self::Output {
+        if self.is_addr_locked(addr) {
+            println!("WARN: Reading locked memory at {addr:#04X}. Returning 0xFF")
+        }
+        return self.bytes.index(addr as usize);
     }
 }
-impl ops::IndexMut<u16> for Interface {
+impl ops::IndexMut<Addr> for Interface {
     #[inline]
-    fn index_mut(&mut self, index: u16) -> &mut Self::Output {
-        return self.0.index_mut(index as usize);
+    fn index_mut(&mut self, addr: u16) -> &mut Self::Output {
+        if self.is_addr_locked(addr) {
+            unreachable!("ERROR: Writing to locked memory at {addr:#04X} is not allowed.")
+        }
+        return self.bytes.index_mut(addr as usize);
     }
 }
-// impl ops::Index<ops::Range<u16>> for MemoryBus {
-//     type Output = [u8];
-//
-//     #[inline]
-//     fn index(&self, range: ops::Range<u16>) -> &Self::Output {
-//         &self.0[(range.start as usize)..(range.end as usize)]
-//     }
-// }
-impl ops::Index<ops::RangeInclusive<u16>> for Interface {
+impl ops::Index<Region> for Interface {
     type Output = [u8];
 
     #[inline]
-    fn index(&self, range: ops::RangeInclusive<u16>) -> &Self::Output {
-        &self.0[(*range.start() as usize)..=(*range.end() as usize)]
+    fn index(&self, region: Region) -> &Self::Output {
+        if self.is_region_locked(&region) {
+            unreachable!("ERROR: Reading locked memory at {region:#?}. Returning slice of 0xFF")
+        }
+
+        return &self.bytes[(*region.start() as usize)..=(*region.end() as usize)];
     }
 }
 
@@ -220,7 +256,7 @@ pub mod regions {
             /// Color 0  | \[1, 0]
             pub const BGP: bus::Addr = 0xFF47;
             /// # OBJ palette 0, 1 data (Non-CGB Mode only)
-            /// These registers assigns gray shades to the color indexes of the OBJs that use the corresponding palette. 
+            /// These registers assigns gray shades to the color indexes of the OBJs that use the corresponding palette.
             /// They work exactly like BGP, except that the lower two bits are ignored because color index 0 is transparent for OBJs.
             pub const OBP: [bus::Addr; 2] = [0xFF48, 0xFF49];
 
