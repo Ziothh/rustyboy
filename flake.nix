@@ -26,33 +26,39 @@
 
       pkgs = import nixpkgs {
         inherit system overlays;
+        config = {
+          allowUnfree = true;
+        };
       };
 
 
-      # Libraries that are mostly needed for tauri to work
+      # Libraries that are mostly needed for raylib to build
       libraries = with pkgs; [
-            cmake
-            xorg.libX11
-            xorg.libXrandr
-            xorg.libXinerama
-            xorg.libXcursor
-            xorg.libXi
-            xorg.libXi
-            libatomic_ops
-            mesa
-            alsa-lib
-            libGL
+        cmake
+        clang
+        libclang
+        libcxx # C++ std library
+        libGL
+      ] ++ pkgs.lib.lists.optionals stdenv.isLinux [
+        xorg.libX11
+        xorg.libXrandr
+        xorg.libXinerama
+        xorg.libXcursor
+        xorg.libXi
+        xorg.libXi
+        libatomic_ops
+        mesa
+        alsa-lib
 
-            glibc
-            libcxx # C++ std library
 
-            clang
-            libclang
+        glibc
 
-            # [Wayland]
-            wayland
-            wayland-protocols
-            libxkbcommon
+        # [Wayland]
+        wayland
+        wayland-protocols
+        libxkbcommon
+      ] ++ pkgs.lib.lists.optionals stdenv.isDarwin [
+        # darwin.xcode
       ];
 
       packages = with pkgs; [
