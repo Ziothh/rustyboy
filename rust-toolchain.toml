@@ -5,6 +5,18 @@ channel = "nightly-2023-12-29"
 # components = ["rust-analyzer", "rustc", "llvm-tools", "rust-src", "rustfmt", "clippy"]
 # targets = ["thumbv6m-none-eabi", "thumbv7em-none-eabi", "thumbv7em-none-eabihf", "riscv32imc-unknown-none-elf", "riscv32imac-unknown-none-elf"]
 targets = ["thumbv6m-none-eabi"]
+components = [
+"cargo",
+"clippy",
+"rust-std",
+"rustc",
+"rustfmt",
+
+"rust-analyzer", 
+"rust-src", 
+
+# "llvm-tools", 
+]
 # components = [
 # info: downloading component 'cargo'
 # info: downloading component 'clippy'
