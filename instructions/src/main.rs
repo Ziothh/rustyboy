@@ -57,7 +57,7 @@ fn main() {
                 "}",
             ]
             .join("\n");
-            return format!(r#"Instruction::new("{repr}", {callback})"#,);
+            return format!(r#"Instruction::new("{repr}", {callback}), // {opcode}"#,);
 
             return [
                 //
@@ -79,5 +79,5 @@ fn main() {
         println!("{x}");
     });
 
-    fs::write("./unprefixed.rs", res.join(",\n")).unwrap();
+    fs::write("./unprefixed.rs", res.join("\n")).unwrap();
 }

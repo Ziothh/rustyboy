@@ -1,5 +1,7 @@
 use std::ops;
 
+use super::Stack;
+
 /// A struct holding all the CPU registers
 pub struct Registers {
     pub a: u8,
@@ -25,10 +27,20 @@ pub struct Registers {
     pub f: FlagsRegister,
     pub h: u8,
     pub l: u8,
-    /// Stack Pointer
-    pub sp: u16,
+    /// Stack Pointer register
+    pub stack: Stack,
     /// Program counter/pointer
     pub pc: u16,
+}
+
+#[rustfmt::skip]
+impl Registers {
+    pub fn af(&self) -> u16 { ((self.a as u16) << 8) | (u8::from(self.f) as u16) }
+    pub fn bc(&self) -> u16 { ((self.b as u16) << 8) | (self.c as u16) }
+    pub fn de(&self) -> u16 { ((self.d as u16) << 8) | (self.e as u16) }
+    pub fn hl(&self) -> u16 { ((self.h as u16) << 8) | (self.l as u16) }
+    /// Stack pointer register value
+    pub fn sp(&self) -> u16 { self.stack.pointer }
 }
 
 impl Registers {
@@ -47,7 +59,7 @@ impl Registers {
             },
             h: 0,
             l: 0,
-            sp: 0,
+            stack: Stack::default(),
             pc: 0,
         }
     }
@@ -55,16 +67,15 @@ impl Registers {
     pub fn read16(&self, register: Reg16) -> u16 {
         use self::Reg16::*;
         match register {
-            AF => ((self.a as u16) << 8) | (u8::from(&self.f) as u16),
-            BC => ((self.b as u16) << 8) | (self.c as u16),
-            DE => ((self.d as u16) << 8) | (self.e as u16),
-            HL => ((self.h as u16) << 8) | (self.l as u16),
-            // TODO: find a way to better do this
-            SP => unreachable!(),
+            AF => self.af(),
+            BC => self.bc(),
+            DE => self.de(),
+            HL => self.hl(),
+            SP => self.stack.pointer,
         }
     }
 
-    pub fn write16(&mut self, register: Reg16, value: u16) {
+    pub fn write16(&mut self, register: Reg16, value: u16) -> &mut Self {
         use self::Reg16::*;
         match register {
             AF => {
@@ -83,17 +94,11 @@ impl Registers {
                 self.h = (value >> 8) as u8;
                 self.l = value as u8
             }
-            SP => unreachable!(),
-        }
-    }
-}
+            SP => self.stack.pointer = value,
+        };
 
-#[rustfmt::skip]
-impl Registers {
-    pub fn af(&self) -> u16 { self.read16(Reg16::AF) }
-    pub fn bc(&self) -> u16 { self.read16(Reg16::BC) }
-    pub fn de(&self) -> u16 { self.read16(Reg16::DE) }
-    pub fn hl(&self) -> u16 { self.read16(Reg16::HL) }
+        return self;
+    }
 }
 
 impl ops::Index<Reg8> for Registers {
@@ -105,7 +110,6 @@ impl ops::Index<Reg8> for Registers {
             Reg8::C => self.c,
             Reg8::D => self.d,
             Reg8::E => self.e,
-            Reg8::F => self.f.into(),
             Reg8::H => self.h,
             Reg8::L => self.l,
         };
@@ -114,10 +118,7 @@ impl ops::Index<Reg8> for Registers {
 impl ops::Index<Reg16> for Registers {
     type Output = u16;
     fn index(&self, register: Reg16) -> &Self::Output {
-        return &match register {
-            Reg16::SP => self.sp,
-            reg => self.read16(reg),
-        };
+        &self.read16(register)
     }
 }
 
@@ -169,12 +170,13 @@ pub enum Reg16 {
 }
 
 pub struct FlagsRegister {
+    /// # Z
     /// Set to `true` if the result of the operation is equal to `0`.
     pub zero: bool,
+    /// # N
     /// Set to `true` if the operation was a subtraction.
     pub subtract: bool,
-    /// Set to `true` if the operation resulted in an overflow.
-    pub carry: bool,
+    /// # H
     /// Set to `true` if there is an operation results in an overflow from the lower nibble (the lower four bits) to the upper nibble (the upper four bits).
     ///
     /// ```text
@@ -187,14 +189,17 @@ pub struct FlagsRegister {
     /// upper nibble            upper nibble
     /// ```
     pub half_carry: bool,
+    /// # C
+    /// Set to `true` if the operation resulted in an overflow.
+    pub carry: bool,
 }
 
 impl FlagsRegister {
     // Left shift info
-    const CARRY_FLAG_BYTE_POSITION: u8 = 4;
-    const HALF_CARRY_FLAG_BYTE_POSITION: u8 = 5;
-    const SUBTRACT_FLAG_BYTE_POSITION: u8 = 6;
     const ZERO_FLAG_BYTE_POSITION: u8 = 7;
+    const SUBTRACT_FLAG_BYTE_POSITION: u8 = 6;
+    const HALF_CARRY_FLAG_BYTE_POSITION: u8 = 5;
+    const CARRY_FLAG_BYTE_POSITION: u8 = 4;
 
     #[rustfmt::skip]
     fn as_byte(&self) -> u8 {

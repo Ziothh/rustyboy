@@ -14,7 +14,7 @@ pub const WINDOW_HEIGHT: usize = 144;
 pub struct LCDControl(u8);
 impl LCDControl {
     pub fn from_bus(memory_bus: &bus::Interface) -> Self {
-        Self(memory_bus[bus::regions::io_registers::lcd::LCDC])
+        Self(memory_bus[bus::regions::io::lcd::LCDC])
     }
     #[inline]
     fn bit_at(&self, bit_index: u8) -> bool {
@@ -100,7 +100,7 @@ impl LCDControl {
 pub struct LCDStatus(u8);
 impl LCDStatus {
     pub fn from_bus(memory_bus: &bus::Interface) -> Self {
-        Self(memory_bus[bus::regions::io_registers::lcd::STAT])
+        Self(memory_bus[bus::regions::io::lcd::STAT])
     }
     #[inline]
     fn bit_at(&self, bit_index: u8) -> bool {
@@ -143,8 +143,8 @@ impl LCDStatus {
     }
     /// NOTE: PPU mode is Read-only for the CPU so this should only be called by the PPU
     pub fn set_ppu_mode(memory_bus: &mut bus::Interface, mode: ppu::PPUMode) {
-        let prev = memory_bus[bus::regions::io_registers::lcd::STAT];
+        let prev = memory_bus[bus::regions::io::lcd::STAT];
 
-        memory_bus[bus::regions::io_registers::lcd::STAT] = (prev & 0b1111_1100) | mode as u8
+        memory_bus[bus::regions::io::lcd::STAT] = (prev & 0b1111_1100) | mode as u8
     }
 }

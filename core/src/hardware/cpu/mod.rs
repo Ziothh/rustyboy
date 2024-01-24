@@ -1,27 +1,23 @@
-use crate::{hardware::bus::Interface, program::Program};
 mod program;
 
 mod memory;
-use self::memory::{Registers, Stack};
+use memory::Registers;
+use crate::program::Program;
+
 
 mod instructions;
 pub use instructions::Instruction;
 
-
 pub struct CPU {
     registers: Registers,
-    // program_counter: u16,
-    stack: Stack,
-    /// Memory bus
-    bus: Interface,
+    is_prefixed: bool,
 }
 
 impl CPU {
     pub fn new() -> Self {
-        Self { 
+        Self {
             registers: Registers::new(),
-            stack: todo!(), 
-            bus: todo!(),
+            is_prefixed: false,
         }
     }
 

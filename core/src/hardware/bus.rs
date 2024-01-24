@@ -1,6 +1,7 @@
-//! The memory bus module
 //! # Game Boy memory bus
-//! 16-bit memory bus with `64kB` (0xFFFF * 8 bit) memory
+//! 16-bit memory bus with `64kB` (0xFFFF * 8 bit) capacity.
+//!
+//! Each address contains an 8-bit value.
 //!
 //! ## Regions
 //!  - ROM (32kB | (16kB static, 16kB mapped))
@@ -184,11 +185,17 @@ pub mod regions {
     /// 8 KiB External RAM
     /// From cartridge, switchable bank if any
     pub const EXTERNAL_RAM: bus::Region = 0xA000..=0xBFFF;
-    /// 4 KiB Work RAM (WRAM)
-    pub const WRAM_FIXED: bus::Region = 0xC000..=0xCFFF;
-    /// 4 KiB Work RAM (WRAM)
-    /// In CGB mode, switchable bank 1~7
-    pub const WRAM_SWITCHABLE: bus::Region = 0xD000..=0xDFFF;
+    /*
+        NOTE: Only valid for CGB
+        /// 4 KiB Work RAM (WRAM)
+        pub const WRAM_FIXED: bus::Region = 0xC000..=0xCFFF;
+        /// 4 KiB Work RAM (WRAM)
+        /// In CGB mode, switchable bank 1~7
+        pub const WRAM_SWITCHABLE: bus::Region = 0xD000..=0xDFFF;
+        /// 4 KiB Work RAM (WRAM)
+    */
+    /// 8 KiB Work RAM (WRAM)
+    pub const WRAM: bus::Region = 0xC000..=0xDFFF;
     /// Mirror of C000~DDFF (ECHO RAM)
     /// Nintendo says use of this area is prohibited.
     pub const ECHO_RAM: bus::Region = 0xE000..=0xFDFF;
@@ -202,10 +209,13 @@ pub mod regions {
     /// Reads otherwise return $00
     pub const NOT_USABLE: bus::Region = 0xFEA0..=0xFEFF;
 
-    /// Currently only includes DMG register maps
+    pub const HIGH_MEMORY: bus::Region = 0xFF00..=0xFFFF;
+
+    /// # IO registers
+    /// Currently only includes DMG io register maps
     ///
     /// See [gbdev.io](https://gbdev.io/pandocs/Hardware_Reg_List.html) for more info
-    pub mod io_registers {
+    pub mod io {
         use super::bus;
 
         /// The full address range of I/O addresses
@@ -274,8 +284,9 @@ pub mod regions {
             pub const WX: bus::Addr = 0xFF4B;
         }
 
-        // Disabled because it first appeared on CGB instead of DMG
-        // const VRAM_BANK_SELECT: u16 = 0xFF4F;
+        /* Disabled because it first appeared on CGB instead of DMG
+            const VRAM_BANK_SELECT: u16 = 0xFF4F;
+        */
         /// Set to non-zero to disable boot ROM
         const DISABLE_BOOT_ROM: bus::Addr = 0xFF50;
 
@@ -288,5 +299,5 @@ pub mod regions {
     /// High RAM (HRAM)
     pub const HRAM: bus::Region = 0xFF80..=0xFFFE;
     /// Interrupt Enable register (IE)
-    pub const IE: bus::Region = 0xFFFF..=0xFFFF;
+    pub const IE: bus::Addr = 0xFFFF;
 }

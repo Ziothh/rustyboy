@@ -45,12 +45,12 @@ pub struct Palette(u8);
 impl Palette {
     /// Fetches the color palette from the background palette register
     pub fn from_bgp(memory_bus: &bus::Interface) -> Self {
-        Self(memory_bus[bus::regions::io_registers::lcd::BGP])
+        Self(memory_bus[bus::regions::io::lcd::BGP])
     }
     /// Fetches the color palette from the object palette register
     /// `palette_index` = 0 | 1;
     pub fn from_obp(memory_bus: &bus::Interface, palette_index: usize) -> Self {
-        Self(memory_bus[bus::regions::io_registers::lcd::OBP[palette_index]])
+        Self(memory_bus[bus::regions::io::lcd::OBP[palette_index]])
     }
 
     pub fn get_color(&self, color_id: &ColorID) -> [bool; 2] {

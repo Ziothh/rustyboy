@@ -6,7 +6,7 @@ use crate::{hardware::bus::Interface, prelude::LittleEndian};
 ///
 /// FILO order of push/pop
 pub struct Stack {
-    pointer: u16,
+    pub pointer: u16,
 }
 
 impl Stack {
@@ -32,5 +32,11 @@ impl Stack {
         self.pointer = self.pointer.wrapping_add(1);
 
         return u16::from_bytes((lsb, msb));
+    }
+}
+
+impl Default for Stack {
+    fn default() -> Self {
+        Self { pointer: 0 }
     }
 }

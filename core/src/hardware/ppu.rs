@@ -147,11 +147,11 @@ impl<'bus> Iterator for FIFOPixelFetcher<'bus> {
         let memory_bus = &self.memory_bus;
 
 
-        let draw_y = memory_bus[bus::regions::io_registers::lcd::LY];
+        let draw_y = memory_bus[bus::regions::io::lcd::LY];
         let control = lcd::LCDControl::from_bus(memory_bus);
 
-        let win_y = memory_bus[bus::regions::io_registers::lcd::WY];
-        let win_x = memory_bus[bus::regions::io_registers::lcd::WX];
+        let win_y = memory_bus[bus::regions::io::lcd::WY];
+        let win_x = memory_bus[bus::regions::io::lcd::WX];
 
         let win_y_seen = draw_y >= win_y;
 
@@ -167,8 +167,8 @@ impl<'bus> Iterator for FIFOPixelFetcher<'bus> {
             ),
             // Background tile
             false => {
-                let scx = memory_bus[bus::regions::io_registers::lcd::SCX];
-                let scy = memory_bus[bus::regions::io_registers::lcd::SCY];
+                let scx = memory_bus[bus::regions::io::lcd::SCX];
+                let scy = memory_bus[bus::regions::io::lcd::SCY];
                 control.bg_tilemap().get_tile(
                     memory_bus,
                     ((scx / 8) + self.x) & 0x1F, /* Clamps value to 0..32 */

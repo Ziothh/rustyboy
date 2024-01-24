@@ -1,4 +1,4 @@
-use super::memory::{Address, Reg16, Reg8};
+use super::memory::{AddrPtr, Reg16, Reg8};
 
 mod decode;
 
@@ -526,5 +526,5 @@ pub enum LoadTarget {
     /// Direct from/into 8-bit register
     Reg8(Reg8),
     /// Direct from/into memory address
-    Address(Address),
+    Address(AddrPtr),
 }

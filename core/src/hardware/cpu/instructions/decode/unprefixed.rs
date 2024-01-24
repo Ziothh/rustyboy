@@ -1,6 +1,6 @@
 use super::super::super::{
     instructions::{ArithmeticTarget, JumpAddress, JumpCondition, LoadTarget},
-    memory::{Address, Reg16, Reg8},
+    memory::{AddrPtr, Reg16, Reg8},
     Instruction,
 };
 use crate::program::Program;
@@ -818,7 +818,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x02 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::BC),
+                destination: LoadTarget::Address(AddrPtr::BC),
                 source: LoadTarget::Reg8(Reg8::A),
             }),
 
@@ -831,7 +831,7 @@ impl Instruction {
             //        - - - -
             0x0A => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::A),
-                source: LoadTarget::Address(Address::BC),
+                source: LoadTarget::Address(AddrPtr::BC),
             }),
 
             // Instruction: LD
@@ -842,7 +842,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x12 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::DE),
+                destination: LoadTarget::Address(AddrPtr::DE),
                 source: LoadTarget::Reg8(Reg8::A),
             }),
 
@@ -855,7 +855,7 @@ impl Instruction {
             //        - - - -
             0x1A => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::A),
-                source: LoadTarget::Address(Address::DE),
+                source: LoadTarget::Address(AddrPtr::DE),
             }),
 
             // Instruction: LD
@@ -866,7 +866,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x22 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::HLI),
+                destination: LoadTarget::Address(AddrPtr::HLI),
                 source: LoadTarget::Reg8(Reg8::A),
             }),
 
@@ -879,7 +879,7 @@ impl Instruction {
             //        - - - -
             0x2A => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::A),
-                source: LoadTarget::Address(Address::HLI),
+                source: LoadTarget::Address(AddrPtr::HLI),
             }),
 
             // Instruction: LD
@@ -890,7 +890,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x32 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::HLD),
+                destination: LoadTarget::Address(AddrPtr::HLD),
                 source: LoadTarget::Reg8(Reg8::A),
             }),
 
@@ -903,7 +903,7 @@ impl Instruction {
             //        - - - -
             0x3A => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::A),
-                source: LoadTarget::Address(Address::HLD),
+                source: LoadTarget::Address(AddrPtr::HLD),
             }),
 
             // Instruction: LD (immediate)
@@ -987,7 +987,7 @@ impl Instruction {
             //        - - - -
             0x46 => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::B),
-                source: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Address(AddrPtr::HL),
             }),
 
             // Instruction: LD (immediate)
@@ -1083,7 +1083,7 @@ impl Instruction {
             //        - - - -
             0x4E => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::C),
-                source: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Address(AddrPtr::HL),
             }),
 
             // Instruction: LD (immediate)
@@ -1179,7 +1179,7 @@ impl Instruction {
             //        - - - -
             0x56 => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::D),
-                source: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Address(AddrPtr::HL),
             }),
 
             // Instruction: LD (immediate)
@@ -1275,7 +1275,7 @@ impl Instruction {
             //        - - - -
             0x5E => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::E),
-                source: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Address(AddrPtr::HL),
             }),
 
             // Instruction: LD (immediate)
@@ -1371,7 +1371,7 @@ impl Instruction {
             //        - - - -
             0x66 => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::H),
-                source: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Address(AddrPtr::HL),
             }),
 
             // Instruction: LD (immediate)
@@ -1467,7 +1467,7 @@ impl Instruction {
             //        - - - -
             0x6E => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::L),
-                source: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Address(AddrPtr::HL),
             }),
 
             // Instruction: LD (immediate)
@@ -1490,7 +1490,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x70 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::HL),
+                destination: LoadTarget::Address(AddrPtr::HL),
                 source: LoadTarget::Reg8(Reg8::B),
             }),
 
@@ -1502,7 +1502,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x71 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::HL),
+                destination: LoadTarget::Address(AddrPtr::HL),
                 source: LoadTarget::Reg8(Reg8::C),
             }),
 
@@ -1514,7 +1514,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x72 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::HL),
+                destination: LoadTarget::Address(AddrPtr::HL),
                 source: LoadTarget::Reg8(Reg8::D),
             }),
 
@@ -1526,7 +1526,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x73 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::HL),
+                destination: LoadTarget::Address(AddrPtr::HL),
                 source: LoadTarget::Reg8(Reg8::E),
             }),
 
@@ -1538,7 +1538,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x74 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::HL),
+                destination: LoadTarget::Address(AddrPtr::HL),
                 source: LoadTarget::Reg8(Reg8::H),
             }),
 
@@ -1550,7 +1550,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x75 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::HL),
+                destination: LoadTarget::Address(AddrPtr::HL),
                 source: LoadTarget::Reg8(Reg8::L),
             }),
 
@@ -1562,7 +1562,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x77 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::HL),
+                destination: LoadTarget::Address(AddrPtr::HL),
                 source: LoadTarget::Reg8(Reg8::A),
             }),
 
@@ -1647,7 +1647,7 @@ impl Instruction {
             //        - - - -
             0x7E => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::A),
-                source: LoadTarget::Address(Address::HL),
+                source: LoadTarget::Address(AddrPtr::HL),
             }),
 
             // Instruction: LD (immediate)
@@ -1670,7 +1670,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xE2 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::ZeroPageC),
+                destination: LoadTarget::Address(AddrPtr::ZeroPageC),
                 source: LoadTarget::Reg8(Reg8::A),
             }),
 
@@ -1683,7 +1683,7 @@ impl Instruction {
             //        - - - -
             0xF2 => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::A),
-                source: LoadTarget::Address(Address::ZeroPageC),
+                source: LoadTarget::Address(AddrPtr::ZeroPageC),
             }),
 
             // Instruction: LD (immediate)
@@ -1704,7 +1704,7 @@ impl Instruction {
             //        - - - -
             0x06 => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::B),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(AddrPtr::Direct(program.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1716,7 +1716,7 @@ impl Instruction {
             //        - - - -
             0x0E => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::C),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(AddrPtr::Direct(program.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1728,7 +1728,7 @@ impl Instruction {
             //        - - - -
             0x16 => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::D),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(AddrPtr::Direct(program.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1740,7 +1740,7 @@ impl Instruction {
             //        - - - -
             0x1E => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::E),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(AddrPtr::Direct(program.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1752,7 +1752,7 @@ impl Instruction {
             //        - - - -
             0x26 => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::H),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(AddrPtr::Direct(program.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1764,7 +1764,7 @@ impl Instruction {
             //        - - - -
             0x2E => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::L),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(AddrPtr::Direct(program.skip_byte().pc())),
             }),
 
             // Instruction: LD
@@ -1775,8 +1775,8 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x36 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::HL),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                destination: LoadTarget::Address(AddrPtr::HL),
+                source: LoadTarget::Address(AddrPtr::Direct(program.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1788,7 +1788,7 @@ impl Instruction {
             //        - - - -
             0x3E => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::B),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(AddrPtr::Direct(program.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1866,7 +1866,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xEA => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                destination: LoadTarget::Address(AddrPtr::Direct(program.skip_byte().pc())),
                 source: LoadTarget::Reg8(Reg8::A),
             }),
 
@@ -1879,7 +1879,7 @@ impl Instruction {
             //        - - - -
             0xFA => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::A),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(AddrPtr::Direct(program.skip_byte().pc())),
             }),
 
             // Instruction: LDH
@@ -1890,7 +1890,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xE0 => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::ZeroPage {
+                destination: LoadTarget::Address(AddrPtr::ZeroPage {
                     lsb: program.next_byte(),
                 }),
                 source: LoadTarget::Reg8(Reg8::A),
@@ -1905,7 +1905,7 @@ impl Instruction {
             //        - - - -
             0xF0 => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::A),
-                source: LoadTarget::Address(Address::ZeroPage {
+                source: LoadTarget::Address(AddrPtr::ZeroPage {
                     lsb: program.next_byte(),
                 }),
             }),

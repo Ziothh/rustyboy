@@ -60,10 +60,10 @@ mod background {
     /// (x, y)
     pub fn calc_bottom_right(memory_bus: &bus::Interface) -> (u8, u8) {
         (
-            memory_bus[bus::regions::io_registers::lcd::SCX]
+            memory_bus[bus::regions::io::lcd::SCX]
                 .overflowing_add(159)
                 .0, // x
-            memory_bus[bus::regions::io_registers::lcd::SCY]
+            memory_bus[bus::regions::io::lcd::SCY]
                 .overflowing_add(143)
                 .0, // y
         )

@@ -25,6 +25,12 @@ path = "src/gui.rs"
 test = false
 doctest = false
 
+[[bin]]
+name = "playground"
+path = "src/playground.rs"
+test = false
+doctest = false
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
