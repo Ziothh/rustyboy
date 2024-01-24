@@ -30,6 +30,7 @@ fn main() {
                     ),
                     true => x.name.clone(),
                 })
+                .map(|operand| operand.replacen("$", "0x", 1))
                 .enumerate()
                 .fold(Vec::with_capacity(2), |mut acc, (i, x)| {
                     if i != 2 {
@@ -41,6 +42,22 @@ fn main() {
                     acc
                 })
                 .join(",");
+
+            let repr = format!("{} {operands}", instruction.mnemonic)
+                .trim()
+                .to_owned();
+            let callback = [
+                "|cpu, bus| {",
+                &format!(
+                    "    cpu.{}({});",
+                    instruction.mnemonic.to_lowercase(),
+                    operands
+                ),
+                &format!("    return &{:?};", instruction.cycles),
+                "}",
+            ]
+            .join("\n");
+            return format!(r#"Instruction::new("{repr}", {callback})"#,);
 
             return [
                 //
@@ -62,5 +79,5 @@ fn main() {
         println!("{x}");
     });
 
-    // fs::write("./unprefixed.rs", res.join("\n")).unwrap();
+    fs::write("./unprefixed.rs", res.join(",\n")).unwrap();
 }

@@ -8,7 +8,7 @@ use super::CPU;
 
 /// A representation of for the reading of the "immediate" memory at the `program_counter` position.
 #[derive(Debug)]
-pub struct Immediate8;
+pub struct Immediate<Size>;
 
 /// Memory address pointer variants
 #[derive(Debug)]
@@ -40,15 +40,15 @@ pub enum Address {
     ZeroPageC,
 }
 
-pub trait Read8<T: Copy> {
-    fn read(&mut self, source: T) -> u8;
+pub trait Out<Src: Copy, T = u8> {
+    fn read(&self, source: Src) -> T;
 }
-pub trait Write8<T: Copy> {
-    fn write(&mut self, destination: T, data: u8) -> &mut Self;
+pub trait In<Dest: Copy, T = u8> {
+    fn write(&mut self, destination: Dest, data: T) -> &mut Self;
 }
 
-impl Read8<Reg8> for CPU {
-    fn read(&mut self, source: Reg8) -> u8 {
+impl Out<Reg8> for CPU {
+    fn read(&self, source: Reg8) -> u8 {
         use Reg8::*;
 
         match source {
@@ -62,8 +62,7 @@ impl Read8<Reg8> for CPU {
         }
     }
 }
-
-impl Write8<Reg8> for CPU {
+impl In<Reg8> for CPU {
     fn write(&mut self, destination: Reg8, data: u8) -> &mut Self {
         use Reg8::*;
 
@@ -79,4 +78,46 @@ impl Write8<Reg8> for CPU {
 
         return self;
     }
+}
+
+
+impl Out<Reg16, u16> for CPU {
+    fn read(&self, register: Reg16) -> u16 {
+        use Reg16::*;
+
+        match register {
+            BC => self.registers.bc(),
+            DE => self.registers.de(),
+            HL => self.registers.hl(),
+            AF => self.registers.af(),
+            SP => todo!(),
+        }
+    }
+}
+impl In<Reg16, u16> for CPU {
+    fn write(&mut self, register: Reg16, data: u16) -> &mut Self {
+        use Reg16::*;
+
+        let [lsb, msb] = data.to_le_bytes();
+        match register {
+            // TODO: check if the which register needs the lsb and msb
+            BC => {
+                self.registers.b = lsb;
+                self.registers.c = msb;
+            },
+            DE => {
+                self.registers.d = lsb;
+                self.registers.e = msb;
+            },
+            HL => {
+                self.registers.h = lsb;
+                self.registers.l = msb;
+            },
+            AF => unreachable!(),
+            SP => todo!(),
+        };
+
+        return self;
+    }
+
 }

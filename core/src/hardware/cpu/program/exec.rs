@@ -1,6 +1,7 @@
 use super::super::CPU;
-use crate::hardware::bus;
+use crate::hardware::{bus, cpu::memory::{Out, In}};
 
+// Utils
 impl CPU {
     /// Reads the byte from mem[PC] and increments PC by 1
     pub fn next_byte(&mut self, bus: &bus::Interface) -> u8 {
@@ -26,27 +27,18 @@ impl CPU {
     pub fn next_u16(&mut self, bus: &bus::Interface) -> u16 {
         u16::from_le_bytes([self.next_byte(bus), self.next_byte(bus)])
     }
+}
 
-    pub fn nop(&mut self) -> u8 {
-        4
+// Instructions execs
+impl CPU {
+    pub fn nop(&mut self) -> &mut Self {
+        self
     }
 
-    pub fn load<R, W, T>(&mut self, dest: impl Write<W, T>, src: impl Read<R, T>) -> u8 
-        where R: Read<impl Copy, T>
+    /// LD: Load
+    pub fn ld<Dest: Copy, Src: Copy, T>(&mut self, dest: Dest, src: Src) -> &mut Self 
+        where Self: Out<Src, T> + In<Dest, T>
     {
-        dest.write(src.read(), );
-
-        4
+        self.write(dest, self.read(src))
     }
 }
-
-
-pub trait Read<T, O = u8> {
-    fn read(cpu: &CPU, bus: &bus::Interface) -> O;
-}
-pub trait Write<T, I = u8> {
-    fn write(value: I, cpu: &mut CPU, bus: &mut bus::Interface);
-}
-
-
-// trait In<T,>
