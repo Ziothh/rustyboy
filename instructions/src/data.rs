@@ -9,6 +9,11 @@ pub fn parse() -> Schema {
 #[derive(Debug, PartialEq, Eq, Clone, Copy, std::hash::Hash, serde::Deserialize)]
 #[serde(try_from = "String")]
 pub struct Opcode(u8);
+impl Opcode {
+    pub fn as_byte(&self) -> u8 {
+        return self.0;
+    }
+}
 
 impl std::fmt::Display for Opcode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -33,17 +38,36 @@ pub type OpcodeMap = HashMap<Opcode, InstructionRecord>;
 
 pub fn print_opcode_map(map: &OpcodeMap) {
     let mut data = map.iter().collect::<Vec<_>>();
-    data.sort_by_key(|x| x.0 .0);
+    data.sort_by_key(|(opcode, _)| opcode.as_byte());
 
     for (opcode, instruction) in data {
         let operands = instruction
             .operands
             .iter()
             .map(|x| match x.immediate {
-                false => format!("[{}]", x.name),
+                false => format!(
+                    "[{}{}]",
+                    x.name,
+                    if x.increment {
+                        "+"
+                    } else if x.decrement {
+                        "-"
+                    } else {
+                        ""
+                    }
+                ),
                 true => x.name.clone(),
             })
-            .collect::<Vec<_>>()
+            .enumerate()
+            .fold(Vec::with_capacity(2), |mut acc, (i, x)| {
+                if i != 2 {
+                    acc.push(x);
+                } else {
+                    acc[1] = format!("{}+{x}", acc[1]);
+                }
+
+                acc
+            })
             .join(",");
 
         println!("{opcode} => {} {operands}", instruction.mnemonic);
@@ -61,6 +85,13 @@ pub struct OperandDescription {
     pub name: String,
     pub immediate: bool,
     pub bytes: Option<usize>,
+
+    // [HL+]
+    #[serde(default = "bool::default")]
+    pub increment: bool,
+    // [HL-]
+    #[serde(default = "bool::default")]
+    pub decrement: bool,
 }
 
 #[derive(Debug, serde::Deserialize)]

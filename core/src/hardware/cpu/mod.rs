@@ -1,4 +1,5 @@
 use crate::{hardware::bus::Interface, program::Program};
+mod program;
 
 mod memory;
 use self::memory::{Registers, Stack};
@@ -16,6 +17,14 @@ pub struct CPU {
 }
 
 impl CPU {
+    pub fn new() -> Self {
+        Self { 
+            registers: Registers::new(),
+            stack: todo!(), 
+            bus: todo!(),
+        }
+    }
+
     pub fn run_program(&mut self, program: Program) -> &mut Self {
         for instruction in program {
             self.execute(instruction);
