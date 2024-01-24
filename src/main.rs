@@ -4,11 +4,13 @@ use gb::hardware;
 
 fn main() {
     // let rom = ROM::try_new("./roms/gb/Super-Mario-Land-4.gb").expect("Failed to find rom");
-    let rom = ROM::try_new("./roms/gb/Pokemon-Red.gb").expect("Failed to find rom");
+    let rom = ROM::try_new("./roms/gb/test.gb")
+        .expect("Failed to find rom")
+        .read()
+        .unwrap();
 
     let mut bus = hardware::bus::Interface::new();
-    bus.load(&rom.read().unwrap()[0..u16::MAX as usize]);
-
+    bus.load(&rom[0..rom.len().min(u16::MAX as usize)]);
 
     // let program = program::Program::new(bus);
     //
@@ -26,7 +28,9 @@ fn main() {
     let title = header.title();
 
     #[allow(unused_must_use)]
-    { dbg!(title); }
+    {
+        dbg!(title);
+    }
     dbg!(&header.licensee());
     dbg!(&header.validate_checksum());
 }
