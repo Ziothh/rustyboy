@@ -184,6 +184,7 @@ pub mod regions {
     /// 8 KiB External RAM
     /// From cartridge, switchable bank if any
     pub const EXTERNAL_RAM: bus::Region = 0xA000..=0xBFFF;
+    
     /// 4 KiB Work RAM (WRAM)
     pub const WRAM_FIXED: bus::Region = 0xC000..=0xCFFF;
     /// 4 KiB Work RAM (WRAM)
