@@ -32,14 +32,17 @@
       };
 
 
-      # Libraries that are mostly needed for raylib to build
-      libraries = with pkgs; [
+      # These are mostly needed for raylib to build
+      packages = with pkgs; [
+        # [Raylib]
         cmake
+      ] ++ pkgs.lib.lists.optionals stdenv.isLinux [
+        # [Raylib]
         clang
         libclang
         libcxx # C++ std library
         libGL
-      ] ++ pkgs.lib.lists.optionals stdenv.isLinux [
+
         xorg.libX11
         xorg.libXrandr
         xorg.libXinerama
@@ -50,7 +53,6 @@
         mesa
         alsa-lib
 
-
         glibc
 
         # [Wayland]
@@ -58,16 +60,16 @@
         wayland-protocols
         libxkbcommon
       ] ++ pkgs.lib.lists.optionals stdenv.isDarwin [
-        # darwin.xcode
-      ];
-
-      packages = with pkgs; [
+        # [Raylib]
+        # https://github.com/NixOS/nixpkgs/blob/master/pkgs/os-specific/darwin/apple-sdk/frameworks.nix
+        darwin.apple_sdk.frameworks.Cocoa
+        darwin.apple_sdk.frameworks.Kernel
       ];
 
       # Inputs needed at compile-time
       nativeBuildInputs = with pkgs; [ rustToolchain ];
       # Inputs needed at runtime
-      buildInputs = with pkgs; [ ] ++ packages ++ libraries;
+      buildInputs = with pkgs; [ ] ++ packages;
     in
     {
       packages.default = naerskLib.buildPackage {
@@ -80,10 +82,6 @@
           nativeBuildInputs = nativeBuildInputs ++ [
             pkgs.cargo-watch
           ];
-
-          shellHook = ''
-          export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath libraries}
-          '';
         };
       };
     });
