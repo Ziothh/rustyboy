@@ -6,7 +6,7 @@ pub struct CartridgeHeader<'a>(&'a [u8]);
 
 impl<'a> CartridgeHeader<'a> {
     pub fn read_from_bus(memory_bus: &'a bus::Interface) -> Self {
-        Self(&memory_bus[bus::regions::CARTRIDGE_HEADER])
+        Self(&memory_bus[bus::regions::rom::CARTRIDGE_HEADER])
     }
 
     pub fn title(&self) -> Result<&str, str::Utf8Error> {
@@ -61,7 +61,7 @@ impl<'a> CartridgeHeader<'a> {
 pub mod regions {
     use crate::hardware::bus;
 
-    pub const START: bus::Addr = *bus::regions::CARTRIDGE_HEADER.start();
+    pub const START: bus::Addr = *bus::regions::rom::CARTRIDGE_HEADER.start();
 
     /// After displaying the Nintendo logo, the built-in boot ROM jumps to the address $0100, which should then jump to the actual main program in the cartridge. Most commercial games fill this 4-byte area with a nop instruction followed by a jp $0150.
     pub const ENTRY_POINT: bus::Region = 0x0100..=0x0103;

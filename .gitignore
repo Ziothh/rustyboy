@@ -2,3 +2,6 @@
 .direnv
 /result
 /lib
+
+# MacOS
+.DS_Store

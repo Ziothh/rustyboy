@@ -166,17 +166,21 @@ pub mod regions {
         pub const INTERRUPTS: [bus::Addr; 5] = [0x0040, 0x0048, 0x0050, 0x0058, 0x0060];
     }
 
-    /// This memory area contains the cartridge header.
-    /// It contains information about the program, its entry point, checksums, information about the used MBC chip, the ROM and RAM sizes, etc.
-    /// Most of the bytes in this area are required to be specified correctly.
-    pub const CARTRIDGE_HEADER: bus::Region = 0x0100..=0x014F;
+    pub mod rom {
+        use super::super::super::bus;
 
-    /// 16 KiB ROM bank 00
-    /// From cartridge, usually a fixed bank
-    pub const ROM_BANK_00: bus::Region = 0x0000..=0x3FFF;
-    /// 16 KiB ROM Bank 01~NN
-    /// From cartridge, switchable bank via mapper (if any)
-    pub const ROM_BANK_NN: bus::Region = 0x4000..=0x7FFF;
+        /// This memory area contains the cartridge header.
+        /// It contains information about the program, its entry point, checksums, information about the used MBC chip, the ROM and RAM sizes, etc.
+        /// Most of the bytes in this area are required to be specified correctly.
+        pub const CARTRIDGE_HEADER: bus::Region = 0x0100..=0x014F;
+
+        /// 16 KiB ROM bank 00
+        /// From cartridge, usually a fixed bank
+        pub const BANK_00: bus::Region = 0x0000..=0x3FFF;
+        /// 16 KiB ROM Bank 01~NN
+        /// From cartridge, switchable bank via mapper (if any)
+        pub const BANK_NN: bus::Region = 0x4000..=0x7FFF;
+    }
 
     /// 8 KiB Video RAM (VRAM)
     /// From cartridge, switchable bank if any
@@ -184,7 +188,7 @@ pub mod regions {
     /// 8 KiB External RAM
     /// From cartridge, switchable bank if any
     pub const EXTERNAL_RAM: bus::Region = 0xA000..=0xBFFF;
-    
+
     /// 4 KiB Work RAM (WRAM)
     pub const WRAM_FIXED: bus::Region = 0xC000..=0xCFFF;
     /// 4 KiB Work RAM (WRAM)
@@ -194,6 +198,7 @@ pub mod regions {
     /// Nintendo says use of this area is prohibited.
     pub const ECHO_RAM: bus::Region = 0xE000..=0xFDFF;
     /// Object attribute memory (OAM)
+    /// 160 bytes
     pub const OAM: bus::Region = 0xFE00..=0xFE9F;
     /// Not Usable
     ///
@@ -277,7 +282,10 @@ pub mod regions {
 
         // Disabled because it first appeared on CGB instead of DMG
         // const VRAM_BANK_SELECT: u16 = 0xFF4F;
+
         /// Set to non-zero to disable boot ROM
+        ///
+        /// When set to non-zero, it can never be set to `0b0` again
         const DISABLE_BOOT_ROM: bus::Addr = 0xFF50;
 
         // CGB only registers so I'm not tackling this atm
@@ -289,5 +297,5 @@ pub mod regions {
     /// High RAM (HRAM)
     pub const HRAM: bus::Region = 0xFF80..=0xFFFE;
     /// Interrupt Enable register (IE)
-    pub const IE: bus::Region = 0xFFFF..=0xFFFF;
+    pub const IE: bus::Addr = 0xFFFF;
 }
