@@ -3,8 +3,25 @@
 // #![feature(inherent_associated_types)] // Cool feature but rust-analyzer doesn't support
 // autocomplete for const values with these types
 
-pub mod hardware;
-pub mod io;
+pub mod cartridge;
+pub mod cpu;
+pub mod ppu;
+
 pub mod prelude;
-pub mod program;
 pub mod utils;
+
+pub struct GameBoy {
+    /// Central Processing Unit
+    cpu: cpu::CPU,
+    /// Pixel Processing Unit
+    ppu: ppu::PPU,
+
+    /// External Cartridge
+    cartridge: cartridge::Cartridge,
+}
+
+impl GameBoy {
+    pub fn new(rom: &[u8]) {
+        todo!()
+    }
+}
