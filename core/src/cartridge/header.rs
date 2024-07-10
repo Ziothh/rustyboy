@@ -1,10 +1,12 @@
 use std::str;
+use crate::memory_bus as bus;
 
 pub struct CartridgeHeader<'a>(&'a [u8]);
 
 impl CartridgeHeader<'_> {
-    pub fn read_from_bus(memory_bus: &bus::Interface) -> Self {
-        Self(&memory_bus[bus::regions::rom::CARTRIDGE_HEADER])
+    pub fn read_from_bus(memory_bus: &bus::Bus<'_>) -> Self {
+        todo!()
+        // Self(&memory_bus[bus::regions::rom::CARTRIDGE_HEADER])
     }
 
     pub fn title(&self) -> Result<&str, str::Utf8Error> {
@@ -280,7 +282,7 @@ mod licensee {
 
 #[allow(dead_code)]
 pub mod regions {
-    use crate::hardware::bus;
+    use super::bus;
 
     pub const START: bus::Addr = *bus::regions::rom::CARTRIDGE_HEADER.start();
 

@@ -1,6 +1,7 @@
 use super::tiles;
 use crate::{
-    hardware::{bus, ppu},
+    memory_bus as bus, 
+    ppu,
     utils::bit,
 };
 
@@ -13,7 +14,7 @@ pub const WINDOW_HEIGHT: usize = 144;
 /// LCDC is the main LCD Control register. Its bits toggle what elements are displayed on the screen, and how.
 pub struct LCDControl(u8);
 impl LCDControl {
-    pub fn from_bus(memory_bus: &bus::Interface) -> Self {
+    pub fn from_bus(memory_bus: &bus::Bus) -> Self {
         Self(memory_bus[bus::regions::io_registers::lcd::LCDC])
     }
     #[inline]
@@ -99,7 +100,7 @@ impl LCDControl {
 
 pub struct LCDStatus(u8);
 impl LCDStatus {
-    pub fn from_bus(memory_bus: &bus::Interface) -> Self {
+    pub fn from_bus(memory_bus: &bus::Bus) -> Self {
         Self(memory_bus[bus::regions::io_registers::lcd::STAT])
     }
     #[inline]
@@ -142,7 +143,7 @@ impl LCDStatus {
         }
     }
     /// NOTE: PPU mode is Read-only for the CPU so this should only be called by the PPU
-    pub fn set_ppu_mode(memory_bus: &mut bus::Interface, mode: ppu::PPUMode) {
+    pub fn set_ppu_mode(memory_bus: &mut bus::Bus, mode: ppu::PPUMode) {
         let prev = memory_bus[bus::regions::io_registers::lcd::STAT];
 
         memory_bus[bus::regions::io_registers::lcd::STAT] = (prev & 0b1111_1100) | mode as u8

@@ -19,7 +19,7 @@
 
 use std::ops;
 
-use crate::prelude::LittleEndian;
+use crate::{cartridge::Cartridge, prelude::LittleEndian, GameBoy};
 
 /// A memory bus address of a byte
 ///
@@ -31,31 +31,26 @@ pub type Addr = u16;
 pub type Region = ops::RangeInclusive<Addr>;
 
 /// The interface to interract with the Game Boys memory bus
-pub struct Bus {
-    bytes: [u8; Self::SIZE],
-    locked_regions: Vec<Region>,
+pub struct Bus<'a> {
+    pub gb: &'a mut GameBoy
+
+    // pub cartridge: &'a mut Cartridge,
+    // pub wram: &'a mut [u8],
 }
-impl Bus {
+impl Bus<'_> {
     const SIZE: usize = u16::MAX as usize;
 
-    pub fn new() -> Self {
-        Self {
-            bytes: [0; u16::MAX as usize],
-            locked_regions: Vec::new(),
-        }
-    }
-
-    pub fn load(&mut self, bytes: &[u8]) -> &mut Self {
-        if bytes.len() > Self::SIZE {
-            todo!("You can only load 64kB into the memory bus");
-        }
-
-        for (i, x) in bytes.iter().enumerate() {
-            self.bytes[i] = *x;
-        }
-
-        return self;
-    }
+    // pub fn load(&mut self, bytes: &[u8]) -> &mut Self {
+    //     if bytes.len() > Self::SIZE {
+    //         todo!("You can only load 64kB into the memory bus");
+    //     }
+    //
+    //     for (i, x) in bytes.iter().enumerate() {
+    //         self.bytes[i] = *x;
+    //     }
+    //
+    //     return self;
+    // }
 
     pub fn read8(&self, address: u16) -> u8 {
         return self[address];
@@ -76,68 +71,80 @@ impl Bus {
         // ((self[index + 1] as u16) << 8) | (self[index] as u16);
     }
 
+    // NOTE: these should all probably be refactored
     pub fn lock_region(&mut self, region: Region) -> &mut Self {
-        self.locked_regions.push(region);
-        return self;
+        todo!()
+
+        // self.locked_regions.push(region);
+        // return self;
     }
     pub fn unlock_region(&mut self, region: Region) -> &mut Self {
-        self.locked_regions.remove(
-            self.locked_regions
-                .iter()
-                .enumerate()
-                .find(|(_, x)| **x == region)
-                .map(|(i, _)| i)
-                .expect("Can not unlock region that's not been locked"),
-        );
-        return self;
+        todo!()
+
+        // self.locked_regions.remove(
+        //     self.locked_regions
+        //         .iter()
+        //         .enumerate()
+        //         .find(|(_, x)| **x == region)
+        //         .map(|(i, _)| i)
+        //         .expect("Can not unlock region that's not been locked"),
+        // );
+        // return self;
     }
     fn is_addr_locked(&self, addr: Addr) -> bool {
-        self.locked_regions
-            .iter()
-            .find(|x| x.contains(&addr))
-            .is_some()
+        todo!()
+
+        // self.locked_regions
+        //     .iter()
+        //     .find(|x| x.contains(&addr))
+        //     .is_some()
     }
     fn is_region_locked(&self, region: &Region) -> bool {
-        self.locked_regions
-            .iter()
-            .find(|x| x.start() <= region.start() && x.end() >= region.end())
-            .is_some()
+        todo!()
+
+        // self.locked_regions
+        //     .iter()
+        //     .find(|x| x.start() <= region.start() && x.end() >= region.end())
+        //     .is_some()
     }
 }
 
-impl ops::Index<Addr> for Bus {
+impl ops::Index<Addr> for Bus<'_> {
     type Output = u8;
 
     #[inline]
     fn index(&self, addr: u16) -> &Self::Output {
-        if self.is_addr_locked(addr) {
-            println!("WARN: Reading locked memory at {addr:#04X}. Returning 0xFF")
-        }
-        return self.bytes.index(addr as usize);
+        todo!()
+        // if self.is_addr_locked(addr) {
+        //     println!("WARN: Reading locked memory at {addr:#04X}. Returning 0xFF")
+        // }
+        // return self.bytes.index(addr as usize);
     }
 }
-impl ops::IndexMut<Addr> for Bus {
+impl ops::IndexMut<Addr> for Bus<'_> {
     #[inline]
     fn index_mut(&mut self, addr: u16) -> &mut Self::Output {
-        if self.is_addr_locked(addr) {
-            unreachable!("ERROR: Writing to locked memory at {addr:#04X} is not allowed.")
-        }
-        return self.bytes.index_mut(addr as usize);
+        todo!()
+        // if self.is_addr_locked(addr) {
+        //     unreachable!("ERROR: Writing to locked memory at {addr:#04X} is not allowed.")
+        // }
+        // return self.bytes.index_mut(addr as usize);
     }
 }
-impl ops::Index<Region> for Bus {
+impl ops::Index<Region> for Bus<'_> {
     type Output = [u8];
 
     #[inline]
     fn index(&self, region: Region) -> &Self::Output {
-        if self.is_region_locked(&region) {
-            unreachable!("ERROR: Reading locked memory at {region:#?}. Returning slice of 0xFF")
-        }
-
-        return &self.bytes[(*region.start() as usize)..=(*region.end() as usize)];
+        todo!()
+        // if self.is_region_locked(&region) {
+        //     unreachable!("ERROR: Reading locked memory at {region:#?}. Returning slice of 0xFF")
+        // }
+        //
+        // return &self.bytes[(*region.start() as usize)..=(*region.end() as usize)];
     }
 }
-impl ops::Index<ops::Range<Addr>> for Bus {
+impl ops::Index<ops::Range<Addr>> for Bus<'_> {
     type Output = [u8];
 
     #[inline]
@@ -148,7 +155,7 @@ impl ops::Index<ops::Range<Addr>> for Bus {
 
 #[allow(dead_code)]
 pub mod regions {
-    use super::super::bus;
+    use super::super::memory_bus as bus;
 
     /// Calculates the amount of bytes in the range.
     pub const fn size(range: bus::Region) -> usize {
@@ -167,7 +174,7 @@ pub mod regions {
     }
 
     pub mod rom {
-        use super::super::super::bus;
+        use super::bus;
 
         /// This memory area contains the cartridge header.
         /// It contains information about the program, its entry point, checksums, information about the used MBC chip, the ROM and RAM sizes, etc.
@@ -226,7 +233,7 @@ pub mod regions {
 
         /// LCD Control, Status, Position, Scrolling, and Palettes
         pub mod lcd {
-            use crate::hardware::bus;
+            use super::bus;
 
             const RANGE: bus::Region = 0xFF40..=0xFF4B;
 

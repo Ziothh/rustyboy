@@ -55,10 +55,10 @@ enum Layer {
 }
 
 mod background {
-    use crate::hardware::bus;
+    use crate::memory_bus as bus;
 
     /// (x, y)
-    pub fn calc_bottom_right(memory_bus: &bus::Interface) -> (u8, u8) {
+    pub fn calc_bottom_right(memory_bus: &bus::Bus) -> (u8, u8) {
         (
             memory_bus[bus::regions::io_registers::lcd::SCX]
                 .overflowing_add(159)

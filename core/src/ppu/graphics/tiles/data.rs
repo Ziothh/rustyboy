@@ -1,4 +1,5 @@
-use crate::{io::graphics::{colors::ColorID, self}, hardware::bus};
+use crate::memory_bus as bus;
+use crate::ppu::graphics;
 
 /// A tile (8*8 pixels) consisting of 16 bytes.
 ///
@@ -31,7 +32,7 @@ impl<'a> Tile<'a> {
     /// (You can notice that block 1 is shared by both addressing methods)
     ///
     /// Objects always use “$8000 addressing”, but the BG and Window can use either mode, controlled by **LCDC bit 4**.
-    pub fn from_bus(memory_bus: &'a bus::Interface, pointer: u8, is_object_tile: bool) -> Self {
+    pub fn from_bus(memory_bus: &'a bus::Bus, pointer: u8, is_object_tile: bool) -> Self {
         let mode = graphics::LCDControl::from_bus(memory_bus).tile_addressing_mode();
         
         let addr: bus::Addr = match !is_object_tile && mode == graphics::tiles::AddresMode::Upper {
@@ -58,19 +59,19 @@ impl<'a> Tile<'a> {
         self.0
     }
 
-    fn get_pixel(&self, x: usize, y: usize) -> ColorID {
+    fn get_pixel(&self, x: usize, y: usize) -> graphics::ColorID {
         let lsb = self.bytes()[y * 2];
         let msb = self.bytes()[y * 2 + 1];
 
         // TODO: check for vertical flip
 
-        return ColorID::from_byte(
+        return graphics::ColorID::from_byte(
             (0b1 & lsb >> (Self::PIXEL_WIDTH - 1 - x))
                 | ((0b1 & msb >> (Self::PIXEL_WIDTH - 1 - x)) << 1),
         );
     }
 
-    pub fn get_pixel_row(&self, y: u8) -> [ColorID; Tile::PIXEL_WIDTH] {
+    pub fn get_pixel_row(&self, y: u8) -> [graphics::ColorID; Tile::PIXEL_WIDTH] {
         let y = y as usize;
         (0..Self::PIXEL_WIDTH)
             .map(|x| self.get_pixel(x, y))
@@ -114,8 +115,8 @@ impl<'a> Tile<'a> {
     ///     ColorID::DarkGray
     /// );
     /// ```
-    pub fn to_color_ids(&self) -> [ColorID; Tile::AREA] {
-        let mut arr = [ColorID::White; Tile::AREA];
+    pub fn to_color_ids(&self) -> [graphics::ColorID; Tile::AREA] {
+        let mut arr = [graphics::ColorID::White; Tile::AREA];
 
         for (i, x) in arr.iter_mut().enumerate() {
             *x = self.get_pixel(
@@ -132,7 +133,7 @@ impl<'a> Tile<'a> {
 mod vram_regions {
     use std::ops;
 
-    use crate::hardware::bus;
+    use super::bus;
 
     /// The full VRAM memory range of the tile data
     /// It contains 384 tiles.
@@ -240,7 +241,7 @@ mod test {
         ];
         assert_eq!(
             Tile::new(&TILE_BYTES).to_color_ids(),
-            COLOR_IDS.map(|b| ColorID::from_byte(b))
+            COLOR_IDS.map(|b| graphics::ColorID::from_byte(b))
         );
     }
 }

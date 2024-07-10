@@ -1,5 +1,5 @@
 use super::Tile;
-use crate::hardware::bus;
+use crate::memory_bus as bus;
 
 pub struct TileMap(bus::Region);
 
@@ -27,7 +27,7 @@ impl TileMap {
 
     pub fn get_tile<'s, 'bus>(
         &'s self,
-        memory_bus: &'bus bus::Interface,
+        memory_bus: &'bus bus::Bus,
         x: u8,
         y: u8,
         is_object_tile: bool,

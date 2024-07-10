@@ -8,3 +8,5 @@ pub mod bit {
     }
 }
 
+/// 1 KiB
+pub const KIBI_BYTE: usize = 1024;

@@ -1,4 +1,4 @@
-use crate::{hardware::cpu, prelude::LittleEndian};
+use crate::{memory_bus, prelude::LittleEndian};
 
 mod memory;
 use self::memory::{Registers, Stack};
@@ -6,6 +6,7 @@ use self::memory::{Registers, Stack};
 mod instructions;
 pub use instructions::Instruction;
 
+#[derive(Default)]
 pub struct CPU {
     registers: Registers,
     stack: Stack,
@@ -15,20 +16,18 @@ pub struct CPU {
 impl CPU {
     pub fn new() -> Self {
         return Self {
-            registers: Default::default(),
-            program: Default::default(),
-            stack: Default::default(),
+            ..Default::default()
         };
     }
 
-    pub fn exec_fetch(&mut self) {
+    pub fn exec_fetch(&mut self, bus: memory_bus::Bus) {
         // TODO: check if the prefixed table has an instruction with opcode PREFIX_INDICATION_BYTE
         // If so: adjust this to also check if it is prefixed or not
         match self.program.next_byte() {
-            cpu::Instruction::PREFIX_INDICATION_BYTE => self.program.prefixed = true,
+            Instruction::PREFIX_INDICATION_BYTE => self.program.prefixed = true,
             prefixed_opcode if self.program.is_prefixed() => todo!(),
             unprefixed_opcode => {
-                cpu::Instruction::try_from_opcode_unprefixed(unprefixed_opcode, self).unwrap();
+                Instruction::try_from_opcode_unprefixed(unprefixed_opcode, todo!()).unwrap();
             }
         };
     }
@@ -76,16 +75,18 @@ impl Program {
     /// Reads the current (immediate) byte, pointed to by the `program_counter` in memory
     /// without incrementing the `program_counter`.
     pub fn read_immediate(&self) -> u8 {
-        self.bus.read8(self.program_counter)
+        todo!()
+        // self.bus.read8(self.program_counter)
     }
 
     /// Reads the current (immediate) byte, pointed to by the `program_counter` in memory,
     /// then increments the `program_counter` by `1`.
     pub fn next_byte(&mut self) -> u8 {
-        let byte = self.bus.read8(self.program_counter);
-        self.program_counter += 1;
-
-        return byte;
+        todo!()
+        // let byte = self.bus.read8(self.program_counter);
+        // self.program_counter += 1;
+        //
+        // return byte;
     }
 
     /// Reads the next byte as an `i8`.
@@ -111,7 +112,7 @@ impl Program {
     ///
     /// @alias self.next()
     #[inline]
-    pub fn next_instruction(&mut self) -> Option<cpu::Instruction> {
+    pub fn next_instruction(&mut self) -> Option<Instruction> {
         self.next()
     }
 
@@ -123,7 +124,7 @@ impl Program {
 }
 
 impl Iterator for Program {
-    type Item = cpu::Instruction;
+    type Item = Instruction;
 
     /// Decodes the next instruction of the program
     ///
@@ -133,7 +134,7 @@ impl Iterator for Program {
 
         // TODO: check if the prefixed table has an instruction with opcode PREFIX_INDICATION_BYTE
         // If so: adjust this to also check if it is prefixed or not
-        if opcode == cpu::Instruction::PREFIX_INDICATION_BYTE {
+        if opcode == Instruction::PREFIX_INDICATION_BYTE {
             self.prefixed = true;
             return self.next();
         }
@@ -142,7 +143,7 @@ impl Iterator for Program {
             // Self::try_from_opcode_prefixed(byte, program)
             todo!()
         } else {
-            cpu::Instruction::try_from_opcode_unprefixed(opcode, self).unwrap()
+            Instruction::try_from_opcode_unprefixed(opcode, self).unwrap()
         });
     }
 }

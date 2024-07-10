@@ -1,4 +1,6 @@
-use super::bus;
+use self::graphics::lcd;
+
+use super::memory_bus as bus;
 
 mod graphics;
 
@@ -37,17 +39,17 @@ impl PPU {
     //
     // }
 
-    fn draw_ly_line<'s, 'bus>(&'s mut self, memory_bus: &'bus mut bus::Interface) -> FIFOPixelFetcher<'bus> 
+    fn draw_ly_line<'s, 'bus>(&'s mut self, memory_bus: &'bus mut bus::Bus<'bus>) -> FIFOPixelFetcher<'bus> 
         where 'bus: 's
     {
         FIFOPixelFetcher::new(memory_bus)
     }
 
-    fn get_mode(memory_bus: &mut bus::Interface) -> PPUMode {
+    fn get_mode(memory_bus: &mut bus::Bus) -> PPUMode {
         graphics::lcd::LCDStatus::from_bus(memory_bus).get_ppu_mode()
     }
 
-    fn set_mode(&mut self, mode: PPUMode, memory_bus: &mut bus::Interface) {
+    fn set_mode(&mut self, mode: PPUMode, memory_bus: &mut bus::Bus) {
         // Unlock memory
         match PPU::get_mode(memory_bus) {
             PPUMode::Drawing => {
@@ -96,7 +98,7 @@ struct Pixel {
     bg_priority: bool,
 }
 impl Pixel {
-    pub fn from_bus(memory_bus: &bus::Interface, color_id: graphics::ColorID) -> Self {
+    pub fn from_bus(memory_bus: &bus::Bus, color_id: graphics::ColorID) -> Self {
         Self {
             color: color_id,
             palette: graphics::Palette::from_bgp(memory_bus), // TODO: also support objects
@@ -126,10 +128,10 @@ impl FIFO {
 struct FIFOPixelFetcher<'bus> {
     /// The tile X coordinate
     x: u8,
-    memory_bus: &'bus mut bus::Interface,
+    memory_bus: &'bus mut bus::Bus<'bus>,
 }
 impl<'bus> FIFOPixelFetcher<'bus> {
-    pub fn new(memory_bus: &'bus mut bus::Interface) -> Self {
+    pub fn new(memory_bus: &'bus mut bus::Bus<'bus>) -> Self {
         Self { 
             x: 0,
             memory_bus,

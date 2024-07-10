@@ -3,21 +3,30 @@
 #![allow(incomplete_features)]
 #![feature(inherent_associated_types)]
 
+use std::fs;
+
 fn main() {
-    let mut gb = GameBoy {
-        cardridge: Some(Default::default()),
-        ..Default::default()
-    };
+    let bytes = fs::read("./roms/gb/bootix.bin").unwrap();
 
-    let bus = gb.bus();
-    let x = bus.read(0);
+    dbg!(bytes.len());
 
-    let mut is_running = true;
-    while is_running {
-        gb.m_clock_tick();
+    dbg!(bytes);
 
-        is_running = false;
-    }
+
+    // let mut gb = GameBoy {
+    //     cardridge: Some(Default::default()),
+    //     ..Default::default()
+    // };
+    //
+    // let bus = gb.bus();
+    // let x = bus.read(0);
+    //
+    // let mut is_running = true;
+    // while is_running {
+    //     gb.m_clock_tick();
+    //
+    //     is_running = false;
+    // }
 }
 
 #[derive(Default)]

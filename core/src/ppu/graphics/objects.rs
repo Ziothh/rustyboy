@@ -13,7 +13,7 @@
 //!
 //! See [gbdev.io](https://gbdev.io/pandocs/OAM.html) for more info.
 
-use crate::hardware::bus;
+use crate::memory_bus as bus;
 
 #[derive(Debug)]
 pub struct Object<'a>(&'a [u8; Object::BYTE_SIZE]);
@@ -30,7 +30,7 @@ impl<'a> Object<'a> {
         Self(bytes)
     }
 
-    pub fn read_all_from_bus(memory_bus: &'a bus::Interface) -> [Self; Object::OAM_ENTRIES] {
+    pub fn read_all_from_bus(memory_bus: &'a bus::Bus) -> [Self; Object::OAM_ENTRIES] {
         memory_bus[bus::regions::OAM]
             .windows(Object::BYTE_SIZE)
             .step_by(Object::BYTE_SIZE)
@@ -128,7 +128,6 @@ impl ObjectFlag {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::hardware::bus;
 
     #[test]
     fn assert_amount_entries_in_bus() {

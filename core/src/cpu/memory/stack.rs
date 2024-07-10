@@ -1,4 +1,4 @@
-use crate::{hardware::bus::Interface, prelude::LittleEndian};
+use crate::{memory_bus, prelude::LittleEndian};
 
 /// A stack containing a stack pointer
 ///
@@ -17,7 +17,7 @@ impl Default for Stack {
 
 impl Stack {
     /// Push a given `value` to the stack
-    pub fn push(&mut self, value: u16, memory: &mut Interface) -> &mut Self {
+    pub fn push(&mut self, value: u16, memory: &mut memory_bus::Bus) -> &mut Self {
         // Least significant byte
         self.pointer = self.pointer.wrapping_sub(1);
         memory[self.pointer] = value.msb();
@@ -30,7 +30,7 @@ impl Stack {
     }
 
     /// Pop the latest value from the stack
-    pub fn pop(&mut self, memory: &mut Interface) -> u16 {
+    pub fn pop(&mut self, memory: &mut memory_bus::Bus) -> u16 {
         let lsb = memory[self.pointer];
         self.pointer = self.pointer.wrapping_add(1);
 

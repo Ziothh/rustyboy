@@ -1,9 +1,10 @@
+use crate::cpu::Program;
+
 use super::super::super::{
     instructions::{ArithmeticTarget, JumpAddress, JumpCondition, LoadTarget},
     memory::{Address, Reg16, Reg8},
     Instruction,
 };
-use crate::program::Program;
 
 impl Instruction {
     pub fn try_from_opcode_unprefixed(byte: u8, program: &mut Program) -> Result<Self, String> {
