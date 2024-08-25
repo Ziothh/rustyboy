@@ -6,7 +6,7 @@ use crate::{
     cartridge::Cartridge,
     memory_bus::{self, MemoryMappedRegion},
     prelude::LittleEndian,
-    GameBoy, Hardware,
+    GameBoy, Hardware, utils::UNDEFINED_READ,
 };
 
 mod memory;
@@ -80,7 +80,7 @@ impl CPU {
             0xE000..=0xFDFF => todo!("ECHO RAM (C000~DDFF)"),
             0xFE00..=0xFE9F => {
                 if todo!("CHECK if PPU is drawing") {
-                    return 0xFF;
+                    return UNDEFINED_READ;
                 }
 
                 return todo!("VRAM read");
@@ -95,9 +95,18 @@ impl CPU {
     fn read_high(&mut self, hardware: &mut Hardware, addr: u8) -> u8 {
         match addr {
             0x00 => hardware.joypad.read_register(),
+            
             0x01 => todo!("SB: Serial Transfer Data"),
             0x02 => todo!("SC: Serial Transfer Control"),
-            _ => 0xFF,
+
+            0x42 => hardware.ppu.scy,
+            0x43 => hardware.ppu.scx,
+
+            0x4A => hardware.ppu.wy,
+            0x4B => hardware.ppu.wx,
+
+
+            _ => UNDEFINED_READ,
         }
     }
 
@@ -126,6 +135,13 @@ impl CPU {
     fn write_high(&mut self, hardware: &mut Hardware, addr: u8, byte: u8) {
         match addr {
             0x00 => hardware.joypad.write_register(byte),
+
+            0x42 => hardware.ppu.scy = byte,
+            0x43 => hardware.ppu.scx = byte,
+
+            0x4A => hardware.ppu.wy = byte,
+            0x4B => hardware.ppu.wx = byte,
+
             _ => { /* no-op */ }
         };
 

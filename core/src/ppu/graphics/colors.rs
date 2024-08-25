@@ -7,10 +7,12 @@ use crate::{memory_bus as bus, utils::bit};
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 #[repr(u8)]
 pub enum ColorID {
-    White = 0b0000_0000,
-    LightGray = 0b0000_0001,
-    DarkGray = 0b0000_0010,
-    Black = 0b0000_0011,
+    /// Color 0 has a special meaning in objects: it’s transparent,
+    /// allowing the background or other objects behind it to show through.
+    White = 0b00,
+    LightGray = 0b01,
+    DarkGray = 0b10,
+    Black = 0b11,
 }
 impl ColorID {
     pub const MIN: u8 = Self::White.as_byte();

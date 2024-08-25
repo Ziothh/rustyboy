@@ -1,9 +1,5 @@
 use super::tiles;
-use crate::{
-    memory_bus as bus, 
-    ppu,
-    utils::bit,
-};
+use crate::{memory_bus as bus, ppu, utils::bit};
 
 /// The pixel width of the actual game boy screen
 pub const WINDOW_WIDTH: usize = 160;
@@ -89,7 +85,7 @@ impl LCDControl {
 
     /// # LCDC.0 — BG and Window display
     /// ## Non-CGB Mode (DMG, SGB and CGB in compatibility mode):
-    /// When Bit 0 is cleared, both background and window become blank (white), and the Window Display Bit is ignored in that case. 
+    /// When Bit 0 is cleared, both background and window become blank (white), and the Window Display Bit is ignored in that case.
     /// Only objects may still be displayed (if enabled in Bit 1).
     ///
     /// ## CGB Mode

@@ -4,26 +4,67 @@ use super::memory_bus as bus;
 mod graphics;
 
 pub struct PPU {
+    pub oam: [u8; bus::regions::size(bus::regions::OAM)],
+    /// # 8 KiB Video RAM (VRAM)
+    /// From cartridge, switchable bank if CGB
+    ///
+    /// ## Tile Data (`0x8000..=0x97FF`)
+    /// [Pandocs reference](https://gbdev.io/pandocs/Tile_Data.html#vram-tile-data)
+    ///
+    /// Each tile consists of 8x8 pixels takes 16 bytes of space.
+    ///
+    /// The tile data is split up in blocks of 128 bytes.
+    /// There are 3×128 = 384 tiles in total (6×128 = 768 in CGB mode because of 2 switchable banks).
+    ///
+    /// There are 2 ways of addressing into the tile data.
+    /// Read the docs for `LCDC.4` for more info
+    ///
+    /// ## Tile Maps (`0x9800..=0x9FFF`)
+    /// The Game Boy contains 2 32×32 tile maps in VRAM.
+    ///  - `0x9800..=0x9BFF`
+    ///  - `0x9C00..=0x9FFF`
+    ///
+    ///  Any of these maps can be used to display the Background or the Window.
+    ///
+    ///  Since one tile has 8×8 pixels, each map holds a 256×256 pixels picture.
+    ///  Only 160×144 of those pixels are displayed on the LCD at any given time.
+    pub vram: [u8; bus::regions::size(bus::regions::VRAM)],
+
+    /* [Background] */
+    /// Background Scroll Y
+    /// Specifies the origin of the visible 160×144 pixel area within the total 256×256 pixel Background map.
+    pub scy: u8,
+    /// Background Scroll X
+    /// Specifies the origin of the visible 160×144 pixel area within the total 256×256 pixel Background map.
+    pub scx: u8,
+
+    /* [Window] */
+    /// Window Y position
+    pub wy: u8,
+    /// Window X position
+    pub wx: u8,
+
+    /* [Rendering] */
     /// Background pixels FIFO
     pub bg_fifo: FIFO,
     // bg_fifo: FIFOPixelFetcher<'static>, // TODO
     /// Object (sprite) pixels FIFO
     pub obj_fifo: FIFO,
-
-    pub oam: [u8; bus::regions::size(bus::regions::OAM)],
-    pub vram: [u8; bus::regions::size(bus::regions::VRAM)],
 }
-impl PPU {
-    pub fn new() -> Self {
+impl Default for PPU {
+    fn default() -> Self {
         Self {
             bg_fifo: FIFO::empty(),
             obj_fifo: FIFO::empty(),
 
             oam: [0; _],
             vram: [0; _],
+            ..Default::default()
         }
     }
+}
 
+impl PPU {
     // pub fn draw_screen<'s, 'bus>(&'s mut self, memory_bus: &'bus mut bus::Interface) -> impl Iterator<Item = FIFOPixelFetcher>
     //     where 'bus: 's
     // {
@@ -35,6 +76,26 @@ impl PPU {
     //         })
     //
     // }
+
+    /// TODO: find out where this is needed and maybe inline
+    ///
+    /// [Pandocs](https://gbdev.io/pandocs/Scrolling.html#ff42ff43--scy-scx-background-viewport-y-position-x-position)
+    fn get_bg_scroll_bottom_right_coords(&self) -> (u8, u8) {
+        return (
+            self.scy.wrapping_add(143), // Bottom
+            self.scx.wrapping_add(159), // Right
+        );
+    }
+
+    /// TODO: find out where this is needed and maybe inline
+    ///
+    /// [Pandocs](https://gbdev.io/pandocs/Scrolling.html#ff42ff43--scy-scx-background-viewport-y-position-x-position)
+    fn get_window_top_left_coords(&self) -> (u8, u8) {
+        return (
+            self.wy, // Top
+            self.scx.wrapping_sub(7), // Left
+        );
+    }
 
     fn draw_ly_line<'s, 'bus>(
         &'s mut self,

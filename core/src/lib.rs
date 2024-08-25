@@ -31,7 +31,6 @@ struct Hardware {
 
     // Memory
     wram: [u8; 8 * KIBI_BYTE],
-    vram: [u8; 8 * KIBI_BYTE],
 
     joypad: joypad::Joypad,
 }

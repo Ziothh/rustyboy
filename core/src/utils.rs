@@ -10,3 +10,7 @@ pub mod bit {
 
 /// 1 KiB
 pub const KIBI_BYTE: usize = 1024;
+
+/// When a read isn't allowed or supported, the Game Boy returns undefined data.
+/// This is mostly equal to `0xFF`
+pub const UNDEFINED_READ: u8 = 0xFF;
