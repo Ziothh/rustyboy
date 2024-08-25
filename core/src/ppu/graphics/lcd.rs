@@ -15,6 +15,7 @@ pub const WINDOW_HEIGHT: usize = 144;
 pub struct LCDControl(u8);
 impl LCDControl {
     pub fn from_bus(memory_bus: &bus::Bus) -> Self {
+        todo!("REFACTOR");
         Self(memory_bus[bus::regions::io_registers::lcd::LCDC])
     }
     #[inline]

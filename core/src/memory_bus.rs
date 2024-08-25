@@ -32,10 +32,8 @@ pub type Region = ops::RangeInclusive<Addr>;
 
 /// The interface to interract with the Game Boys memory bus
 pub struct Bus<'a> {
-    pub gb: &'a mut GameBoy
-
-    // pub cartridge: &'a mut Cartridge,
-    // pub wram: &'a mut [u8],
+    pub gb: &'a mut GameBoy, // pub cartridge: &'a mut Cartridge,
+                             // pub wram: &'a mut [u8],
 }
 impl Bus<'_> {
     const SIZE: usize = u16::MAX as usize;
@@ -67,46 +65,47 @@ impl Bus<'_> {
     /// This function panics when reading on `address = u16::MAX` when reading the `msb` because
     /// it'll read on `mem[address + 1]` which is out of bounds.
     pub fn read16(&self, address: u16) -> u16 {
+        // TODO: refactor to u16::from_le_bytes()
         return u16::from_bytes((self[address], self[address + 1]));
         // ((self[index + 1] as u16) << 8) | (self[index] as u16);
     }
 
-    // NOTE: these should all probably be refactored
-    pub fn lock_region(&mut self, region: Region) -> &mut Self {
-        todo!()
-
-        // self.locked_regions.push(region);
-        // return self;
-    }
-    pub fn unlock_region(&mut self, region: Region) -> &mut Self {
-        todo!()
-
-        // self.locked_regions.remove(
-        //     self.locked_regions
-        //         .iter()
-        //         .enumerate()
-        //         .find(|(_, x)| **x == region)
-        //         .map(|(i, _)| i)
-        //         .expect("Can not unlock region that's not been locked"),
-        // );
-        // return self;
-    }
-    fn is_addr_locked(&self, addr: Addr) -> bool {
-        todo!()
-
-        // self.locked_regions
-        //     .iter()
-        //     .find(|x| x.contains(&addr))
-        //     .is_some()
-    }
-    fn is_region_locked(&self, region: &Region) -> bool {
-        todo!()
-
-        // self.locked_regions
-        //     .iter()
-        //     .find(|x| x.start() <= region.start() && x.end() >= region.end())
-        //     .is_some()
-    }
+    // // NOTE: these should all probably be refactored
+    // pub fn lock_region(&mut self, region: Region) -> &mut Self {
+    //     todo!()
+    //
+    //     // self.locked_regions.push(region);
+    //     // return self;
+    // }
+    // pub fn unlock_region(&mut self, region: Region) -> &mut Self {
+    //     todo!()
+    //
+    //     // self.locked_regions.remove(
+    //     //     self.locked_regions
+    //     //         .iter()
+    //     //         .enumerate()
+    //     //         .find(|(_, x)| **x == region)
+    //     //         .map(|(i, _)| i)
+    //     //         .expect("Can not unlock region that's not been locked"),
+    //     // );
+    //     // return self;
+    // }
+    // fn is_addr_locked(&self, addr: Addr) -> bool {
+    //     todo!()
+    //
+    //     // self.locked_regions
+    //     //     .iter()
+    //     //     .find(|x| x.contains(&addr))
+    //     //     .is_some()
+    // }
+    // fn is_region_locked(&self, region: &Region) -> bool {
+    //     todo!()
+    //
+    //     // self.locked_regions
+    //     //     .iter()
+    //     //     .find(|x| x.start() <= region.start() && x.end() >= region.end())
+    //     //     .is_some()
+    // }
 }
 
 impl ops::Index<Addr> for Bus<'_> {
@@ -305,4 +304,24 @@ pub mod regions {
     pub const HRAM: bus::Region = 0xFF80..=0xFFFE;
     /// Interrupt Enable register (IE)
     pub const IE: bus::Addr = 0xFFFF;
+}
+
+/// A trait to be implemented for structs that are connected to the memory bus
+pub trait MemoryMappedRegion {
+    const START_ADDR: Addr;
+    const END_ADDR: Addr;
+    const RANGE: Region = Self::START_ADDR..=Self::END_ADDR;
+
+    /// Converts the absolute memory bus address to a relative address
+    /// that fits within its own memory
+    fn bus_addr_to_own_addr(bus_addr: Addr) -> Addr {
+        assert!(bus_addr >= Self::START_ADDR);
+        let actual_addr = bus_addr - Self::START_ADDR;
+        assert!(actual_addr <= Self::END_ADDR);
+
+        return actual_addr;
+    }
+
+    fn bus_read(&self, bus_addr: Addr) -> u8;
+    fn bus_write(&mut self, bus_addr: Addr, byte: u8) -> &mut Self;
 }

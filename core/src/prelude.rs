@@ -16,18 +16,22 @@ pub trait LittleEndian<Bytes> {
 }
 
 impl LittleEndian<(u8, u8)> for u16 {
+    /// TODO: move to utils
     fn msb(&self) -> u8 {
         ((self & 0xFF00) >> 8) as u8
     }
 
+    /// TODO: move to utils
     fn lsb(&self) -> u8 {
         (self & 0xFF) as u8
     }
 
+    // TODO: delete this and use u16::from_le_bytes()
     fn from_bytes((lsb, msb): (u8, u8)) -> Self {
         ((msb as u16) << 8) | (lsb as u16)
     }
 
+    // TODO: delete this and use u16::to_le_bytes()
     fn as_bytes(&self) -> (u8, u8) {
         (self.lsb(), self.msb())
     }

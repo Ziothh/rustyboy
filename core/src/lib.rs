@@ -1,12 +1,13 @@
 #![allow(dead_code)] // TODO: Dev only
 #![feature(generic_arg_infer)]
-// #![feature(inherent_associated_types)] // Cool feature but rust-analyzer doesn't support
-// autocomplete for const values with these types
+// #![feature(inherent_associated_types)] // Cool feature but rust-analyzer doesn't support autocomplete for const values with these types
+#![allow(unused, private_interfaces)] // TODO: remove
 
 use utils::KIBI_BYTE;
 
 mod cartridge;
 mod cpu;
+mod joypad;
 mod memory_bus;
 mod ppu;
 
@@ -16,6 +17,15 @@ mod utils;
 pub struct GameBoy {
     /// Central Processing Unit
     cpu: cpu::CPU,
+    hardware: Hardware,
+}
+
+struct Hardware {
+    bootrom: Bootrom,
+
+    /// External Cartridge (32KiB)
+    cartridge: cartridge::Cartridge,
+
     /// Pixel Processing Unit
     ppu: ppu::PPU,
 
@@ -23,10 +33,7 @@ pub struct GameBoy {
     wram: [u8; 8 * KIBI_BYTE],
     vram: [u8; 8 * KIBI_BYTE],
 
-    /// External Cartridge
-    cartridge: cartridge::Cartridge,
-
-    bootrom: Bootrom,
+    joypad: joypad::Joypad,
 }
 
 impl GameBoy {
@@ -36,13 +43,13 @@ impl GameBoy {
 
     /// Machine clock tick (4 clock ticks)
     fn m_clock_tick(&mut self) {
-        let bus = memory_bus::Bus {
-            gb: self
-        };
-        self.cpu.exec_fetch(todo!());
+        let bus = memory_bus::Bus { gb: self };
+        self.cpu.exec_fetch(&mut self.hardware);
     }
 }
 
+/// The rom that gets read on startup.
+/// Will be mapped to `0x0000..=0x00FF` and then deactivates itself
 struct Bootrom {
     rom: [u8; Self::SIZE],
     is_active: bool,

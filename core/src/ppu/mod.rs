@@ -1,20 +1,17 @@
 use self::graphics::lcd;
-
 use super::memory_bus as bus;
 
 mod graphics;
 
 pub struct PPU {
     /// Background pixels FIFO
-    bg_fifo: FIFO,
+    pub bg_fifo: FIFO,
     // bg_fifo: FIFOPixelFetcher<'static>, // TODO
     /// Object (sprite) pixels FIFO
-    obj_fifo: FIFO,
+    pub obj_fifo: FIFO,
 
-    /// Just a copy of OAM, taken before locking memory for the CPU
-    oam_read: [u8; bus::regions::size(bus::regions::OAM)],
-    /// Just a copy of VRAM, taken before locking memory for the CPU
-    vram_read: [u8; bus::regions::size(bus::regions::VRAM)],
+    pub oam: [u8; bus::regions::size(bus::regions::OAM)],
+    pub vram: [u8; bus::regions::size(bus::regions::VRAM)],
 }
 impl PPU {
     pub fn new() -> Self {
@@ -22,12 +19,12 @@ impl PPU {
             bg_fifo: FIFO::empty(),
             obj_fifo: FIFO::empty(),
 
-            oam_read: [0; _],
-            vram_read: [0; _],
+            oam: [0; _],
+            vram: [0; _],
         }
     }
 
-    // pub fn draw_screen<'s, 'bus>(&'s mut self, memory_bus: &'bus mut bus::Interface) -> impl Iterator<Item = FIFOPixelFetcher> 
+    // pub fn draw_screen<'s, 'bus>(&'s mut self, memory_bus: &'bus mut bus::Interface) -> impl Iterator<Item = FIFOPixelFetcher>
     //     where 'bus: 's
     // {
     //     (0..(graphics::lcd::WINDOW_HEIGHT + 16))
@@ -39,8 +36,12 @@ impl PPU {
     //
     // }
 
-    fn draw_ly_line<'s, 'bus>(&'s mut self, memory_bus: &'bus mut bus::Bus<'bus>) -> FIFOPixelFetcher<'bus> 
-        where 'bus: 's
+    fn draw_ly_line<'s, 'bus>(
+        &'s mut self,
+        memory_bus: &'bus mut bus::Bus<'bus>,
+    ) -> FIFOPixelFetcher<'bus>
+    where
+        'bus: 's,
     {
         FIFOPixelFetcher::new(memory_bus)
     }
@@ -52,12 +53,13 @@ impl PPU {
     fn set_mode(&mut self, mode: PPUMode, memory_bus: &mut bus::Bus) {
         // Unlock memory
         match PPU::get_mode(memory_bus) {
-            PPUMode::Drawing => {
-                memory_bus.unlock_region(bus::regions::VRAM);
-            }
-            PPUMode::OAMScan => {
-                memory_bus.unlock_region(bus::regions::OAM);
-            }
+            // TODO: move this to the bus write
+            // PPUMode::Drawing => {
+            //     memory_bus.unlock_region(bus::regions::VRAM);
+            // }
+            // PPUMode::OAMScan => {
+            //     memory_bus.unlock_region(bus::regions::OAM);
+            // }
             _ => (), // Blanking modes don't block CPU from reading memory
         };
 
@@ -65,11 +67,13 @@ impl PPU {
         match mode {
             PPUMode::Drawing => {
                 self.vram_read = memory_bus[bus::regions::VRAM].try_into().unwrap();
-                memory_bus.lock_region(bus::regions::VRAM);
+                // TODO: move this to the bus write
+                // memory_bus.lock_region(bus::regions::VRAM);
             }
             PPUMode::OAMScan => {
                 self.oam_read = memory_bus[bus::regions::OAM].try_into().unwrap();
-                memory_bus.lock_region(bus::regions::OAM);
+                // TODO: move this to the bus write
+                // memory_bus.lock_region(bus::regions::OAM);
             }
             _ => (), // Blanking modes don't block CPU from reading memory
         }
@@ -132,10 +136,7 @@ struct FIFOPixelFetcher<'bus> {
 }
 impl<'bus> FIFOPixelFetcher<'bus> {
     pub fn new(memory_bus: &'bus mut bus::Bus<'bus>) -> Self {
-        Self { 
-            x: 0,
-            memory_bus,
-        }
+        Self { x: 0, memory_bus }
     }
 }
 impl<'bus> Iterator for FIFOPixelFetcher<'bus> {
@@ -143,12 +144,13 @@ impl<'bus> Iterator for FIFOPixelFetcher<'bus> {
 
     /// The fetcher fetches a row of 8 background or window pixels and queues them up to be mixed with object pixels.
     fn next(&mut self) -> Option<Self::Item> {
-        if self.x == graphics::lcd::WINDOW_WIDTH as u8 + 8 /* extra padding */ {
+        if self.x == graphics::lcd::WINDOW_WIDTH as u8 + 8
+        /* extra padding */
+        {
             return None;
         }
 
         let memory_bus = &self.memory_bus;
-
 
         let draw_y = memory_bus[bus::regions::io_registers::lcd::LY];
         let control = lcd::LCDControl::from_bus(memory_bus);
@@ -181,12 +183,9 @@ impl<'bus> Iterator for FIFOPixelFetcher<'bus> {
             }
         };
 
-
         // TODO: check if this is correct
         let row = tile.get_pixel_row(draw_y % graphics::tiles::Tile::PIXEL_HEIGHT as u8);
         self.x += 1;
         return Some(row.map(|color_id| Pixel::from_bus(memory_bus, color_id)));
-        
     }
-    
 }

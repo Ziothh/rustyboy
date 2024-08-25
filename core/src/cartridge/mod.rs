@@ -1,22 +1,18 @@
+use crate::memory_bus::{Addr, MemoryMappedRegion};
 
 mod header;
 
-#[derive(Default)]
-pub struct Cartridge { 
-    rom: Box<[u8]>
+pub struct Cartridge {
+    pub rom: Box<[u8]>,
+    pub mbc: MBC,
 }
 
-impl Cartridge {
-    
-}
-
-
+impl Cartridge {}
 
 /// Memory Bank Controller
 ///
 /// See [gbdev.io](https://gbdev.io/pandocs/MBCs.html#mbcs)
 enum MBC {}
-
 
 // #[derive(Debug)]
 // struct ROM {
@@ -52,3 +48,29 @@ enum MBC {}
 //         write!(f, "\n> {} bytes", self.path.metadata().unwrap().len())
 //     }
 // }
+
+impl MemoryMappedRegion for Cartridge {
+    const START_ADDR: Addr = 0x0000;
+    const END_ADDR: Addr = 0x7FFF;
+
+    fn bus_read(&self, bus_addr: Addr) -> u8 {
+        return match bus_addr {
+            /// Bank 00
+            0x0000..=0x3FFF => self.rom[Self::bus_addr_to_own_addr(bus_addr) as usize],
+            /// Bank 01~NN
+            0x4000..=0x7FFF => todo!("MBC mapping hasn't been implemented"),
+            _ => unreachable!(),
+        };
+    }
+
+    fn bus_write(&mut self, bus_addr: Addr, byte: u8) -> &mut Self {
+        match bus_addr {
+            /// Bank 00
+            0x0000..=0x3FFF => self.rom[Self::bus_addr_to_own_addr(bus_addr) as usize] = byte,
+            /// Bank 01~NN
+            0x4000..=0x7FFF => todo!("MBC mapping hasn't been implemented"),
+            _ => unreachable!(),
+        };
+        return self;
+    }
+}
