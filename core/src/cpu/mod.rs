@@ -6,7 +6,8 @@ use crate::{
     cartridge::Cartridge,
     memory_bus::{self, MemoryMappedRegion},
     prelude::LittleEndian,
-    GameBoy, Hardware, utils::UNDEFINED_READ,
+    utils::UNDEFINED_READ,
+    GameBoy, Hardware,
 };
 
 mod memory;
@@ -66,6 +67,51 @@ impl CPU {
     //     return byte;
     // }
 
+    /// Read high memory.
+    ///
+    /// The given addr should be in range `0x0000..=0x00FF`
+    fn read_high(&mut self, hardware: &mut Hardware, addr: u8) -> u8 {
+        match addr {
+            0x00 => hardware.joypad.read_register(),
+
+            0x01 => todo!("SB: Serial Transfer Data"),
+            0x02 => todo!("SC: Serial Transfer Control"),
+
+            0x40 => hardware.ppu.read_control_register(),
+            0x41 => hardware.ppu.read_stat_register(),
+            0x42 => hardware.ppu.scy,
+            0x43 => hardware.ppu.scx,
+            0x44 => hardware.ppu.ly,
+            0x45 => hardware.ppu.lyc,
+            0x4A => hardware.ppu.wy,
+            0x4B => hardware.ppu.wx,
+
+            _ => UNDEFINED_READ,
+        }
+    }
+
+    /// Write high memory.
+    ///
+    /// The given addr should be in range `0x0000..=0x00FF`
+    fn write_high(&mut self, hardware: &mut Hardware, addr: u8, byte: u8) {
+        match addr {
+            0x00 => hardware.joypad.write_register(byte),
+
+            0x40 => hardware.ppu.write_control_register(byte),
+            0x41 => hardware.ppu.write_stat_register(byte),
+            0x42 => hardware.ppu.scy = byte,
+            0x43 => hardware.ppu.scx = byte,
+            0x44 => hardware.ppu.ly = 0,
+            0x45 => hardware.ppu.lyc = byte,
+            0x4A => hardware.ppu.wy = byte,
+            0x4B => hardware.ppu.wx = byte,
+
+            _ => { /* no-op */ }
+        };
+
+        return;
+    }
+
     fn read(&mut self, hardware: &mut Hardware, addr: u16) -> u8 {
         use crate::memory_bus::regions;
 
@@ -89,26 +135,6 @@ impl CPU {
             0xFF00..=0xFFFF => self.read_high(hardware, addr as u8),
         }
     }
-    /// Read high memory.
-    ///
-    /// The given addr should be in range `0x0000..=0x00FF`
-    fn read_high(&mut self, hardware: &mut Hardware, addr: u8) -> u8 {
-        match addr {
-            0x00 => hardware.joypad.read_register(),
-            
-            0x01 => todo!("SB: Serial Transfer Data"),
-            0x02 => todo!("SC: Serial Transfer Control"),
-
-            0x42 => hardware.ppu.scy,
-            0x43 => hardware.ppu.scx,
-
-            0x4A => hardware.ppu.wy,
-            0x4B => hardware.ppu.wx,
-
-
-            _ => UNDEFINED_READ,
-        }
-    }
 
     fn write(&mut self, hardware: &mut Hardware, addr: u16, byte: u8) {
         use crate::memory_bus::regions;
@@ -125,24 +151,6 @@ impl CPU {
             0xFE00..=0xFE9F => todo!("VRAM read"),
             0xFEA0..=0xFEFF => todo!("NOT USABLE (read comments for impl)"),
             0xFF00..=0xFFFF => self.write_high(hardware, addr as u8, byte),
-        };
-
-        return;
-    }
-    /// Write high memory.
-    ///
-    /// The given addr should be in range `0x0000..=0x00FF`
-    fn write_high(&mut self, hardware: &mut Hardware, addr: u8, byte: u8) {
-        match addr {
-            0x00 => hardware.joypad.write_register(byte),
-
-            0x42 => hardware.ppu.scy = byte,
-            0x43 => hardware.ppu.scx = byte,
-
-            0x4A => hardware.ppu.wy = byte,
-            0x4B => hardware.ppu.wx = byte,
-
-            _ => { /* no-op */ }
         };
 
         return;

@@ -8,7 +8,7 @@ mod objects;
 pub use objects::{Object, ObjectFlag};
 
 pub mod lcd;
-pub use lcd::{LCDControl, LCDStatus};
+pub use lcd::{LCDControl, LCDStat};
 
 
 /// Ordered from front to back.

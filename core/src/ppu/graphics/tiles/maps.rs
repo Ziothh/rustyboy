@@ -1,30 +1,30 @@
 use super::Tile;
 use crate::memory_bus as bus;
 
-pub struct TileMap(bus::Region);
+/// 32x32 tile maps
+pub enum TileMap {
+    /// `0x9800..=0x9BFF`
+    Map0,
+    /// `0x9C00..=0x9FFF`
+    Map1,
+}
 
 /// A 32x32 byte slice of memory that contains indexes to
 impl TileMap {
     const BYTE_WIDTH: usize = 32;
     const BYTE_HEIGHT: usize = 32;
+
     const PIXEL_WIDTH: usize = Self::BYTE_WIDTH * Tile::PIXEL_WIDTH;
     const PIXEL_HEIGHT: usize = Self::BYTE_HEIGHT * Tile::PIXEL_HEIGHT;
 
-    const REGIONS: [bus::Region; 2] = [0x9800..=0x9BFF, 0x9C00..=0x9FFF];
-
-    /// Gets a `TileMap` by its index
-    ///
-    /// TileMap 0 = 0x9800..=0x9BFF
-    /// TileMap 1 = 0x9C00..=0x9FFF
-    /// _ = panic!
-    pub fn from_index(index: usize) -> Self {
-        Self(Self::REGIONS[index].clone())
+    pub fn region(&self) -> std::ops::RangeInclusive<u16> {
+        return match self {
+            TileMap::Map0 => 0x9800..=0x9BFF,
+            TileMap::Map1 => 0x9C00..=0x9FFF,
+        };
     }
 
-    pub fn region(&self) -> &bus::Region {
-        &self.0
-    }
-
+    /// TODO: check if this is needed and maybe clean up
     pub fn get_tile<'s, 'bus>(
         &'s self,
         memory_bus: &'bus bus::Bus,

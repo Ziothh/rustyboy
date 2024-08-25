@@ -1,10 +1,22 @@
-use self::graphics::lcd;
+use self::graphics::{lcd, LCDControl, LCDStat};
 use super::memory_bus as bus;
 
 mod graphics;
 
 pub struct PPU {
-    pub oam: [u8; bus::regions::size(bus::regions::OAM)],
+    pub control: LCDControl,
+    pub stat: LCDStat,
+    pub mode: PPUMode,
+
+    /// # LY Compare (LYC)
+    /// When `LYC == LY` the flag in STAT is set and (if enabled) a STAT interrupt is requested
+    pub lyc: u8,
+    /// # LCD Y coordinate
+    /// Indicates the current line which is being drawn or has just been drawn.
+    ///
+    /// Ranges between `0..=153`, with `144..=153` indicating VBlank
+    pub ly: u8,
+
     /// # 8 KiB Video RAM (VRAM)
     /// From cartridge, switchable bank if CGB
     ///
@@ -44,6 +56,16 @@ pub struct PPU {
     /// Window X position
     pub wx: u8,
 
+    /// # Object Attribute Memory (OAM)
+    /// Contains 160 bytes
+    ///
+    /// The Game Boy PPU can display up to 40 movable objects (or sprites), each 8×8 or 8×16 pixels.
+    /// Because of a limitation of hardware, only ten objects can be displayed per scanline.
+    ///
+    /// Object tiles have the same format as Background tiles, but may only be taken
+    /// from the lower 2 tile blocks 0 and 1 (`0x8000..=0x8FFF`) using unsigned indexing
+    pub oam: [u8; bus::regions::size(bus::regions::OAM)],
+
     /* [Rendering] */
     /// Background pixels FIFO
     pub bg_fifo: FIFO,
@@ -52,6 +74,7 @@ pub struct PPU {
     pub obj_fifo: FIFO,
 }
 impl Default for PPU {
+    #[allow(unconditional_recursion)]
     fn default() -> Self {
         Self {
             bg_fifo: FIFO::empty(),
@@ -92,7 +115,7 @@ impl PPU {
     /// [Pandocs](https://gbdev.io/pandocs/Scrolling.html#ff42ff43--scy-scx-background-viewport-y-position-x-position)
     fn get_window_top_left_coords(&self) -> (u8, u8) {
         return (
-            self.wy, // Top
+            self.wy,                  // Top
             self.scx.wrapping_sub(7), // Left
         );
     }
@@ -107,40 +130,52 @@ impl PPU {
         FIFOPixelFetcher::new(memory_bus)
     }
 
-    fn get_mode(memory_bus: &mut bus::Bus) -> PPUMode {
-        graphics::lcd::LCDStatus::from_bus(memory_bus).get_ppu_mode()
+    pub fn read_stat_register(&self) -> u8 {
+        const STAT_UNUSED_MASK: u8 = (1 << 7);
+
+        return if self.control.contains(LCDControl::LCD_ENABLED) {
+            STAT_UNUSED_MASK 
+                | self.stat.bits() 
+                | ((self.lyc == self.ly) as u8) << 2  // This might cause issues. Maybe it should only "update" on every cycle
+                | self.mode as u8
+        } else {
+            STAT_UNUSED_MASK
+        };
+    }
+    pub fn write_stat_register(&mut self, byte: u8) {
+        self.stat = LCDStat::from_bits_truncate(byte);
+        // Mode and LYC are read-only
     }
 
-    fn set_mode(&mut self, mode: PPUMode, memory_bus: &mut bus::Bus) {
-        // Unlock memory
-        match PPU::get_mode(memory_bus) {
-            // TODO: move this to the bus write
-            // PPUMode::Drawing => {
-            //     memory_bus.unlock_region(bus::regions::VRAM);
-            // }
-            // PPUMode::OAMScan => {
-            //     memory_bus.unlock_region(bus::regions::OAM);
-            // }
-            _ => (), // Blanking modes don't block CPU from reading memory
-        };
 
-        // Lock memory
-        match mode {
-            PPUMode::Drawing => {
-                self.vram_read = memory_bus[bus::regions::VRAM].try_into().unwrap();
-                // TODO: move this to the bus write
-                // memory_bus.lock_region(bus::regions::VRAM);
+    pub fn read_control_register(&self) -> u8 {
+        self.control.bits()
+    }
+    pub fn write_control_register(&mut self, value: u8) {
+        let new_control = LCDControl::from_bits_truncate(value);
+
+        if !new_control.contains(LCDControl::LCD_ENABLED)
+            && new_control.contains(LCDControl::LCD_ENABLED)
+        {
+            if self.mode != PPUMode::VerticalBlank {
+                panic!("Warning! Turned LCD off, but not in VBlank")
             }
-            PPUMode::OAMScan => {
-                self.oam_read = memory_bus[bus::regions::OAM].try_into().unwrap();
-                // TODO: move this to the bus write
-                // memory_bus.lock_region(bus::regions::OAM);
-            }
-            _ => (), // Blanking modes don't block CPU from reading memory
+
+            todo!("Set current current line to 0");
         }
+
+        if new_control.contains(LCDControl::LCD_ENABLED) && !self.control.contains(LCDControl::LCD_ENABLED) {
+            self.mode = PPUMode::HorizontalBlank;
+            todo!("Set cycles");
+            // self.cycles = PPUMode::AccessOam.cycles(self.scroll_x); // TODO: cycles support
+        }
+
+        self.control = new_control;
     }
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
 pub enum PPUMode {
     /// Waiting until the end of the scanline
     HorizontalBlank = 0,
@@ -205,48 +240,49 @@ impl<'bus> Iterator for FIFOPixelFetcher<'bus> {
 
     /// The fetcher fetches a row of 8 background or window pixels and queues them up to be mixed with object pixels.
     fn next(&mut self) -> Option<Self::Item> {
-        if self.x == graphics::lcd::WINDOW_WIDTH as u8 + 8
-        /* extra padding */
-        {
-            return None;
-        }
-
-        let memory_bus = &self.memory_bus;
-
-        let draw_y = memory_bus[bus::regions::io_registers::lcd::LY];
-        let control = lcd::LCDControl::from_bus(memory_bus);
-
-        let win_y = memory_bus[bus::regions::io_registers::lcd::WY];
-        let win_x = memory_bus[bus::regions::io_registers::lcd::WX];
-
-        let win_y_seen = draw_y >= win_y;
-
-        // [1. Get the tile]
-        let tile = match win_y_seen && control.window_enabled() && self.x >= win_x {
-            // Window tile
-            true => control.window_tilemap().get_tile(
-                memory_bus,
-                // TODO: check if this is right
-                self.x - win_x,
-                draw_y,
-                false,
-            ),
-            // Background tile
-            false => {
-                let scx = memory_bus[bus::regions::io_registers::lcd::SCX];
-                let scy = memory_bus[bus::regions::io_registers::lcd::SCY];
-                control.bg_tilemap().get_tile(
-                    memory_bus,
-                    ((scx / 8) + self.x) & 0x1F, /* Clamps value to 0..32 */
-                    self.x.clone().wrapping_add(scy), /* Clamps value to 0..255 */
-                    false,
-                )
-            }
-        };
-
-        // TODO: check if this is correct
-        let row = tile.get_pixel_row(draw_y % graphics::tiles::Tile::PIXEL_HEIGHT as u8);
-        self.x += 1;
-        return Some(row.map(|color_id| Pixel::from_bus(memory_bus, color_id)));
+        todo!("Fix broken code after refactor");
+        // if self.x == graphics::lcd::WINDOW_WIDTH as u8 + 8
+        // /* extra padding */
+        // {
+        //     return None;
+        // }
+        //
+        // let memory_bus = &self.memory_bus;
+        //
+        // let draw_y = memory_bus[bus::regions::io_registers::lcd::LY];
+        // let control = lcd::LCDControl::from_bus(memory_bus);
+        //
+        // let win_y = memory_bus[bus::regions::io_registers::lcd::WY];
+        // let win_x = memory_bus[bus::regions::io_registers::lcd::WX];
+        //
+        // let win_y_seen = draw_y >= win_y;
+        //
+        // // [1. Get the tile]
+        // let tile = match win_y_seen && control.window_enabled() && self.x >= win_x {
+        //     // Window tile
+        //     true => control.window_tilemap().get_tile(
+        //         memory_bus,
+        //         // TODO: check if this is right
+        //         self.x - win_x,
+        //         draw_y,
+        //         false,
+        //     ),
+        //     // Background tile
+        //     false => {
+        //         let scx = memory_bus[bus::regions::io_registers::lcd::SCX];
+        //         let scy = memory_bus[bus::regions::io_registers::lcd::SCY];
+        //         control.bg_tilemap().get_tile(
+        //             memory_bus,
+        //             ((scx / 8) + self.x) & 0x1F, /* Clamps value to 0..32 */
+        //             self.x.clone().wrapping_add(scy), /* Clamps value to 0..255 */
+        //             false,
+        //         )
+        //     }
+        // };
+        //
+        // // TODO: check if this is correct
+        // let row = tile.get_pixel_row(draw_y % graphics::tiles::Tile::PIXEL_HEIGHT as u8);
+        // self.x += 1;
+        // return Some(row.map(|color_id| Pixel::from_bus(memory_bus, color_id)));
     }
 }

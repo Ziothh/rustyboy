@@ -33,25 +33,26 @@ impl<'a> Tile<'a> {
     ///
     /// Objects always use “$8000 addressing”, but the BG and Window can use either mode, controlled by **LCDC bit 4**.
     pub fn from_bus(memory_bus: &'a bus::Bus, pointer: u8, is_object_tile: bool) -> Self {
-        let mode = graphics::LCDControl::from_bus(memory_bus).tile_addressing_mode();
-        
-        let addr: bus::Addr = match !is_object_tile && mode == graphics::tiles::AddresMode::Upper {
-            // $8000: objects & lower addressing
-            false => vram_regions::BLOCKS[0].start() + pointer as u16,
-            // $8800: upper addressing
-            true => {
-                let start = *vram_regions::BLOCKS[2].start() as i32;
-                // TODO: check if this numbers conversion works
-                let index = pointer as i8 as i32;
-                (start + index) as u16
-            },
-        };
-
-        return Self::new(
-            memory_bus[addr..(addr + Self::BYTES as bus::Addr)]
-                .try_into()
-                .expect("Tile should be exactly 16 bytes long")
-        );
+        todo!("Fix broken code after refactor")
+        // let mode = graphics::LCDControl::from_bus(memory_bus).tile_addressing_mode();
+        // 
+        // let addr: bus::Addr = match !is_object_tile && mode == graphics::tiles::AddresMode::Upper {
+        //     // $8000: objects & lower addressing
+        //     false => vram_regions::BLOCKS[0].start() + pointer as u16,
+        //     // $8800: upper addressing
+        //     true => {
+        //         let start = *vram_regions::BLOCKS[2].start() as i32;
+        //         // TODO: check if this numbers conversion works
+        //         let index = pointer as i8 as i32;
+        //         (start + index) as u16
+        //     },
+        // };
+        //
+        // return Self::new(
+        //     memory_bus[addr..(addr + Self::BYTES as bus::Addr)]
+        //         .try_into()
+        //         .expect("Tile should be exactly 16 bytes long")
+        // );
     }
 
     #[inline]
