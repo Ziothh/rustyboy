@@ -72,6 +72,9 @@ pub struct PPU {
     // bg_fifo: FIFOPixelFetcher<'static>, // TODO
     /// Object (sprite) pixels FIFO
     pub obj_fifo: FIFO,
+
+    /// Writing to this register starts a DMA transfer from ROM or RAM to OAM
+    pub oam_dma: OamDma,
 }
 impl Default for PPU {
     #[allow(unconditional_recursion)]
@@ -171,6 +174,19 @@ impl PPU {
         }
 
         self.control = new_control;
+    }
+}
+
+pub struct OamDma {
+    pub requested: Option<u8>,
+    pub source: u8,
+}
+impl Default for OamDma {
+    fn default() -> Self {
+        Self {
+            requested: None,
+            source: 0xFF,
+        }
     }
 }
 

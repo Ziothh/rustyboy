@@ -83,6 +83,7 @@ impl CPU {
             0x43 => hardware.ppu.scx,
             0x44 => hardware.ppu.ly,
             0x45 => hardware.ppu.lyc,
+            0x46 => hardware.ppu.oam_dma.source,
             0x4A => hardware.ppu.wy,
             0x4B => hardware.ppu.wx,
 
@@ -103,6 +104,7 @@ impl CPU {
             0x43 => hardware.ppu.scx = byte,
             0x44 => hardware.ppu.ly = 0,
             0x45 => hardware.ppu.lyc = byte,
+            0x46 => hardware.ppu.oam_dma.requested = Some(byte),
             0x4A => hardware.ppu.wy = byte,
             0x4B => hardware.ppu.wx = byte,
 
