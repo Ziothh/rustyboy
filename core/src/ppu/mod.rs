@@ -1,4 +1,4 @@
-use self::graphics::{lcd, LCDControl, LCDStat};
+use self::graphics::{lcd, LCDControl, LCDStat, ColorID, Palette};
 use super::memory_bus as bus;
 
 mod graphics;
@@ -42,6 +42,18 @@ pub struct PPU {
     ///  Only 160×144 of those pixels are displayed on the LCD at any given time.
     pub vram: [u8; bus::regions::size(bus::regions::VRAM)],
 
+    /// # BG palette data
+    ///
+    /// ```ignore
+    /// Bits     | 7 6 | 5 4 | 3 2 | 1 0
+    /// Color ID |  3  |  2  |  1  |  0
+    /// ```
+    pub bg_palette: Palette,
+    /// Works exactly like `bg_palette`, except that the lower two bits are ignored because color index 0 is transparent for OBJs.
+    pub obj0_palette: Palette,
+    /// Works exactly like `bg_palette`, except that the lower two bits are ignored because color index 0 is transparent for OBJs.
+    pub obj1_palette: Palette,
+
     /* [Background] */
     /// Background Scroll Y
     /// Specifies the origin of the visible 160×144 pixel area within the total 256×256 pixel Background map.
@@ -66,15 +78,16 @@ pub struct PPU {
     /// from the lower 2 tile blocks 0 and 1 (`0x8000..=0x8FFF`) using unsigned indexing
     pub oam: [u8; bus::regions::size(bus::regions::OAM)],
 
+    /// Writing to this register starts a DMA transfer from ROM or RAM to OAM
+    pub oam_dma: OamDma,
+
+
     /* [Rendering] */
     /// Background pixels FIFO
     pub bg_fifo: FIFO,
     // bg_fifo: FIFOPixelFetcher<'static>, // TODO
     /// Object (sprite) pixels FIFO
     pub obj_fifo: FIFO,
-
-    /// Writing to this register starts a DMA transfer from ROM or RAM to OAM
-    pub oam_dma: OamDma,
 }
 impl Default for PPU {
     #[allow(unconditional_recursion)]
@@ -175,7 +188,10 @@ impl PPU {
 
         self.control = new_control;
     }
+
 }
+
+
 
 pub struct OamDma {
     pub requested: Option<u8>,
@@ -215,11 +231,13 @@ struct Pixel {
 }
 impl Pixel {
     pub fn from_bus(memory_bus: &bus::Bus, color_id: graphics::ColorID) -> Self {
-        Self {
-            color: color_id,
-            palette: graphics::Palette::from_bgp(memory_bus), // TODO: also support objects
-            bg_priority: false,                               // TODO
-        }
+        todo!("FIXME after refactor")
+
+        // Self {
+        //     color: color_id,
+        //     palette: graphics::Palette::from_bgp(memory_bus), // TODO: also support objects
+        //     bg_priority: false,                               // TODO
+        // }
     }
 }
 

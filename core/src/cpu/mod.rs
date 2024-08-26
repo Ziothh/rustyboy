@@ -84,6 +84,9 @@ impl CPU {
             0x44 => hardware.ppu.ly,
             0x45 => hardware.ppu.lyc,
             0x46 => hardware.ppu.oam_dma.source,
+            0x47 => hardware.ppu.bg_palette.bits,
+            0x48 => hardware.ppu.obj0_palette.bits,
+            0x49 => hardware.ppu.obj1_palette.bits,
             0x4A => hardware.ppu.wy,
             0x4B => hardware.ppu.wx,
 
@@ -105,6 +108,9 @@ impl CPU {
             0x44 => hardware.ppu.ly = 0,
             0x45 => hardware.ppu.lyc = byte,
             0x46 => hardware.ppu.oam_dma.requested = Some(byte),
+            0x47 => hardware.ppu.bg_palette.bits = byte,
+            0x48 => hardware.ppu.obj0_palette.bits = byte,
+            0x49 => hardware.ppu.obj1_palette.bits = byte,
             0x4A => hardware.ppu.wy = byte,
             0x4B => hardware.ppu.wx = byte,
 
