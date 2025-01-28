@@ -72,10 +72,21 @@ impl CPU {
     /// The given addr should be in range `0x0000..=0x00FF`
     fn read_high(&mut self, hardware: &mut Hardware, addr: u8) -> u8 {
         match addr {
+            // # I/O Registers
             0x00 => hardware.joypad.read_register(),
 
             0x01 => todo!("SB: Serial Transfer Data"),
             0x02 => todo!("SC: Serial Transfer Control"),
+
+            0x04 => todo!("DIV: Divider register"),
+            0x05 => todo!("TIMA: Timer counter"),
+            0x06 => todo!("TMA: Timer modulo"),
+            0x07 => todo!("TAC: Timer control"),
+
+            0x0F => todo!("IF: Interupt flag"),
+
+            0x10..=0x26 => todo!("Audio"),
+            0x30..=0x3F => todo!("Wave pattern"),
 
             0x40 => hardware.ppu.read_control_register(),
             0x41 => hardware.ppu.read_stat_register(),
@@ -90,6 +101,12 @@ impl CPU {
             0x4A => hardware.ppu.wy,
             0x4B => hardware.ppu.wx,
 
+            0x50 => todo!("Bootrom disabled"),
+
+            0x80..=0xFE => todo!("HRAM"),
+
+            0xFF => todo!("IE: Interupt Enable"),
+
             _ => UNDEFINED_READ,
         }
     }
@@ -99,7 +116,21 @@ impl CPU {
     /// The given addr should be in range `0x0000..=0x00FF`
     fn write_high(&mut self, hardware: &mut Hardware, addr: u8, byte: u8) {
         match addr {
+            // # I/O Registers
             0x00 => hardware.joypad.write_register(byte),
+
+            0x01 => todo!("SB: Serial Transfer Data"),
+            0x02 => todo!("SC: Serial Transfer Control"),
+
+            0x04 => todo!("DIV: Divider register"),
+            0x05 => todo!("TIMA: Timer counter"),
+            0x06 => todo!("TMA: Timer modulo"),
+            0x07 => todo!("TAC: Timer control"),
+
+            0x0F => todo!("IF: Interupt flag"),
+
+            0x10..=0x26 => todo!("Audio"),
+            0x30..=0x3F => todo!("Wave pattern"),
 
             0x40 => hardware.ppu.write_control_register(byte),
             0x41 => hardware.ppu.write_stat_register(byte),
@@ -113,6 +144,12 @@ impl CPU {
             0x49 => hardware.ppu.obj1_palette.bits = byte,
             0x4A => hardware.ppu.wy = byte,
             0x4B => hardware.ppu.wx = byte,
+
+            0x50 => todo!("Bootrom disabled"),
+
+            0x80..=0xFE => todo!("HRAM"),
+
+            0xFF => todo!("IE: Interupt Enable"),
 
             _ => { /* no-op */ }
         };
@@ -139,6 +176,7 @@ impl CPU {
 
                 return todo!("VRAM read");
             }
+            /// https://gbdev.io/pandocs/Memory_Map.html#fea0feff-range
             0xFEA0..=0xFEFF => todo!("NOT USABLE (read comments for impl)"),
             0xFF00..=0xFFFF => self.read_high(hardware, addr as u8),
         }
@@ -157,6 +195,7 @@ impl CPU {
             0xD000..=0xDFFF => todo!("WRAM_SWITCHABLE (CGB)"),
             0xE000..=0xFDFF => todo!("ECHO RAM (C000~DDFF)"),
             0xFE00..=0xFE9F => todo!("VRAM read"),
+            /// https://gbdev.io/pandocs/Memory_Map.html#fea0feff-range
             0xFEA0..=0xFEFF => todo!("NOT USABLE (read comments for impl)"),
             0xFF00..=0xFFFF => self.write_high(hardware, addr as u8, byte),
         };
