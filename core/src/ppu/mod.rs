@@ -44,7 +44,7 @@ pub struct PPU {
 
     /// # BG palette data
     ///
-    /// ```ignore
+    /// ```text
     /// Bits     | 7 6 | 5 4 | 3 2 | 1 0
     /// Color ID |  3  |  2  |  1  |  0
     /// ```

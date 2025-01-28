@@ -3,6 +3,8 @@ use bitflags::bitflags;
 /// Also known as P1 (some relic from the NES supporting multiple controllers)
 ///
 /// It's a virtual register that converts the button states to a byte
+///
+/// NOTE: Joypad register has active as low (0)
 pub struct Joypad {
     /// CPU Pin 14: Select direction buttons
     select_dpad: bool,
@@ -11,6 +13,17 @@ pub struct Joypad {
 
     dpad: ButtonState,
     buttons: ButtonState,
+}
+impl Default for Joypad {
+    fn default() -> Self {
+        Self {
+            select_dpad: false,
+            select_button: false,
+
+            dpad: ButtonState::empty(),
+            buttons: ButtonState::empty(),
+        }
+    }
 }
 
 bitflags! {
@@ -26,20 +39,12 @@ bitflags! {
     }
 }
 
-/// NOTE: If a bit is set to `0`, it means it's active
 impl Joypad {
-    pub const SELECT_DPAD_BIT_IDX: u8 = 4;
-    pub const SELECT_BUTTON_BIT_IDX: u8 = 5;
+    const SELECT_DPAD_BIT_IDX: u8 = 4;
+    const SELECT_BUTTON_BIT_IDX: u8 = 5;
 
-    /// A mask of all writeable bits
-    ///
-    /// Only the `select_<dpad|buttons>` bits are writable
-    pub const WRITEABLE: u8 = 0b0011_0000;
-}
-
-impl Joypad {
     /// NOTE: The Game Boy expects bits to be inversed.
-    /// If a bit/ is set to `0`, it means it's active
+    /// If a bit is set to `0`, it means it's active
     pub fn read_register(&self) -> u8 {
         #[rustfmt::skip]
         let state_nibble: u8 = {
@@ -58,9 +63,17 @@ impl Joypad {
         return !inverted_register;
     }
 
+    /// Write selection mode to the register
+    ///
+    /// NOTE: this register is active low: `0` means `true`
     pub fn write_register(&mut self, byte: u8) {
+        /// A mask of all writeable bits
+        ///
+        /// Only the `select_<dpad|buttons>` bits are writable
+        const WRITEABLE_MASK: u8 = 0b0011_0000;
+
         // Invert the given `byte` because the Game Boy considers bits set as `0` to be `true`
-        let truncated = !byte & Self::WRITEABLE;
+        let truncated = !byte & WRITEABLE_MASK;
 
         self.select_dpad = truncated & (1 << Self::SELECT_DPAD_BIT_IDX) != 0;
         self.select_button = truncated & (1 << Self::SELECT_BUTTON_BIT_IDX) != 0;
@@ -112,4 +125,272 @@ pub enum JoypadButton {
 }
 impl JoypadButton {
     const DPAD_BIT_OFFSET: u8 = 4;
+}
+
+#[cfg(test)]
+mod test {
+    #![allow(non_snake_case)]
+
+    use super::*;
+
+    macro_rules! assert_u8_eq {
+        ($left:expr, $right:expr) => {
+            if $left != $right {
+                panic!(
+                    "assertion `left == right` failed\n  left: 0b{:04b}_{:04b}\n right: 0b{:04b}_{:04b}",
+                    ($left & 0b1111_0000) >> 4,
+                    ($left & 0b0000_1111),
+                    ($right & 0b1111_0000) >> 4,
+                    ($right & 0b0000_1111),
+                );
+            }
+        };
+    }
+
+    const WRITE_DPAD_SELECT: u8 = 0b1110_1111;
+    const WRITE_BUTTON_SELECT: u8 = 0b1101_1111;
+
+    #[test]
+    fn initial_state() {
+        let mut joyp = Joypad::default();
+
+        // READ (initial selection modes OFF)
+        {
+            assert_eq!(joyp.select_dpad, false);
+            assert_eq!(joyp.select_button, false);
+            assert_u8_eq!(joyp.read_register(), 0b1111_1111);
+        }
+
+        // READ with selection modes ON
+        {
+            joyp.write_register(0b1100_0000);
+            assert_eq!(joyp.select_dpad, true);
+            assert_eq!(joyp.select_button, true);
+            assert_u8_eq!(joyp.read_register(), 0b1100_1111);
+        }
+
+        // READ with selection modes OFF
+        {
+            joyp.write_register(0b1111_0000);
+            assert_eq!(joyp.select_dpad, false);
+            assert_eq!(joyp.select_button, false);
+            assert_u8_eq!(joyp.read_register(), 0b1111_1111);
+        }
+    }
+
+    #[test]
+    fn readonly_bits() {
+        let mut joyp = Joypad::default();
+
+        joyp.write_register(0b0000_0000); // Means "everything active"
+        assert_u8_eq!(joyp.read_register(), 0b1100_1111);
+
+        joyp.write_register(0b0000_1111); // Means "everything active"
+        assert_u8_eq!(joyp.read_register(), 0b1100_1111);
+    }
+
+    #[test]
+    fn selection_modes() {
+        // Select DPAD
+        {
+            let mut joyp = Joypad::default();
+            joyp.write_register(0b1110_1111);
+            assert_eq!(joyp.select_dpad, true);
+            assert_eq!(joyp.select_button, false);
+        }
+
+        // Select Buttons
+        {
+            let mut joyp = Joypad::default();
+            joyp.write_register(0b1101_1111);
+            assert_eq!(joyp.select_dpad, false);
+            assert_eq!(joyp.select_button, true);
+        }
+
+        // Select both
+        {
+            let mut joyp = Joypad::default();
+            joyp.write_register(0b1100_1111);
+            assert_eq!(joyp.select_dpad, true);
+            assert_eq!(joyp.select_button, true);
+        }
+    }
+
+    #[test]
+    fn button_A() {
+        const KEY: JoypadButton = JoypadButton::A;
+        const KEY_ACTIVE_MASK: u8 = !0b0000_0001;
+
+        let mut joyp = Joypad::default();
+        joyp.key_down(KEY);
+
+        assert_u8_eq!(joyp.read_register(), 0b1111_1111);
+
+        joyp.write_register(WRITE_DPAD_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_DPAD_SELECT);
+
+        joyp.write_register(WRITE_BUTTON_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_BUTTON_SELECT & KEY_ACTIVE_MASK);
+
+        joyp.write_register(WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT);
+        assert_u8_eq!(
+            joyp.read_register(),
+            WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT & KEY_ACTIVE_MASK
+        );
+    }
+    #[test]
+    fn button_B() {
+        const KEY: JoypadButton = JoypadButton::B;
+        const KEY_ACTIVE_MASK: u8 = !0b0000_0010;
+
+        let mut joyp = Joypad::default();
+        joyp.key_down(KEY);
+
+        assert_u8_eq!(joyp.read_register(), 0b1111_1111);
+
+        joyp.write_register(WRITE_DPAD_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_DPAD_SELECT);
+
+        joyp.write_register(WRITE_BUTTON_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_BUTTON_SELECT & KEY_ACTIVE_MASK);
+
+        joyp.write_register(WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT);
+        assert_u8_eq!(
+            joyp.read_register(),
+            WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT & KEY_ACTIVE_MASK
+        );
+    }
+    #[test]
+    fn button_SELECT() {
+        const KEY: JoypadButton = JoypadButton::Select;
+        const KEY_ACTIVE_MASK: u8 = !0b0000_0100;
+
+        let mut joyp = Joypad::default();
+        joyp.key_down(KEY);
+
+        assert_u8_eq!(joyp.read_register(), 0b1111_1111);
+
+        joyp.write_register(WRITE_DPAD_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_DPAD_SELECT);
+
+        joyp.write_register(WRITE_BUTTON_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_BUTTON_SELECT & KEY_ACTIVE_MASK);
+
+        joyp.write_register(WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT);
+        assert_u8_eq!(
+            joyp.read_register(),
+            WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT & KEY_ACTIVE_MASK
+        );
+    }
+    #[test]
+    fn button_START() {
+        const KEY: JoypadButton = JoypadButton::Start;
+        const KEY_ACTIVE_MASK: u8 = !0b0000_1000;
+
+        let mut joyp = Joypad::default();
+        joyp.key_down(KEY);
+
+        assert_u8_eq!(joyp.read_register(), 0b1111_1111);
+
+        joyp.write_register(WRITE_DPAD_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_DPAD_SELECT);
+
+        joyp.write_register(WRITE_BUTTON_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_BUTTON_SELECT & KEY_ACTIVE_MASK);
+
+        joyp.write_register(WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT);
+        assert_u8_eq!(
+            joyp.read_register(),
+            WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT & KEY_ACTIVE_MASK
+        );
+    }
+
+    #[test]
+    fn button_RIGHT() {
+        const KEY: JoypadButton = JoypadButton::Right;
+        const KEY_ACTIVE_MASK: u8 = !0b0000_0001;
+
+        let mut joyp = Joypad::default();
+        joyp.key_down(KEY);
+
+        assert_u8_eq!(joyp.read_register(), 0b1111_1111);
+
+        joyp.write_register(WRITE_DPAD_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_DPAD_SELECT & KEY_ACTIVE_MASK);
+
+        joyp.write_register(WRITE_BUTTON_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_BUTTON_SELECT);
+
+        joyp.write_register(WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT);
+        assert_u8_eq!(
+            joyp.read_register(),
+            WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT & KEY_ACTIVE_MASK
+        );
+    }
+    #[test]
+    fn button_LEFT() {
+        const KEY: JoypadButton = JoypadButton::Left;
+        const KEY_ACTIVE_MASK: u8 = !0b0000_0010;
+
+        let mut joyp = Joypad::default();
+        joyp.key_down(KEY);
+
+        assert_u8_eq!(joyp.read_register(), 0b1111_1111);
+
+        joyp.write_register(WRITE_DPAD_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_DPAD_SELECT & KEY_ACTIVE_MASK);
+
+        joyp.write_register(WRITE_BUTTON_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_BUTTON_SELECT);
+
+        joyp.write_register(WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT);
+        assert_u8_eq!(
+            joyp.read_register(),
+            WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT & KEY_ACTIVE_MASK
+        );
+    }
+    #[test]
+    fn button_UP() {
+        const KEY: JoypadButton = JoypadButton::Up;
+        const KEY_ACTIVE_MASK: u8 = !0b0000_0100;
+
+        let mut joyp = Joypad::default();
+        joyp.key_down(KEY);
+
+        assert_u8_eq!(joyp.read_register(), 0b1111_1111);
+
+        joyp.write_register(WRITE_DPAD_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_DPAD_SELECT & KEY_ACTIVE_MASK);
+
+        joyp.write_register(WRITE_BUTTON_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_BUTTON_SELECT);
+
+        joyp.write_register(WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT);
+        assert_u8_eq!(
+            joyp.read_register(),
+            WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT & KEY_ACTIVE_MASK
+        );
+    }
+    #[test]
+    fn button_DOWN() {
+        const KEY: JoypadButton = JoypadButton::Down;
+        const KEY_ACTIVE_MASK: u8 = !0b0000_1000;
+
+        let mut joyp = Joypad::default();
+        joyp.key_down(KEY);
+
+        assert_u8_eq!(joyp.read_register(), 0b1111_1111);
+
+        joyp.write_register(WRITE_DPAD_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_DPAD_SELECT & KEY_ACTIVE_MASK);
+
+        joyp.write_register(WRITE_BUTTON_SELECT);
+        assert_u8_eq!(joyp.read_register(), WRITE_BUTTON_SELECT);
+
+        joyp.write_register(WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT);
+        assert_u8_eq!(
+            joyp.read_register(),
+            WRITE_BUTTON_SELECT & WRITE_DPAD_SELECT & KEY_ACTIVE_MASK
+        );
+    }
 }
