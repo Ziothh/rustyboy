@@ -26,8 +26,6 @@ pub struct CPU {
 
     /// Determines in which opcode table the CPU should look
     is_opcode_prefixed: bool,
-
-    hram: [u8; memory_bus::regions::size(memory_bus::regions::HRAM)],
 }
 
 impl CPU {
@@ -162,7 +160,8 @@ impl CPU {
 
         match addr {
             0x0000..=0x00FF if hardware.bootrom.is_active => hardware.bootrom.rom[addr as usize],
-            0x0000..=0x7FFF => hardware.cartridge.bus_read(addr),
+            0x0000..=0x3FFF => hardware.cartridge.bus_read_0x0000_0x3FFF(addr),
+            0x4000..=0x7FFF => hardware.cartridge.bus_read_0x4000_0x7FFF(addr),
             0x8000..=0x9FFF => todo!("VRAM"),
             0xA000..=0xBFFF => todo!("EXTERNAL RAM (ROM)"),
             0xC000..=0xCFFF => todo!("WRAM_FIXED"),
@@ -187,7 +186,8 @@ impl CPU {
 
         match addr {
             0x0000..=0x00FF if hardware.bootrom.is_active => todo!(),
-            0x0000..=0x7FFF => todo!("CARTRIDGE"),
+            0x0000..=0x3FFF => hardware.cartridge.bus_write_0x0000_0x3FFF(addr, byte),
+            0x4000..=0x7FFF => hardware.cartridge.bus_write_0x4000_0x7FFF(addr, byte),
             0x8000..=0x9FFF => todo!("VRAM"),
             0xA000..=0xBFFF => todo!("EXTERNAL RAM (ROM)"),
             0xC000..=0xCFFF => todo!("WRAM_FIXED"),
@@ -254,7 +254,6 @@ impl Default for CPU {
             is_opcode_prefixed: false,
             stack: Default::default(),
             registers: Default::default(),
-            hram: [0; _],
         };
     }
 }

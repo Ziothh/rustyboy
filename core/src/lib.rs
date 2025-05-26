@@ -1,11 +1,14 @@
 #![allow(dead_code)] // TODO: Dev only
 #![feature(generic_arg_infer)]
+#![allow(non_snake_case)]
 // #![feature(inherent_associated_types)] // Cool feature but rust-analyzer doesn't support autocomplete for const values with these types
 #![allow(unused, private_interfaces)] // TODO: remove
 
 use utils::KIBI_BYTE;
 
 mod cartridge;
+pub use cartridge::Cartridge;
+
 mod cpu;
 mod joypad;
 mod memory_bus;
@@ -30,19 +33,31 @@ struct Hardware {
     ppu: ppu::PPU,
 
     // Memory
-    wram: [u8; 8 * KIBI_BYTE],
+    wram: Box<[u8; 8 * KIBI_BYTE]>,
 
     joypad: joypad::Joypad,
+
+    /// High RAM
+    hram: [u8; memory_bus::regions::size(memory_bus::regions::HRAM)],
 }
 
 impl GameBoy {
-    pub fn new(rom: &[u8]) {
-        todo!()
+    pub fn new(cartridge: Cartridge) -> Self {
+        Self {
+            cpu: cpu::CPU::default(),
+            hardware: Hardware {
+                hram: [0; _],
+                bootrom: Bootrom::default(),
+                joypad: joypad::Joypad::default(),
+                ppu: ppu::PPU::default(),
+                wram: Box::new([0; _]),
+                cartridge,
+            },
+        }
     }
 
     /// Machine clock tick (4 clock ticks)
-    fn m_clock_tick(&mut self) {
-        let bus = memory_bus::Bus { gb: self };
+    pub fn m_clock_tick(&mut self) {
         self.cpu.exec_fetch(&mut self.hardware);
     }
 }
@@ -60,12 +75,9 @@ impl Bootrom {
     pub fn new(rom: [u8; Self::SIZE]) -> Self {
         return Self {
             rom,
+            // Active on start-up
             is_active: true,
         };
-    }
-
-    pub fn tmp(&mut self, gb: &mut GameBoy) -> Self {
-        todo!()
     }
 }
 

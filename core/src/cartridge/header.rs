@@ -1,63 +1,8 @@
 use std::str;
+
 use crate::memory_bus as bus;
 
-pub struct CartridgeHeader<'a>(&'a [u8]);
-
-impl CartridgeHeader<'_> {
-    pub fn read_from_bus(memory_bus: &bus::Bus<'_>) -> Self {
-        todo!()
-        // Self(&memory_bus[bus::regions::rom::CARTRIDGE_HEADER])
-    }
-
-    pub fn title(&self) -> Result<&str, str::Utf8Error> {
-        std::str::from_utf8(
-            self.read_relative_region(regions::TITLE), // &bus[regions::TITLE]
-        )
-        .and_then(|x| Ok(x.trim_end_matches(char::from(0))))
-    }
-
-    pub fn licensee(&self) -> Option<&'static str> {
-        let code = self.0[Self::relative_address(regions::OLD_LICENSEE_CODE)];
-
-        return match code {
-            0x33 => licensee::get_new(
-                self.read_relative_region(regions::NEW_LICENSEE_CODE)
-                    .try_into()
-                    .expect("New licensee code should be 2 bytes long"),
-            ),
-            code => licensee::get_old(code),
-        };
-    }
-
-    // /// This doens't work as intended atm
-    // pub fn manufacturer_code(&self) -> Result<&str, std::str::Utf8Error> {
-    //     std::str::from_utf8(self.relative_range_inclusive(regions::MANUFACTURER_CODE))
-    // }
-
-    /// Calculates the header checksum and validates it with the the checksum byte at `$014D`.
-    pub fn validate_checksum(&self) -> bool {
-        self.read_relative_region(0x0134..=0x014C)
-            .iter()
-            .fold(0u8, |checksum, byte| {
-                checksum.wrapping_sub(*byte).wrapping_sub(1)
-            })
-            .eq(&self.read_relative_addr(regions::HEADER_CHECKSUM))
-    }
-
-    /// Calculates the `address` relative to the start of the cartridge header
-    /// and returns it as a `usize`
-    fn relative_address(address: bus::Addr) -> usize {
-        (address - regions::START) as usize
-    }
-    fn read_relative_addr(&self, address: bus::Addr) -> u8 {
-        self.0[Self::relative_address(address)]
-    }
-    fn read_relative_region(&self, range: bus::Region) -> &[u8] {
-        &self.0[Self::relative_address(*range.start())..=Self::relative_address(*range.end())]
-    }
-}
-
-mod licensee {
+pub mod licensee {
     pub fn get_old(code: u8) -> Option<&'static str> {
         match code {
             0x00 => Some("None"),
