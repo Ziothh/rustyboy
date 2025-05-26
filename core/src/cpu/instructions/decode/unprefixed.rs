@@ -1,4 +1,4 @@
-use crate::cpu::Program;
+use crate::{cpu::Program, Hardware};
 
 use super::super::super::{
     instructions::{ArithmeticTarget, JumpAddress, JumpCondition, LoadTarget},
@@ -7,7 +7,7 @@ use super::super::super::{
 };
 
 impl Instruction {
-    pub fn try_from_opcode_unprefixed(byte: u8, program: &mut Program) -> Result<Self, String> {
+    pub fn try_from_opcode_unprefixed(byte: u8, hardware: &mut Hardware) -> Result<Self, String> {
         match byte {
             /* [ADC] */
             // Instruction: ADC (immediate)
@@ -90,7 +90,7 @@ impl Instruction {
             // Flags: Z N H C
             //        Z 0 H C
             0xCE => Ok(Instruction::ADC(ArithmeticTarget::Immediate {
-                value: program.next_byte(),
+                value: hardware.next_byte(),
             })),
 
             /* [ADD] */
@@ -210,7 +210,7 @@ impl Instruction {
             // Flags: Z N H C
             //        Z 0 H C
             0xC6 => Ok(Instruction::ADD(ArithmeticTarget::Immediate {
-                value: program.next_byte(),
+                value: hardware.next_byte(),
             })),
 
             // Instruction: ADD (immediate)
@@ -220,7 +220,7 @@ impl Instruction {
             //     e8 (immediate)
             // Flags: Z N H C
             //        0 0 H C
-            0xE8 => Ok(Instruction::ADD_SP_i8(program.next_i8())),
+            0xE8 => Ok(Instruction::ADD_SP_i8(hardware.next_i8())),
 
             /* [AND] */
             // Instruction: AND (immediate)
@@ -303,7 +303,7 @@ impl Instruction {
             // Flags: Z N H C
             //        Z 0 1 0
             0xE6 => Ok(Instruction::AND(ArithmeticTarget::Immediate {
-                value: program.next_byte(),
+                value: hardware.next_byte(),
             })),
 
             // Instruction: CALL (immediate)
@@ -314,7 +314,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xC4 => Ok(Instruction::CALL {
-                address: program.next_u16(),
+                address: hardware.next_u16(),
                 condition: JumpCondition::NotZero,
             }),
 
@@ -326,7 +326,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xCC => Ok(Instruction::CALL {
-                address: program.next_u16(),
+                address: hardware.next_u16(),
                 condition: JumpCondition::Zero,
             }),
 
@@ -337,7 +337,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xCD => Ok(Instruction::CALL {
-                address: program.next_u16(),
+                address: hardware.next_u16(),
                 condition: JumpCondition::Always,
             }),
 
@@ -349,7 +349,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xD4 => Ok(Instruction::CALL {
-                address: program.next_u16(),
+                address: hardware.next_u16(),
                 condition: JumpCondition::NotCarry,
             }),
 
@@ -361,7 +361,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xDC => Ok(Instruction::CALL {
-                address: program.next_u16(),
+                address: hardware.next_u16(),
                 condition: JumpCondition::NotCarry,
             }),
 
@@ -452,7 +452,7 @@ impl Instruction {
             // Flags: Z N H C
             //        Z 1 H C
             0xFE => Ok(Instruction::CP(ArithmeticTarget::Immediate {
-                value: program.next_byte(),
+                value: hardware.next_byte(),
             })),
 
             // Instruction: CPL (immediate)
@@ -701,7 +701,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xC2 => Ok(Instruction::JP {
-                target: JumpAddress::Immediate(program.next_u16()),
+                target: JumpAddress::Immediate(hardware.next_u16()),
                 condition: JumpCondition::NotZero,
             }),
 
@@ -712,7 +712,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xC3 => Ok(Instruction::JP {
-                target: JumpAddress::Immediate(program.next_u16()),
+                target: JumpAddress::Immediate(hardware.next_u16()),
                 condition: JumpCondition::Always,
             }),
 
@@ -724,7 +724,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xCA => Ok(Instruction::JP {
-                target: JumpAddress::Immediate(program.next_u16()),
+                target: JumpAddress::Immediate(hardware.next_u16()),
                 condition: JumpCondition::Zero,
             }),
 
@@ -736,7 +736,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xD2 => Ok(Instruction::JP {
-                target: JumpAddress::Immediate(program.next_u16()),
+                target: JumpAddress::Immediate(hardware.next_u16()),
                 condition: JumpCondition::NotCarry,
             }),
 
@@ -748,7 +748,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xDA => Ok(Instruction::JP {
-                target: JumpAddress::Immediate(program.next_u16()),
+                target: JumpAddress::Immediate(hardware.next_u16()),
                 condition: JumpCondition::Carry,
             }),
 
@@ -759,7 +759,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x18 => Ok(Instruction::JR {
-                target: program.next_i8(),
+                target: hardware.next_i8(),
                 condition: JumpCondition::Always,
             }),
 
@@ -771,7 +771,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x20 => Ok(Instruction::JR {
-                target: program.next_i8(),
+                target: hardware.next_i8(),
                 condition: JumpCondition::NotZero,
             }),
 
@@ -783,7 +783,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x28 => Ok(Instruction::JR {
-                target: program.next_i8(),
+                target: hardware.next_i8(),
                 condition: JumpCondition::Zero,
             }),
 
@@ -795,7 +795,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x30 => Ok(Instruction::JR {
-                target: program.next_i8(),
+                target: hardware.next_i8(),
                 condition: JumpCondition::NotCarry,
             }),
 
@@ -807,7 +807,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0x38 => Ok(Instruction::JR {
-                target: program.next_i8(),
+                target: hardware.next_i8(),
                 condition: JumpCondition::Carry,
             }),
 
@@ -1705,7 +1705,7 @@ impl Instruction {
             //        - - - -
             0x06 => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::B),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(Address::Direct(hardware.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1717,7 +1717,7 @@ impl Instruction {
             //        - - - -
             0x0E => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::C),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(Address::Direct(hardware.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1729,7 +1729,7 @@ impl Instruction {
             //        - - - -
             0x16 => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::D),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(Address::Direct(hardware.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1741,7 +1741,7 @@ impl Instruction {
             //        - - - -
             0x1E => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::E),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(Address::Direct(hardware.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1753,7 +1753,7 @@ impl Instruction {
             //        - - - -
             0x26 => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::H),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(Address::Direct(hardware.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1765,7 +1765,7 @@ impl Instruction {
             //        - - - -
             0x2E => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::L),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(Address::Direct(hardware.skip_byte().pc())),
             }),
 
             // Instruction: LD
@@ -1777,7 +1777,7 @@ impl Instruction {
             //        - - - -
             0x36 => Ok(Instruction::LD {
                 destination: LoadTarget::Address(Address::HL),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(Address::Direct(hardware.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1789,7 +1789,7 @@ impl Instruction {
             //        - - - -
             0x3E => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::B),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(Address::Direct(hardware.skip_byte().pc())),
             }),
 
             // Instruction: LD (immediate)
@@ -1800,7 +1800,7 @@ impl Instruction {
             //     e8 (immediate)
             // Flags: Z N H C
             //        0 0 H C
-            0xF8 => Ok(Instruction::LD_HL_SP_e(program.next_i8())),
+            0xF8 => Ok(Instruction::LD_HL_SP_e(hardware.next_i8())),
 
             // Instruction: LD (immediate)
             // { bytes: 3, cycles: 12 }
@@ -1811,7 +1811,7 @@ impl Instruction {
             //        - - - -
             0x01 => Ok(Instruction::LD16 {
                 destination: Reg16::BC,
-                value: program.next_u16(),
+                value: hardware.next_u16(),
             }),
 
             // Instruction: LD
@@ -1821,7 +1821,7 @@ impl Instruction {
             //     SP (immediate)
             // Flags: Z N H C
             //        - - - -
-            0x08 => Ok(Instruction::LD_nn_SP(program.next_u16())),
+            0x08 => Ok(Instruction::LD_nn_SP(hardware.next_u16())),
 
             // Instruction: LD (immediate)
             // { bytes: 3, cycles: 12 }
@@ -1832,7 +1832,7 @@ impl Instruction {
             //        - - - -
             0x11 => Ok(Instruction::LD16 {
                 destination: Reg16::DE,
-                value: program.next_u16(),
+                value: hardware.next_u16(),
             }),
 
             // Instruction: LD (immediate)
@@ -1844,7 +1844,7 @@ impl Instruction {
             //        - - - -
             0x21 => Ok(Instruction::LD16 {
                 destination: Reg16::HL,
-                value: program.next_u16(),
+                value: hardware.next_u16(),
             }),
 
             // Instruction: LD (immediate)
@@ -1856,7 +1856,7 @@ impl Instruction {
             //        - - - -
             0x31 => Ok(Instruction::LD16 {
                 destination: Reg16::SP,
-                value: program.next_u16(),
+                value: hardware.next_u16(),
             }),
 
             // Instruction: LD
@@ -1867,7 +1867,7 @@ impl Instruction {
             // Flags: Z N H C
             //        - - - -
             0xEA => Ok(Instruction::LD {
-                destination: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                destination: LoadTarget::Address(Address::Direct(hardware.skip_byte().pc())),
                 source: LoadTarget::Reg8(Reg8::A),
             }),
 
@@ -1880,7 +1880,7 @@ impl Instruction {
             //        - - - -
             0xFA => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::A),
-                source: LoadTarget::Address(Address::Direct(program.skip_byte().pc())),
+                source: LoadTarget::Address(Address::Direct(hardware.skip_byte().pc())),
             }),
 
             // Instruction: LDH
@@ -1892,7 +1892,7 @@ impl Instruction {
             //        - - - -
             0xE0 => Ok(Instruction::LD {
                 destination: LoadTarget::Address(Address::ZeroPage {
-                    lsb: program.next_byte(),
+                    lsb: hardware.next_byte(),
                 }),
                 source: LoadTarget::Reg8(Reg8::A),
             }),
@@ -1907,7 +1907,7 @@ impl Instruction {
             0xF0 => Ok(Instruction::LD {
                 destination: LoadTarget::Reg8(Reg8::A),
                 source: LoadTarget::Address(Address::ZeroPage {
-                    lsb: program.next_byte(),
+                    lsb: hardware.next_byte(),
                 }),
             }),
 
@@ -2015,7 +2015,7 @@ impl Instruction {
             //        Z 0 0 0
             0xF6 => Ok(Instruction::OR {
                 source: ArithmeticTarget::Immediate {
-                    value: program.next_byte(),
+                    value: hardware.next_byte(),
                 },
             }),
 
@@ -2309,7 +2309,7 @@ impl Instruction {
             // Flags: Z N H C
             //        Z 1 H C
             0xDE => Ok(Instruction::SBC(ArithmeticTarget::Immediate {
-                value: program.next_byte(),
+                value: hardware.next_byte(),
             })),
 
             // Instruction: SCF (immediate)
@@ -2407,7 +2407,7 @@ impl Instruction {
             // Flags: Z N H C
             //        Z 1 H C
             0xD6 => Ok(Instruction::SUB(ArithmeticTarget::Immediate {
-                value: program.next_byte(),
+                value: hardware.next_byte(),
             })),
 
             // Instruction: XOR (immediate)
@@ -2490,7 +2490,7 @@ impl Instruction {
             // Flags: Z N H C
             //        Z 0 0 0
             0xEE => Ok(Instruction::XOR(ArithmeticTarget::Immediate {
-                value: program.next_byte(),
+                value: hardware.next_byte(),
             })),
 
             0xD3 | 0xDB | 0xDD | 0xE3 | 0xE4 | 0xEB | 0xEC | 0xED | 0xF4 | 0xFC | 0xFD => {

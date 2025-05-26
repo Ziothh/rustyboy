@@ -40,7 +40,7 @@ pub struct PPU {
     ///
     ///  Since one tile has 8×8 pixels, each map holds a 256×256 pixels picture.
     ///  Only 160×144 of those pixels are displayed on the LCD at any given time.
-    pub vram: [u8; bus::regions::size(bus::regions::VRAM)],
+    pub vram: Box<[u8; bus::regions::size(bus::regions::VRAM)]>,
 
     /// # BG palette data
     ///
@@ -76,7 +76,7 @@ pub struct PPU {
     ///
     /// Object tiles have the same format as Background tiles, but may only be taken
     /// from the lower 2 tile blocks 0 and 1 (`0x8000..=0x8FFF`) using unsigned indexing
-    pub oam: [u8; bus::regions::size(bus::regions::OAM)],
+    pub oam: Box<[u8; bus::regions::size(bus::regions::OAM)]>,
 
     /// Writing to this register starts a DMA transfer from ROM or RAM to OAM
     pub oam_dma: OamDma,
@@ -90,15 +90,29 @@ pub struct PPU {
     pub obj_fifo: FIFO,
 }
 impl Default for PPU {
-    #[allow(unconditional_recursion)]
     fn default() -> Self {
         Self {
             bg_fifo: FIFO::empty(),
             obj_fifo: FIFO::empty(),
 
-            oam: [0; _],
-            vram: [0; _],
-            ..Default::default()
+            oam: Box::new([0; _]),
+            vram: Box::new([0; _]),
+
+            oam_dma: Default::default(),
+            ly: Default::default(),
+            lyc: Default::default(),
+            wy: Default::default(),
+            wx: Default::default(),
+            scy: Default::default(),
+            scx: Default::default(),
+
+            stat: LCDStat::empty(), // TODO: check if true
+            mode: PPUMode::OAMScan, // TODO: check if true
+            control: LCDControl::empty(), // TODO: check if true
+            bg_palette: Default::default(), // TODO: check if true
+            obj0_palette: Default::default(), // TODO: check if true
+            obj1_palette: Default::default(), // TODO: check if true
+
         }
     }
 }

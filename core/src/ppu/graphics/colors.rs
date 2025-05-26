@@ -58,3 +58,8 @@ impl Palette {
     }
 }
 
+impl Default for Palette {
+    fn default() -> Self {
+        Self { bits: 0 }
+    }
+}
