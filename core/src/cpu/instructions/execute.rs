@@ -1,5 +1,6 @@
 use crate::{
     cpu::memory::{Read8, Reg16, Write8},
+    utils::bit,
     GameBoy,
 };
 
@@ -42,10 +43,25 @@ impl GameBoy {
 
         let byte = self.read(source);
 
-        let has_bit = 1 << bit_idx != 0;
-        self.cpu.registers.f.zero = !has_bit;
+        self.cpu.registers.f.zero = !bit::is_set(byte, bit_idx);
         self.cpu.registers.f.subtract = false;
         self.cpu.registers.f.half_carry = true;
+
+        self.cycle();
+    }
+
+    /// SET b, s
+    ///
+    /// Flags: Z N H C
+    ///        - - - -
+    pub(super) fn set<IO: Copy>(&mut self, bit_idx: u8, io: IO) -> ()
+    where
+        Self: Read8<IO> + Write8<IO>,
+    {
+        debug_assert!(bit_idx < 8);
+
+        let byte = self.read(io);
+        self.write(io, byte & (1 << bit_idx));
 
         self.cycle();
     }
