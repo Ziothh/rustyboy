@@ -100,7 +100,7 @@ impl CPU {
             0x4A => hardware.ppu.wy,
             0x4B => hardware.ppu.wx,
 
-            0x50 => todo!("Bootrom disabled"),
+            0x50 => !(hardware.bootrom.is_active as u8), // Active low
 
             0x80..=0xFE => todo!("HRAM"),
 
@@ -144,7 +144,11 @@ impl CPU {
             0x4A => hardware.ppu.wy = byte,
             0x4B => hardware.ppu.wx = byte,
 
-            0x50 => todo!("Bootrom disabled"),
+            0x50 => {
+                if hardware.bootrom.is_active {
+                    hardware.bootrom.is_active = byte & 0b0000_0001 == 0
+                }
+            }
 
             0x80..=0xFE => todo!("HRAM"),
 
