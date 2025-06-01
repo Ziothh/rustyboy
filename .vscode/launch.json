@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'gb-emu#main'",
+            "initCommands": ["type format add -f hex u8", "type format add -f hex u16"],
+            "cargo": {
+                "args": ["build", "--bin=main", "--package=gb-emu"],
+                "filter": {
+                    "name": "main",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
