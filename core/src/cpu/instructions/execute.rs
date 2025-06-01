@@ -38,4 +38,9 @@ impl GameBoy {
 
         self.cpu.registers.write16(register, value)
     }
+
+    // --- Misc
+    pub(super) fn prefix(&mut self) {
+        self.cpu.is_opcode_prefixed = true;
+    }
 }

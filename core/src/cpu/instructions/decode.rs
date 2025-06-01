@@ -276,7 +276,7 @@ impl GameBoy {
             // 0x1B => self.dec16(DE),
             // 0x2B => self.dec16(HL),
             // 0x3B => self.dec16(SP),
-            // 0xCB => self.cb_prefix(ctx),
+            0xCB => self.prefix(),
             // 0xD3 | 0xDB | 0xDD | 0xE3 | 0xE4 | 0xEB | 0xEC | 0xED | 0xF4 | 0xFC | 0xFD => {
             //     self.undefined(ctx)
             // }
