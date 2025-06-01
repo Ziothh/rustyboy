@@ -11,7 +11,7 @@ use crate::{
 };
 
 mod memory;
-use self::memory::{Registers};
+use self::memory::Registers;
 
 mod instructions;
 pub use instructions::Instruction;
@@ -93,9 +93,42 @@ impl GameBoy {
     pub(super) fn decode_fetch_exec(&mut self) {
         let opcode = self.fetch_u8();
 
+        use std::path::PathBuf;
+        {
+            // Debug opcode being called
+            let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .parent()
+                .unwrap()
+                .join(file!())
+                .parent()
+                .unwrap()
+                .join("instructions/decode.rs")
+                .canonicalize()
+                .expect("Decode file to exist");
+
+            let contents = std::fs::read_to_string(path).unwrap();
+
+            let opcode_str = format!("{:02X} =>", opcode);
+
+            let mut lines = contents
+                .lines()
+                .filter(|line| line.find(&opcode_str).is_some())
+                .map(|x| x.trim());
+
+            let line = match self.cpu.is_opcode_prefixed {
+                false => lines.next().unwrap(),
+                true => lines.skip(1).next().unwrap(),
+            };
+
+            println!("> Executing 0x{:02X}: {line}", self.cpu.pc);
+        }
+
         match self.cpu.is_opcode_prefixed {
             false => self.execute_unprefixed(opcode),
-            true => self.execute_cb_prefixed(opcode),
+            true => {
+                self.execute_cb_prefixed(opcode);
+                self.cpu.is_opcode_prefixed = false
+            }
         }
     }
 

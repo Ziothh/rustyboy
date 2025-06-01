@@ -27,6 +27,8 @@ fn main() {
 
         cycles += 1;
 
+        println!("");
+
         // std::thread::sleep(std::time::Duration::from_millis(1000 / fps));
     }
 
