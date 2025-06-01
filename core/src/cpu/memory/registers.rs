@@ -25,6 +25,8 @@ pub struct Registers {
     pub f: FlagsRegister,
     pub h: u8,
     pub l: u8,
+    /// Stack Pointer
+    pub sp: u16,
 }
 
 impl Registers {
@@ -35,8 +37,7 @@ impl Registers {
             BC => ((self.b as u16) << 8) | (self.c as u16),
             DE => ((self.d as u16) << 8) | (self.e as u16),
             HL => ((self.h as u16) << 8) | (self.l as u16),
-            // TODO: find a way to better do this
-            SP => unreachable!(),
+            SP => self.sp,
         }
     }
 
@@ -59,7 +60,7 @@ impl Registers {
                 self.h = (value >> 8) as u8;
                 self.l = value as u8
             }
-            SP => unreachable!(),
+            SP => self.sp = value,
         }
     }
 }

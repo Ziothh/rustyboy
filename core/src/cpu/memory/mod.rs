@@ -2,7 +2,6 @@ mod registers;
 pub use registers::{Reg16, Reg8, Registers};
 
 mod stack;
-pub use stack::Stack;
 
 use super::CPU;
 use crate::{cpu, GameBoy};

@@ -281,11 +281,11 @@ impl GameBoy {
             //     self.undefined(ctx)
             // }
 
-            _ => todo!("Implement unprefixed opcode {opcode:02X}")
+            _ => todo!("Implement unprefixed opcode 0x{opcode:X}")
         }
     }
 
     pub fn execute_cb_prefixed(&mut self, opcode: u8) {
-        todo!("EXECUTE UNPREFIXED {opcode:02X}")
+        todo!("EXECUTE UNPREFIXED 0x{opcode:X}")
     }
 }

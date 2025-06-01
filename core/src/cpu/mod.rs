@@ -11,14 +11,13 @@ use crate::{
 };
 
 mod memory;
-use self::memory::{Registers, Stack};
+use self::memory::{Registers};
 
 mod instructions;
 pub use instructions::Instruction;
 
 pub struct CPU {
     pub registers: Registers,
-    pub stack: Stack,
     /// The Program Counter (PC), the index into the program
     ///
     /// On the Game Boy this is a 16-bit register on the CPU,
@@ -84,7 +83,6 @@ impl Default for CPU {
         return Self {
             pc: 0,
             is_opcode_prefixed: false,
-            stack: Default::default(),
             registers: Default::default(),
         };
     }
@@ -101,12 +99,20 @@ impl GameBoy {
         }
     }
 
+    /// TODO: unimplemented
+    fn cycle(&mut self) {
+        // TODO: emulate OAM DMA
+        // TODO: tick_cycle PPU
+        // TODO: tick_cycle timer
+        // TODO: tick_cycle APU
+    }
+
     /// Reads `[PC++]` and cycles
     fn fetch_u8(&mut self) -> u8 {
         let byte = self.read_addr(self.cpu.pc);
-        self.cpu.pc.wrapping_add(1);
+        self.cpu.pc = self.cpu.pc.wrapping_add(1);
 
-        todo!("Cycle");
+        self.cycle();
 
         return byte;
     }
