@@ -5,10 +5,23 @@ mod stack;
 pub use stack::Stack;
 
 use super::CPU;
+use crate::{cpu, GameBoy};
+
+pub trait Read8<T> {
+    fn read(&mut self, source: T) -> u8;
+}
+pub trait Write8<T> {
+    fn write(&mut self, destination: T, data: u8) -> &mut Self;
+}
 
 /// A representation of for the reading of the "immediate" memory at the `program_counter` position.
 #[derive(Debug)]
 pub struct Immediate8;
+impl Read8<Immediate8> for GameBoy {
+    fn read(&mut self, source: Immediate8) -> u8 {
+        return self.fetch_u8();
+    }
+}
 
 /// Memory address pointer variants
 #[derive(Debug)]
@@ -27,54 +40,84 @@ pub enum Address {
     HLI,
     /// The 2 bytes (nibbles) following the current Program Counter on the opcode
     /// contain the pointer to the memory address
-    Direct(u16),
-    // { 
+    ///
+    /// `u16::from_nibbles(lsb=mem[PC++], msb=mem[PC++])`
+    Immediate,
+    // {
     //     /// First byte following the Program Counter of the current opcode
-    //     lsb: u8, 
+    //     lsb: u8,
     //     /// Second byte following the Program Counter of the current opcode
-    //     msb: u8 
+    //     msb: u8
     // },
-    /// The pointer is the value of `0xFF{lsb}`
-    ZeroPage { lsb: u8 },
+    /// The pointer is the value of `0xFF{lsb=mem[PC++]}`
+    ZeroPage,
     /// The pointer is the value of `0xFF{Reg8::C.read()}`
     ZeroPageC,
 }
 
-pub trait Read8<T: Copy> {
-    fn read(&mut self, source: T) -> u8;
+impl Read8<Address> for GameBoy {
+    fn read(&mut self, source: Address) -> u8 {
+        let addr: u16 = self.addr_to_bus_addr(source);
+
+        todo!("Cycle on read");
+        // NOTE: immediate has correct cycles
+        // Others currently have have no cycles. Fetch immdiate bytes here instead while decoding
+        return self.read_addr(addr);
+    }
 }
-pub trait Write8<T: Copy> {
-    fn write(&mut self, destination: T, data: u8) -> &mut Self;
+impl Write8<Address> for GameBoy {
+    fn write(&mut self, destination: Address, data: u8) -> &mut Self {
+        let addr: u16 = self.addr_to_bus_addr(destination);
+
+        todo!("Cycle on write");
+        self.write_addr(addr, data);
+
+        return self;
+    }
+}
+impl GameBoy {
+    fn addr_to_bus_addr(&mut self, addr: Address) -> u16 {
+        return match addr {
+            Address::BC => self.cpu.registers.bc(),
+            Address::DE => self.cpu.registers.bc(),
+            Address::HL => self.cpu.registers.bc(),
+            Address::HLD => self.cpu.registers.bc(),
+            Address::HLI => self.cpu.registers.bc(),
+            Address::Immediate => u16::from_le_bytes([self.fetch_u8(), self.fetch_u8()]),
+            Address::ZeroPage => u16::from_le_bytes([self.fetch_u8(), 0xFF]),
+            Address::ZeroPageC => u16::from_be_bytes([0xFF, self.cpu.registers.c]),
+        };
+    }
 }
 
-impl Read8<Reg8> for CPU {
+impl Read8<Reg8> for GameBoy {
     fn read(&mut self, source: Reg8) -> u8 {
         use Reg8::*;
 
         match source {
-            A => self.registers.a,
-            B => self.registers.b,
-            C => self.registers.c,
-            D => self.registers.d,
-            E => self.registers.e,
-            H => self.registers.h,
-            L => self.registers.l,
+            A => self.cpu.registers.a,
+            B => self.cpu.registers.b,
+            C => self.cpu.registers.c,
+            D => self.cpu.registers.d,
+            E => self.cpu.registers.e,
+            H => self.cpu.registers.h,
+            L => self.cpu.registers.l,
         }
     }
 }
 
-impl Write8<Reg8> for CPU {
+impl Write8<Reg8> for GameBoy {
     fn write(&mut self, destination: Reg8, data: u8) -> &mut Self {
         use Reg8::*;
 
         match destination {
-            A => self.registers.a = data,
-            B => self.registers.b = data,
-            C => self.registers.c = data,
-            D => self.registers.d = data,
-            E => self.registers.e = data,
-            H => self.registers.h = data,
-            L => self.registers.l = data,
+            A => self.cpu.registers.a = data,
+            B => self.cpu.registers.b = data,
+            C => self.cpu.registers.c = data,
+            D => self.cpu.registers.d = data,
+            E => self.cpu.registers.e = data,
+            H => self.cpu.registers.h = data,
+            L => self.cpu.registers.l = data,
         };
 
         return self;

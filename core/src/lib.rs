@@ -1,5 +1,5 @@
 #![allow(dead_code)] // TODO: Dev only
-#![feature(generic_arg_infer)]
+#![feature(generic_arg_infer, stmt_expr_attributes)]
 #![allow(non_snake_case)]
 // #![feature(inherent_associated_types)] // Cool feature but rust-analyzer doesn't support autocomplete for const values with these types
 #![allow(unused, private_interfaces)] // TODO: remove
@@ -19,26 +19,26 @@ mod utils;
 
 pub struct GameBoy {
     /// Central Processing Unit
-    cpu: cpu::CPU,
-    hardware: Hardware,
+    pub cpu: cpu::CPU,
+    pub hardware: Hardware,
 }
 
 struct Hardware {
-    bootrom: Bootrom,
+    pub bootrom: Bootrom,
 
     /// External Cartridge (32KiB)
-    cartridge: cartridge::Cartridge,
+    pub cartridge: cartridge::Cartridge,
 
     /// Pixel Processing Unit
-    ppu: ppu::PPU,
+    pub ppu: ppu::PPU,
 
     // Memory
-    wram: Box<[u8; 8 * KIBI_BYTE]>,
+    pub wram: Box<[u8; 8 * KIBI_BYTE]>,
 
-    joypad: joypad::Joypad,
+    pub joypad: joypad::Joypad,
 
     /// High RAM
-    hram: [u8; memory_bus::regions::size(memory_bus::regions::HRAM)],
+    pub hram: [u8; memory_bus::regions::size(memory_bus::regions::HRAM)],
 }
 
 impl GameBoy {
@@ -75,7 +75,7 @@ impl GameBoy {
             }
         }
 
-        self.cpu.exec_fetch(&mut self.hardware);
+        self.decode_fetch_exec();
     }
 }
 

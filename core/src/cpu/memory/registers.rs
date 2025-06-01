@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 #[derive(Default)]
 pub struct Registers {
     pub a: u8,
@@ -70,6 +72,17 @@ impl Registers {
     pub fn hl(&self) -> u16 { self.read16(Reg16::HL) }
 }
 
+impl std::fmt::Display for Registers {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "A:{:02X} F:{} B:{:02X} C:{:02X} \
+            D:{:02X} E:{:02X} H:{:02X} L:{:02X}",
+            self.a, self.f, self.b, self.c, self.d, self.e, self.h, self.l
+        )
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
 #[repr(u8)]
 /// Enum of the 8 bit register names on the CPU
@@ -83,29 +96,29 @@ pub enum Reg8 {
     L,
 }
 
-impl TryFrom<u8> for Reg8 {
-    type Error = String;
-
-    fn try_from(byte: u8) -> Result<Self, Self::Error> {
-        match byte {
-            0x00 => Ok(Reg8::A),
-            0x01 => Ok(Reg8::B),
-            0x02 => Ok(Reg8::C),
-            0x03 => Ok(Reg8::D),
-            0x04 => Ok(Reg8::E),
-            0x05 => Ok(Reg8::H),
-            0x06 => Ok(Reg8::L),
-            _ => Err(format!("Byte {byte:X} is not a valid register identifier")),
-        }
-    }
-}
-impl TryFrom<&u8> for Reg8 {
-    type Error = String;
-
-    fn try_from(byte: &u8) -> Result<Self, Self::Error> {
-        Self::try_from(*byte)
-    }
-}
+// impl TryFrom<u8> for Reg8 {
+//     type Error = String;
+//
+//     fn try_from(byte: u8) -> Result<Self, Self::Error> {
+//         match byte {
+//             0x00 => Ok(Reg8::A),
+//             0x01 => Ok(Reg8::B),
+//             0x02 => Ok(Reg8::C),
+//             0x03 => Ok(Reg8::D),
+//             0x04 => Ok(Reg8::E),
+//             0x05 => Ok(Reg8::H),
+//             0x06 => Ok(Reg8::L),
+//             _ => Err(format!("Byte {byte:X} is not a valid register identifier")),
+//         }
+//     }
+// }
+// impl TryFrom<&u8> for Reg8 {
+//     type Error = String;
+//
+//     fn try_from(byte: &u8) -> Result<Self, Self::Error> {
+//         Self::try_from(*byte)
+//     }
+// }
 
 #[derive(Clone, Copy, Debug)]
 /// Enum of the virtual 16 bit register names on the CPU
@@ -137,6 +150,28 @@ pub struct FlagsRegister {
     /// upper nibble            upper nibble
     /// ```
     pub half_carry: bool,
+}
+impl Display for FlagsRegister {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let zero = match self.zero {
+            true => 'Z',
+            false => 'z',
+        };
+        let subtract = match self.subtract {
+            true => 'S',
+            false => 's',
+        };
+        let half_carry = match self.half_carry {
+            true => 'H',
+            false => 'h',
+        };
+        let carry = match self.carry {
+            true => 'C',
+            false => 'c',
+        };
+
+        write!(f, "{zero}{subtract}{half_carry}{carry}")
+    }
 }
 
 impl FlagsRegister {

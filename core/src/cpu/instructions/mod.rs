@@ -1,8 +1,9 @@
 use super::memory::{Address, Reg16, Reg8};
 
-mod decode;
+// mod decode;
 
 mod execute;
+mod decode;
 
 #[derive(Debug)]
 #[allow(non_camel_case_types)]
@@ -471,9 +472,10 @@ pub enum Instruction {
     // SWAP (swap nibbles) - switch upper and lower nibble of a specific register
 }
 
-/// NOTE
+/// # 8-bit ArithmeticTarget
 ///
-/// Immediate is only available for the following instructions:
+///
+/// NOTE: Immediate is only available for the following instructions:
 ///  - ADD & ADC
 #[derive(Debug)]
 pub enum ArithmeticTarget {
@@ -527,4 +529,6 @@ pub enum LoadTarget {
     Reg8(Reg8),
     /// Direct from/into memory address
     Address(Address),
+    /// Immediate byte at [PC++]
+    Immediate(u8),
 }

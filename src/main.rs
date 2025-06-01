@@ -17,7 +17,13 @@ fn main() {
 
     let mut gb = gb::GameBoy::new(cartridge);
 
-    gb.emulate();
+    let fps = 1;
+
+    loop {
+        gb.emulate();
+
+        std::thread::sleep(std::time::Duration::from_millis(1000 / fps));
+    }
 
     // let rom = ROM::try_new("./roms/gb/Super-Mario-Land-4.gb").expect("Failed to find rom");
     // let rom = ROM::try_new("./roms/gb/Pokemon-Red.gb").expect("Failed to find rom");
