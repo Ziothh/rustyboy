@@ -14,7 +14,7 @@ pub trait Write8<T> {
 }
 
 /// A representation of for the reading of the "immediate" memory at the `program_counter` position.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Immediate8;
 impl Read8<Immediate8> for GameBoy {
     fn read(&mut self, source: Immediate8) -> u8 {
@@ -23,7 +23,7 @@ impl Read8<Immediate8> for GameBoy {
 }
 
 /// Memory address pointer variants
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Address {
     /// BC, a combined 16-bit register, contains the pointer to the memory address
     BC,

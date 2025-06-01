@@ -30,6 +30,10 @@ impl GameBoy {
         self.cpu.registers.f.carry = false;
     }
 
+    /// BIT b, s
+    ///
+    /// Flags: Z N H C
+    ///        * 0 1 -
     pub(super) fn bit<I>(&mut self, bit_idx: u8, source: I) -> ()
     where
         Self: Read8<I>,
@@ -42,6 +46,25 @@ impl GameBoy {
         self.cpu.registers.f.zero = !has_bit;
         self.cpu.registers.f.subtract = false;
         self.cpu.registers.f.half_carry = true;
+
+        self.cycle();
+    }
+
+    /// SLA s
+    ///
+    /// Flags: Z N H C
+    ///        * 0 0 *
+    pub(super) fn sla<IO: Copy>(&mut self, io: IO) -> ()
+    where
+        Self: Read8<IO> + Write8<IO>,
+    {
+        let (data, has_overflown) = self.read(io).overflowing_shl(1);
+        self.write(io, data);
+
+        self.cpu.registers.f.zero = data == 0;
+        self.cpu.registers.f.subtract = false;
+        self.cpu.registers.f.half_carry = false;
+        self.cpu.registers.f.carry = has_overflown;
 
         self.cycle();
     }
