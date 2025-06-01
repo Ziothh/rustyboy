@@ -68,8 +68,8 @@ impl Write8<Address> for GameBoy {
     fn write(&mut self, destination: Address, data: u8) -> &mut Self {
         let addr: u16 = self.addr_to_bus_addr(destination);
 
-        todo!("Cycle on write");
         self.write_addr(addr, data);
+        self.cycle();
 
         return self;
     }
@@ -78,10 +78,18 @@ impl GameBoy {
     fn addr_to_bus_addr(&mut self, addr: Address) -> u16 {
         return match addr {
             Address::BC => self.cpu.registers.bc(),
-            Address::DE => self.cpu.registers.bc(),
-            Address::HL => self.cpu.registers.bc(),
-            Address::HLD => self.cpu.registers.bc(),
-            Address::HLI => self.cpu.registers.bc(),
+            Address::DE => self.cpu.registers.de(),
+            Address::HL => self.cpu.registers.hl(),
+            Address::HLD => {
+                let addr = self.cpu.registers.hl();
+                self.cpu.registers.write16(Reg16::HL, addr.wrapping_sub(1));
+                addr
+            },
+            Address::HLI => {
+                let addr = self.cpu.registers.hl();
+                self.cpu.registers.write16(Reg16::HL, addr.wrapping_add(1));
+                addr
+            },
             Address::Immediate => self.fetch_u16(),
             Address::ZeroPage => u16::from_le_bytes([self.fetch_u8(), 0xFF]),
             Address::ZeroPageC => u16::from_be_bytes([0xFF, self.cpu.registers.c]),
