@@ -1,3 +1,5 @@
+use crate::utils::UNDEFINED_READ;
+
 use self::graphics::{lcd, LCDControl, LCDStat, ColorID, Palette};
 use super::memory_bus as bus;
 
@@ -201,6 +203,20 @@ impl PPU {
         }
 
         self.control = new_control;
+    }
+
+    pub fn write_vram(&mut self, addr: u16, byte: u8) {
+        if self.mode == PPUMode::Drawing {
+            return;
+        }
+
+        return self.vram[addr as usize & 0x1FFF] = byte;
+    }
+    pub fn read_vram(&mut self, addr: u16) -> u8 {
+        match self.mode {
+            PPUMode::Drawing => UNDEFINED_READ,
+            _ =>self.vram[addr as usize & 0x1FFF] 
+        }
     }
 
 }

@@ -19,10 +19,15 @@ fn main() {
 
     let fps = 1;
 
+    let mut cycles = 0;
     loop {
+        println!("Cycle {cycles}");
+
         gb.emulate();
 
-        std::thread::sleep(std::time::Duration::from_millis(1000 / fps));
+        cycles += 1;
+
+        // std::thread::sleep(std::time::Duration::from_millis(1000 / fps));
     }
 
     // let rom = ROM::try_new("./roms/gb/Super-Mario-Land-4.gb").expect("Failed to find rom");

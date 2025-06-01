@@ -246,7 +246,7 @@ impl GameBoy {
             }
             0x0000..=0x3FFF => self.hardware.cartridge.bus_read_0x0000_0x3FFF(addr),
             0x4000..=0x7FFF => self.hardware.cartridge.bus_read_0x4000_0x7FFF(addr),
-            0x8000..=0x9FFF => todo!("VRAM"),
+            0x8000..=0x9FFF => self.hardware.ppu.read_vram(addr),
             0xA000..=0xBFFF => todo!("EXTERNAL RAM (ROM)"),
             0xC000..=0xCFFF => todo!("WRAM_FIXED"),
             // I won't be supporting CGB for now so prob don't need to make a distinction
@@ -257,7 +257,7 @@ impl GameBoy {
                     return UNDEFINED_READ;
                 }
 
-                return todo!("VRAM read");
+                return todo!("OAM Read");
             }
             /// https://gbdev.io/pandocs/Memory_Map.html#fea0feff-range
             0xFEA0..=0xFEFF => todo!("NOT USABLE (read comments for impl)"),
@@ -272,13 +272,13 @@ impl GameBoy {
             0x0000..=0x00FF if self.hardware.bootrom.is_active => todo!(),
             0x0000..=0x3FFF => self.hardware.cartridge.bus_write_0x0000_0x3FFF(addr, byte),
             0x4000..=0x7FFF => self.hardware.cartridge.bus_write_0x4000_0x7FFF(addr, byte),
-            0x8000..=0x9FFF => todo!("VRAM"),
+            0x8000..=0x9FFF => self.hardware.ppu.write_vram(addr, byte),
             0xA000..=0xBFFF => todo!("EXTERNAL RAM (ROM)"),
             0xC000..=0xCFFF => todo!("WRAM_FIXED"),
             // I won't be supporting CGB for now so prob don't need to make a distinction
             0xD000..=0xDFFF => todo!("WRAM_SWITCHABLE (CGB)"),
             0xE000..=0xFDFF => todo!("ECHO RAM (C000~DDFF)"),
-            0xFE00..=0xFE9F => todo!("VRAM read"),
+            0xFE00..=0xFE9F => todo!("OAM Read"),
             /// https://gbdev.io/pandocs/Memory_Map.html#fea0feff-range
             0xFEA0..=0xFEFF => todo!("NOT USABLE (read comments for impl)"),
             0xFF00..=0xFFFF => self.write_high(addr as u8, byte),
