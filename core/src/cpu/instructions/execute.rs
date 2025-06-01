@@ -30,6 +30,22 @@ impl GameBoy {
         self.cpu.registers.f.carry = false;
     }
 
+    pub(super) fn bit<I>(&mut self, bit_idx: u8, source: I) -> ()
+    where
+        Self: Read8<I>,
+    {
+        debug_assert!(bit_idx < 8);
+
+        let byte = self.read(source);
+
+        let has_bit = 1 << bit_idx != 0;
+        self.cpu.registers.f.zero = !has_bit;
+        self.cpu.registers.f.subtract = false;
+        self.cpu.registers.f.half_carry = true;
+
+        self.cycle();
+    }
+
     // --- 16-bit load
     pub(super) fn load16_imm(&mut self, register: Reg16) {
         let value = self.fetch_u16();
