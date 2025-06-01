@@ -56,8 +56,25 @@ impl GameBoy {
         }
     }
 
-    /// Machine clock tick (4 clock ticks)
-    pub fn m_clock_tick(&mut self) {
+    /// Main execution function of `GameBoy`.
+    ///
+    /// Emulates one lifetime cycle, which may result in 1 or more m_cycles
+    pub fn emulate(&mut self) {
+        let has_interupts: bool = false; // TODO
+        let ime: bool = false; // TODO
+
+        if has_interupts && ime {
+            todo!("Handle interupts");
+        }
+
+        let halted: bool = false;
+        if halted {
+            match has_interupts {
+                true => todo!("Handle interupts"),
+                false => todo!("Tick and continue halting"),
+            }
+        }
+
         self.cpu.exec_fetch(&mut self.hardware);
     }
 }

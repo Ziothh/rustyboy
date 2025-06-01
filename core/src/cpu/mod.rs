@@ -42,13 +42,14 @@ impl CPU {
         // If so: adjust this to also check if it is prefixed or not
         match self.fetch(hardware) {
             Instruction::PREFIX_INDICATION_BYTE => self.is_opcode_prefixed = true,
-            prefixed_opcode if self.is_opcode_prefixed => todo!(),
+            prefixed_opcode if self.is_opcode_prefixed => todo!("Decode prefixed opcode"),
             unprefixed_opcode => {
-                Instruction::try_from_opcode_unprefixed(unprefixed_opcode, todo!()).unwrap();
+                Instruction::try_from_opcode_unprefixed(unprefixed_opcode, hardware).unwrap();
             }
         };
     }
 
+    /// Reads `[PC++]`
     pub fn fetch(&mut self, hardware: &mut Hardware) -> u8 {
         let byte = self.read(hardware, self.pc);
         self.pc.wrapping_add(1);

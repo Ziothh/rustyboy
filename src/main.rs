@@ -17,7 +17,7 @@ fn main() {
 
     let mut gb = gb::GameBoy::new(cartridge);
 
-    gb.m_clock_tick();
+    gb.emulate();
 
     // let rom = ROM::try_new("./roms/gb/Super-Mario-Land-4.gb").expect("Failed to find rom");
     // let rom = ROM::try_new("./roms/gb/Pokemon-Red.gb").expect("Failed to find rom");
