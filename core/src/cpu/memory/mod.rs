@@ -83,7 +83,7 @@ impl GameBoy {
             Address::HL => self.cpu.registers.bc(),
             Address::HLD => self.cpu.registers.bc(),
             Address::HLI => self.cpu.registers.bc(),
-            Address::Immediate => u16::from_le_bytes([self.fetch_u8(), self.fetch_u8()]),
+            Address::Immediate => self.fetch_u16(),
             Address::ZeroPage => u16::from_le_bytes([self.fetch_u8(), 0xFF]),
             Address::ZeroPageC => u16::from_be_bytes([0xFF, self.cpu.registers.c]),
         };

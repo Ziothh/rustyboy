@@ -120,7 +120,7 @@ pub enum Reg8 {
 //     }
 // }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 /// Enum of the virtual 16 bit register names on the CPU
 pub enum Reg16 {
     BC,

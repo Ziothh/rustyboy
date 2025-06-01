@@ -12,13 +12,14 @@
 use crate::{
     cpu::{
         instructions::LoadTarget,
-        memory::{Address, Immediate8, Read8, Reg8},
+        memory::{Address, Immediate8, Reg16, Reg8},
     },
     GameBoy, Hardware,
 };
 
 impl GameBoy {
     pub fn execute_unprefixed(&mut self, opcode: u8) {
+        use Reg16::*;
         use Reg8::*;
 
         #[rustfmt::skip]
@@ -246,10 +247,10 @@ impl GameBoy {
             // 0x2F => self.cpl(ctx),
             // // --- 16-bit operations
             // // 16-bit loads
-            // 0x01 => self.load16_imm(BC),
-            // 0x11 => self.load16_imm(DE),
-            // 0x21 => self.load16_imm(HL),
-            // 0x31 => self.load16_imm(SP),
+            0x01 => self.load16_imm(BC),
+            0x11 => self.load16_imm(DE),
+            0x21 => self.load16_imm(HL),
+            0x31 => self.load16_imm(SP),
             // 0x08 => self.load16_nn_sp(ctx),
             // 0xF9 => self.load16_sp_hl(ctx),
             // 0xF8 => self.load16_hl_sp_e(ctx),
