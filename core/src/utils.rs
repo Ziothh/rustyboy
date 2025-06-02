@@ -3,6 +3,7 @@ pub mod bit {
     /// Checks if the bit at the `bit_idx` is set to 1
     ///
     /// TODO: maybe refactor this to a trait if it is needed in multiple data types
+    #[inline(always)]
     pub fn is_set(byte: u8, bit_idx: u8) -> bool {
         debug_assert!(bit_idx < 8);
 

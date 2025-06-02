@@ -3,22 +3,52 @@ pub use registers::{Reg16, Reg8, Registers};
 
 mod stack;
 
-use super::CPU;
-use crate::{cpu, GameBoy};
+use crate::{cpu::CPU, GameBoy};
 
-pub trait Read8<T> {
-    fn read(&mut self, source: T) -> u8;
+pub trait CpuRead<T, O> {
+    fn read(&mut self, source: T) -> O;
 }
-pub trait Write8<T> {
-    fn write(&mut self, destination: T, data: u8) -> &mut Self;
+pub trait CpuWrite<T, I> {
+    fn write(&mut self, destination: T, data: I) -> &mut Self;
 }
 
 /// A representation of for the reading of the "immediate" memory at the `program_counter` position.
 #[derive(Debug, Clone, Copy)]
-pub struct Immediate8;
-impl Read8<Immediate8> for GameBoy {
-    fn read(&mut self, source: Immediate8) -> u8 {
+pub struct Immediate<T>(std::marker::PhantomData<T>);
+#[allow(non_upper_case_globals)]
+impl Immediate<()> {
+    /// # Immediate at `[PC++]`;
+    /// Read/write takes 1 m_cyle
+    pub const u8: Immediate<u8> = Immediate(std::marker::PhantomData::<u8>);
+    /// # Immediate at `u16::from_le_bytes(lsb: [PC++], msb: [PC++])`;
+    /// Read takes 2_cycles
+    /// Write takes 4 cycles (2 read, 2 write)
+    ///
+    /// NOTE: currently only used for `LD (nn) SP`,
+    /// maybe this should be removed and we should `impl CpuRead<Address, u16> for GameBoy {}`
+    pub const u16: Immediate<u16> = Immediate(std::marker::PhantomData::<u16>);
+}
+
+impl CpuRead<Immediate<u8>, u8> for GameBoy {
+    fn read(&mut self, source: Immediate<u8>) -> u8 {
         return self.fetch_u8();
+    }
+}
+
+impl CpuRead<Immediate<u16>, u16> for GameBoy {
+    fn read(&mut self, source: Immediate<u16>) -> u16 {
+        return self.fetch_u16();
+    }
+}
+impl CpuWrite<Immediate<u16>, u16> for GameBoy {
+    fn write(&mut self, destination: Immediate<u16>, data: u16) -> &mut Self {
+        let addr = self.fetch_u16();
+
+        let [lsb, msb] = data.to_le_bytes();
+        self.write_addr(addr, lsb);
+        self.write_addr(addr.wrapping_add(1), msb);
+
+        return self;
     }
 }
 
@@ -54,7 +84,7 @@ pub enum Address {
     ZeroPageC,
 }
 
-impl Read8<Address> for GameBoy {
+impl CpuRead<Address, u8> for GameBoy {
     fn read(&mut self, source: Address) -> u8 {
         let addr: u16 = self.addr_to_bus_addr(source);
 
@@ -64,7 +94,7 @@ impl Read8<Address> for GameBoy {
         return self.read_addr(addr);
     }
 }
-impl Write8<Address> for GameBoy {
+impl CpuWrite<Address, u8> for GameBoy {
     fn write(&mut self, destination: Address, data: u8) -> &mut Self {
         let addr: u16 = self.addr_to_bus_addr(destination);
 
@@ -84,12 +114,12 @@ impl GameBoy {
                 let addr = self.cpu.registers.hl();
                 self.cpu.registers.write16(Reg16::HL, addr.wrapping_sub(1));
                 addr
-            },
+            }
             Address::HLI => {
                 let addr = self.cpu.registers.hl();
                 self.cpu.registers.write16(Reg16::HL, addr.wrapping_add(1));
                 addr
-            },
+            }
             Address::Immediate => self.fetch_u16(),
             Address::ZeroPage => u16::from_le_bytes([self.fetch_u8(), 0xFF]),
             Address::ZeroPageC => u16::from_be_bytes([0xFF, self.cpu.registers.c]),
@@ -97,7 +127,7 @@ impl GameBoy {
     }
 }
 
-impl Read8<Reg8> for GameBoy {
+impl CpuRead<Reg8, u8> for GameBoy {
     fn read(&mut self, source: Reg8) -> u8 {
         use Reg8::*;
 
@@ -113,7 +143,7 @@ impl Read8<Reg8> for GameBoy {
     }
 }
 
-impl Write8<Reg8> for GameBoy {
+impl CpuWrite<Reg8, u8> for GameBoy {
     fn write(&mut self, destination: Reg8, data: u8) -> &mut Self {
         use Reg8::*;
 
@@ -126,6 +156,25 @@ impl Write8<Reg8> for GameBoy {
             H => self.cpu.registers.h = data,
             L => self.cpu.registers.l = data,
         };
+
+        return self;
+    }
+}
+
+impl CpuRead<Reg16, u16> for GameBoy {
+    fn read(&mut self, source: Reg16) -> u16 {
+        return self.cpu.registers.read16(source);
+    }
+}
+
+impl CpuWrite<Reg16, u16> for GameBoy {
+    fn write(&mut self, destination: Reg16, data: u16) -> &mut Self {
+        debug_assert!(
+            destination != Reg16::AF,
+            "{destination:?} Does not support load"
+        );
+
+        self.cpu.registers.write16(destination, data);
 
         return self;
     }

@@ -1,14 +1,14 @@
 use crate::{
-    cpu::memory::{Read8, Reg16, Write8},
+    cpu::memory::{CpuRead, CpuWrite, Reg16},
     utils::bit,
     GameBoy,
 };
 
 impl GameBoy {
-    // --- 8-bit load
+    // --- 8-bit & 16-bit load
     pub(super) fn load<O, I>(&mut self, destination: O, source: I) -> ()
     where
-        Self: Write8<O> + Read8<I>,
+        Self: CpuWrite<O, u8> + CpuRead<I, u8>,
     {
         let data = self.read(source);
         self.write(destination, data);
@@ -21,7 +21,7 @@ impl GameBoy {
     ///        * 0 0 0
     pub(super) fn xor<I>(&mut self, source: I) -> ()
     where
-        Self: Read8<I>,
+        Self: CpuRead<I, u8>,
     {
         let data = self.read(source);
         self.cpu.registers.a ^= data;
@@ -37,7 +37,7 @@ impl GameBoy {
     ///        * 0 1 -
     pub(super) fn bit<I>(&mut self, bit_idx: u8, source: I) -> ()
     where
-        Self: Read8<I>,
+        Self: CpuRead<I, u8>,
     {
         debug_assert!(bit_idx < 8);
 
@@ -56,7 +56,7 @@ impl GameBoy {
     ///        - - - -
     pub(super) fn set<IO: Copy>(&mut self, bit_idx: u8, io: IO) -> ()
     where
-        Self: Read8<IO> + Write8<IO>,
+        Self: CpuRead<IO, u8> + CpuWrite<IO, u8>,
     {
         debug_assert!(bit_idx < 8);
 
@@ -72,7 +72,7 @@ impl GameBoy {
     ///        * 0 0 *
     pub(super) fn sla<IO: Copy>(&mut self, io: IO) -> ()
     where
-        Self: Read8<IO> + Write8<IO>,
+        Self: CpuRead<IO, u8> + CpuWrite<IO, u8>,
     {
         let (data, has_overflown) = self.read(io).overflowing_shl(1);
         self.write(io, data);
@@ -85,17 +85,54 @@ impl GameBoy {
         self.cycle();
     }
 
+
     // --- 16-bit load
-    pub(super) fn load16_imm(&mut self, register: Reg16) {
-        let value = self.fetch_u16();
+    pub(super) fn load16<O, I>(&mut self, destination: O, source: I) -> ()
+    where
+        Self: CpuWrite<O, u16> + CpuRead<I, u16>,
+    {
+        let data = self.read(source);
+        self.write(destination, data);
+    }
+    pub(super) fn load16_hl_sp_e(&mut self) {
+        let e = self.fetch_i8();
+        let e_abs = e.abs() as u16;
 
-        debug_assert!(register != Reg16::AF, "AF Does not support load");
-
-        self.cpu.registers.write16(register, value)
+        let (data, has_overflown) = match e.is_positive() {
+            true => self.cpu.pc.overflowing_add(e_abs),
+            false => self.cpu.pc.overflowing_sub(e_abs),
+        };
+        self.write(Reg16::HL, data);
+        self.cpu.registers.f.zero = false;
+        self.cpu.registers.f.subtract = false;
+        self.cpu.registers.f.half_carry = u16_test_addition_bit_carry(3, self.cpu.pc, e_abs);
+        self.cpu.registers.f.carry = u16_test_addition_bit_carry(7, self.cpu.pc, e_abs);
     }
 
     // --- Misc
     pub(super) fn prefix(&mut self) {
         self.cpu.is_opcode_prefixed = true;
     }
+}
+
+/// Tests if addition results in a carry from the specified bit.
+/// Does not support overflow, so cannot be used to check carry from the leftmost bit
+#[inline(always)]
+fn u16_test_addition_bit_carry(bit_idx: u16, a: u16, b: u16) -> bool {
+    debug_assert!(bit_idx < u16::BITS as u16, "Last bit can not be checked");
+
+    let mask: u16 = 1 << bit_idx;
+
+    // Sets all rightmost 0-bits to 1
+    // e.g. 1010 1000 -> 1010 1111
+    //
+    // Equivalent to Intel BMI1 instruction BLSMSK
+    //
+    // Examples
+    //   bit=0 -> 0000 0001
+    //   bit=3 -> 0000 1111
+    //   bit=6 -> 0111 1111
+    let mask = mask | mask.wrapping_sub(1);
+
+    (a & mask) + (b & mask) > mask
 }

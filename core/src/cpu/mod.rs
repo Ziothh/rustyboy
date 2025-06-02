@@ -269,6 +269,7 @@ impl GameBoy {
         return;
     }
 
+    /// Read from the address bus
     /// NOTE(Louis): should not cause m_cycles.
     fn read_addr(&mut self, addr: u16) -> u8 {
         use crate::memory_bus::regions;
@@ -298,6 +299,7 @@ impl GameBoy {
         }
     }
 
+    /// Write to the address bus
     fn write_addr(&mut self, addr: u16, byte: u8) {
         use crate::memory_bus::regions;
 
