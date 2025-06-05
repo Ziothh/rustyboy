@@ -86,8 +86,12 @@ impl GameBoy {
         self.cycle();
     }
 
-
     // --- 16-bit load
+    /// LD dd, nn
+    /// LD (nn), SP
+    ///
+    /// Flags: Z N H C
+    ///        - - - -
     pub(super) fn load16<O, I>(&mut self, destination: O, source: I) -> ()
     where
         Self: CpuWrite<O, u16> + CpuRead<I, u16>,
@@ -95,15 +99,20 @@ impl GameBoy {
         let data = self.read(source);
         self.write(destination, data);
     }
+
+    /// LD HL, SP+e
+    ///
+    /// Flags: Z N H C
+    ///        - - * *
     pub(super) fn load16_hl_sp_e(&mut self) {
         let e = self.fetch_i8();
         let e_abs = e.abs() as u16;
 
-        let (data, has_overflown) = match e.is_positive() {
-            true => self.cpu.pc.overflowing_add(e_abs),
-            false => self.cpu.pc.overflowing_sub(e_abs),
-        };
-        self.write(Reg16::HL, data);
+        // TODO: Not sure this is correct
+        let data = u16_add_i8(self.cpu.pc, e);
+
+        // TODO: Not sure this is correct
+        self.cpu.registers.write16(Reg16::HL, data);
         self.cpu.registers.f.zero = false;
         self.cpu.registers.f.subtract = false;
         self.cpu.registers.f.half_carry = u16_test_addition_bit_carry(3, self.cpu.pc, e_abs);
