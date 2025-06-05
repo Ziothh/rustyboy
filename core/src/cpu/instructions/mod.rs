@@ -510,8 +510,6 @@ pub enum JumpCondition {
     NotCarry,
     /// Jump if the C(arry) flag is set to `1`
     Carry,
-    /// Always jump
-    Always,
 }
 
 #[derive(Debug)]

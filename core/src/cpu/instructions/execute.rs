@@ -1,3 +1,4 @@
+use super::JumpCondition;
 use crate::{
     cpu::memory::{CpuRead, CpuWrite, Reg16},
     utils::bit,
@@ -109,6 +110,34 @@ impl GameBoy {
         self.cpu.registers.f.carry = u16_test_addition_bit_carry(7, self.cpu.pc, e_abs);
     }
 
+    // --- Control flow
+    /// JR e
+    ///
+    /// Flags: Z N H C
+    ///        - - - -
+    pub(super) fn jr(&mut self) {
+        let offset = self.fetch_i8();
+        dbg!(offset);
+        self.cpu.pc = u16_add_i8(self.cpu.pc, offset);
+    }
+
+    /// JR cc, e
+    ///
+    /// Flags: Z N H C
+    ///        - - - -
+    pub(super) fn jr_cc(&mut self, condition: JumpCondition) {
+        if !match condition {
+            JumpCondition::NotZero => !self.cpu.registers.f.zero,
+            JumpCondition::Zero => self.cpu.registers.f.zero,
+            JumpCondition::NotCarry => !self.cpu.registers.f.carry,
+            JumpCondition::Carry => self.cpu.registers.f.carry,
+        } {
+            return;
+        }
+
+        self.jr();
+    }
+
     // --- Misc
     pub(super) fn prefix(&mut self) {
         self.cpu.is_opcode_prefixed = true;
@@ -135,4 +164,15 @@ fn u16_test_addition_bit_carry(bit_idx: u16, a: u16, b: u16) -> bool {
     let mask = mask | mask.wrapping_sub(1);
 
     (a & mask) + (b & mask) > mask
+}
+
+fn u16_add_i8(addr: u16, offset: i8) -> u16 {
+    let abs_offset = offset.abs() as u16;
+
+    match offset.signum() {
+        1 => addr.wrapping_add(abs_offset),
+        -1 => addr.wrapping_sub(abs_offset),
+        0 => addr,
+        _ => unreachable!(),
+    }
 }
