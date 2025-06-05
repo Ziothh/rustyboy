@@ -1,34 +1,40 @@
+SECTION "Bootrom", ROM0[0]
+; Initialize SP
 00000000: 31  1 LD SP n16
 00000001: fe  . > imm lsb
 00000002: ff  . > imm msb
+; Clear VRAM
 00000003: 21  ! LD HL n16
 00000004: ff  . > imm lsb
 00000005: 9f  . > imm msb
+.ClearVRAM
 00000006: af  . XOR A
 00000007: 32  2 LD [HL-] A
 00000008: cb  . PREFIX
 00000009: 7c  | BIT 7 A
-0000000a: 20    JR nz
-0000000b: fa  .
-0000000c: 0e  .
-0000000d: 11  .
-0000000e: 21  !
-0000000f: 26  &
-00000010: ff  .
-00000011: 3e  >
-00000012: 80  .
-00000013: 32  2
-00000014: e2  .
-00000015: 0c  .
-00000016: 3e  >
-00000017: f3  .
-00000018: 32  2
-00000019: e2  .
-0000001a: 0c  .
-0000001b: 3e  >
-0000001c: 77  w
-0000001d: 32  2
-0000001e: e2  .
+0000000a: 20    JR nz, ClearVRAM
+0000000b: fa  . > e
+; Initialize Audio
+0000000c: 0e  . LD C 0x11
+0000000d: 11  . > imm 0x11
+0000000e: 21  ! LD HL zAUDENA=0xFF26
+0000000f: 26  & > imm lsb
+00000010: ff  . > imm msb
+00000011: 3e  > LD A AUDENA_ON=0x80
+00000012: 80  . > imm 0x80
+00000013: 32  2 LD [HL-], A
+00000014: e2  . LD [0xFF00+C], A
+00000015: 0c  . INC C
+00000016: 3e  > LD A 0xF3
+00000017: f3  . > imm 0xF3
+00000018: 32  2 LD [HL-] A
+00000019: e2  . LDH [0xFF00+C] A
+0000001a: 0c  . INC C
+0000001b: 3e  > LD A 0x77
+0000001c: 77  w > imm 0x77
+0000001d: 32  2 LD [HL-] A
+0000001e: e2  . LDH [0xFF00+C] A
+; Decode logo and load into VRAM
 0000001f: 11  .
 00000020: 04  .
 00000021: 01  .
